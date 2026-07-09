@@ -23,6 +23,17 @@ class Command(BaseCommand):
             }
         )
 
+        # 1.5 Create a Dummy User for the Tokens
+        dummy_user, _ = User.objects.get_or_create(
+            email='patient@example.com',
+            defaults={
+                'first_name': 'John',
+                'last_name': 'Doe',
+                'role': 'PATIENT'
+            }
+        )
+
+
         # 2. Create Departments
         opd, _ = Department.objects.get_or_create(
             code='OPD', branch=branch,
@@ -60,6 +71,9 @@ class Command(BaseCommand):
                     service = random.choice(services)
                     token = QueueToken.objects.create(
                         service=service,
+                        branch=branch,
+                        user=dummy_user,
+                        queue_date=day.date(),
                         token_number=f"{service.prefix}-{j+1:03d}",
                         status='COMPLETED' if i > 0 else random.choice(['WAITING', 'SERVING', 'COMPLETED'])
                     )
