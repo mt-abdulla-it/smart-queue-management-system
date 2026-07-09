@@ -1,0 +1,128 @@
+/* =============================================================================
+   Smart Queue Management System — Dark Mode Theme
+   Toggled via data-bs-theme="dark" on <html> element.
+   ============================================================================= */
+
+[data-bs-theme="dark"] {
+    /* Override CSS custom properties for dark mode */
+    --bg-body: #0f172a;
+    --bg-card: #1e293b;
+    --bg-sidebar: #0a0f1c;
+    --bg-sidebar-hover: #151d30;
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --border-color: #334155;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+[data-bs-theme="dark"] body {
+    background-color: var(--bg-body);
+    color: var(--text-primary);
+}
+
+[data-bs-theme="dark"] .top-navbar {
+    background: var(--bg-card);
+    border-bottom-color: var(--border-color);
+}
+
+[data-bs-theme="dark"] .card {
+    background: var(--bg-card);
+    border-color: var(--border-color);
+}
+
+[data-bs-theme="dark"] .card-header {
+    border-bottom-color: var(--border-color);
+}
+
+[data-bs-theme="dark"] .stat-card {
+    background: var(--bg-card);
+}
+
+[data-bs-theme="dark"] .app-footer {
+    background: var(--bg-card);
+    border-top-color: var(--border-color);
+}
+
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .form-select {
+    background-color: #0f172a;
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-bs-theme="dark"] .table {
+    color: var(--text-primary);
+}
+
+[data-bs-theme="dark"] .table thead th {
+    border-bottom-color: var(--border-color);
+    color: var(--text-secondary);
+}
+
+[data-bs-theme="dark"] .table tbody td {
+    border-bottom-color: var(--border-color);
+}
+
+[data-bs-theme="dark"] .table tbody tr:hover {
+    background-color: rgba(var(--primary-rgb), 0.08);
+}
+
+[data-bs-theme="dark"] .search-box .input-group {
+    background: #0f172a;
+}
+
+[data-bs-theme="dark"] .dropdown-menu {
+    background: var(--bg-card);
+    border-color: var(--border-color);
+}
+
+[data-bs-theme="dark"] .dropdown-item {
+    color: var(--text-primary);
+}
+
+[data-bs-theme="dark"] .dropdown-item:hover {
+    background: #0f172a;
+}
+
+[data-bs-theme="dark"] .feature-card {
+    background: var(--bg-card);
+}
+
+[data-bs-theme="dark"] .bg-light {
+    background-color: #0a0f1c !important;
+}
+
+[data-bs-theme="dark"] .alert {
+    border-color: var(--border-color);
+}
+
+/* Dark mode scrollbar */
+[data-bs-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: #475569;
+}
+
+[data-bs-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
+/* DataTables dark mode */
+[data-bs-theme="dark"] .dataTables_wrapper .dataTables_filter input,
+[data-bs-theme="dark"] .dataTables_wrapper .dataTables_length select {
+    background-color: #0f172a;
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-bs-theme="dark"] .page-link {
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-bs-theme="dark"] .page-item.active .page-link {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}

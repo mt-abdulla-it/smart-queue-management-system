@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ site_name }} — Smart Queue Management{% endblock %}
+
+{% block public_content %}
+<!-- ========== Hero Section ========== -->
+<section class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="container position-relative">
+        <div class="row align-items-center min-vh-100">
+            <div class="col-lg-6">
+                <div class="hero-content">
+                    <span class="badge bg-primary bg-opacity-25 text-primary px-3 py-2 mb-3 animate-fade-in">
+                        <i class="fas fa-hospital me-1"></i> For Hospitals & Government Offices
+                    </span>
+                    <h1 class="display-4 fw-bold mb-3 animate-fade-in-up">
+                        Smart Queue<br>
+                        <span class="text-gradient">Management System</span>
+                    </h1>
+                    <p class="lead text-muted mb-4 animate-fade-in-up" style="animation-delay: 0.2s">
+                        Eliminate long waiting lines in Sri Lankan hospitals and government offices.
+                        Book your queue online, track your position in real-time, and get notified when it's your turn.
+                    </p>
+                    <div class="d-flex gap-3 animate-fade-in-up" style="animation-delay: 0.4s">
+                        <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg px-4">
+                            <i class="fas fa-user-plus me-2"></i>Get Started
+                        </a>
+                        <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-lg px-4">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 d-none d-lg-block">
+                <div class="hero-illustration animate-float">
+                    <div class="queue-card-preview">
+                        <div class="preview-header">
+                            <i class="fas fa-hospital-user me-2"></i>Your Queue Token
+                        </div>
+                        <div class="preview-body">
+                            <div class="token-number">A-042</div>
+                            <div class="token-service">General OPD</div>
+                            <div class="token-status">
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fas fa-clock me-1"></i>Position: 3
+                                </span>
+                            </div>
+                            <div class="token-wait mt-2">
+                                <i class="fas fa-hourglass-half me-1"></i>Est. Wait: 15 min
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== Features Section ========== -->
+<section class="py-5 bg-light" id="features">
+    <div class="container py-5">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Why Choose Smart Queue?</h2>
+            <p class="text-muted">Solving real queue problems in Sri Lanka</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card text-center p-4">
+                    <div class="feature-icon bg-primary bg-opacity-10 text-primary">
+                        <i class="fas fa-mobile-alt fa-2x"></i>
+                    </div>
+                    <h5 class="mt-3">Online Booking</h5>
+                    <p class="text-muted">Book your queue token from anywhere using your phone or computer. No need to wait in physical lines.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card text-center p-4">
+                    <div class="feature-icon bg-success bg-opacity-10 text-success">
+                        <i class="fas fa-broadcast-tower fa-2x"></i>
+                    </div>
+                    <h5 class="mt-3">Real-Time Tracking</h5>
+                    <p class="text-muted">Track your queue position in real-time with WebSocket technology. Know exactly when it's your turn.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card text-center p-4">
+                    <div class="feature-icon bg-warning bg-opacity-10 text-warning">
+                        <i class="fas fa-qrcode fa-2x"></i>
+                    </div>
+                    <h5 class="mt-3">QR Code Token</h5>
+                    <p class="text-muted">Get a QR code token that can be scanned at the service counter. Download as PDF for offline use.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card text-center p-4">
+                    <div class="feature-icon bg-info bg-opacity-10 text-info">
+                        <i class="fas fa-bell fa-2x"></i>
+                    </div>
+                    <h5 class="mt-3">Smart Notifications</h5>
+                    <p class="text-muted">Receive email and SMS alerts when your turn is approaching. Never miss your queue number.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card text-center p-4">
+                    <div class="feature-icon bg-danger bg-opacity-10 text-danger">
+                        <i class="fas fa-chart-line fa-2x"></i>
+                    </div>
+                    <h5 class="mt-3">Analytics Dashboard</h5>
+                    <p class="text-muted">Comprehensive analytics and reports for administrators to optimize service delivery.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card text-center p-4">
+                    <div class="feature-icon bg-secondary bg-opacity-10 text-secondary">
+                        <i class="fas fa-tv fa-2x"></i>
+                    </div>
+                    <h5 class="mt-3">Live Display</h5>
+                    <p class="text-muted">Display live queue status on TV screens and kiosks in waiting areas for walk-in patients.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== CTA Section ========== -->
+<section class="cta-section py-5">
+    <div class="container text-center py-5">
+        <h2 class="fw-bold text-white mb-3">Ready to skip the queue?</h2>
+        <p class="text-white-50 mb-4">Join thousands of Sri Lankans who are already using Smart Queue.</p>
+        <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg px-5">
+            <i class="fas fa-rocket me-2"></i>Register Now — It's Free
+        </a>
+    </div>
+</section>
+
+<!-- ========== Landing Page Footer ========== -->
+<footer class="py-4 bg-dark text-center">
+    <p class="mb-0 text-muted">
+        &copy; {{ current_year }} {{ site_name }}. All Rights Reserved.
+        <br><small>A Final Year Project — Solving Real Problems in Sri Lanka</small>
+    </p>
+</footer>
+{% endblock %}

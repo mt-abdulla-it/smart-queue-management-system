@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — {{ site_name }}{% endblock %}
+{% block content %}
+<!-- Fallback template — user should be redirected to role-specific dashboard -->
+<div class="container-fluid py-4">
+    <h4>Welcome to {{ site_name }}</h4>
+    <p>Loading your dashboard...</p>
+</div>
+{% endblock %}

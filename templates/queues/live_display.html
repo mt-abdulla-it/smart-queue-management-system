@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}Live Queue Display — {{ site_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* TV Display specific styling */
+    body { background-color: #0f172a; color: white; }
+    .top-navbar, .sidebar, .app-footer, .sidebar-toggle { display: none !important; }
+    .main-content { margin-left: 0 !important; padding: 20px; }
+    
+    .serving-card {
+        background: linear-gradient(135deg, #1e293b, #0f172a);
+        border: 2px solid #3b82f6;
+        box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+    }
+    
+    .blink {
+        animation: blinker 1.5s linear infinite;
+    }
+    @keyframes blinker {
+        50% { opacity: 0; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid h-100">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-5 border-bottom border-secondary pb-3">
+        <div class="d-flex align-items-center gap-3">
+            <div class="brand-icon" style="width: 60px; height: 60px; font-size: 2rem;">
+                <i class="fas fa-hospital-user text-white"></i>
+            </div>
+            <div>
+                <h2 class="mb-0 fw-bold">{{ site_name }}</h2>
+                <h4 class="text-info mb-0">Live Queue Status</h4>
+            </div>
+        </div>
+        <div class="text-end">
+            <h3 class="mb-0" id="clock">--:--:--</h3>
+            <p class="text-secondary mb-0" id="date">Loading date...</p>
+        </div>
+    </div>
+
+    <div class="row g-5">
+        <!-- Now Serving (Left Side) -->
+        <div class="col-lg-7">
+            <h2 class="text-warning mb-4"><i class="fas fa-bullhorn me-2"></i>NOW SERVING</h2>
+            
+            <div id="nowServingContainer">
+                <div class="card serving-card rounded-4 p-5 mb-4 text-center">
+                    <h1 class="display-1 fw-bold text-white mb-2" id="servingToken">--</h1>
+                    <h3 class="text-info" id="servingService">Waiting for next token...</h3>
+                    <div class="mt-4">
+                        <span class="badge bg-danger fs-4 px-4 py-2 blink d-none" id="proceedBadge">PLEASE PROCEED TO COUNTER</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Audio for bell chime -->
+            <audio id="bellSound" preload="auto">
+                <!-- Using a placeholder data URI for a tiny beep, in production use a real MP3/WAV file -->
+                <source src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU" type="audio/wav">
+            </audio>
+        </div>
+
+        <!-- Waiting List (Right Side) -->
+        <div class="col-lg-5">
+            <h3 class="text-secondary mb-4"><i class="fas fa-users me-2"></i>UPCOMING</h3>
+            
+            <div class="card bg-dark border-secondary rounded-4">
+                <div class="card-body p-0">
+                    <table class="table table-dark table-striped table-borderless mb-0 fs-4">
+                        <thead>
+                            <tr class="text-secondary border-bottom border-secondary">
+                                <th class="py-3 px-4">Token</th>
+                                <th class="py-3 px-4">Service</th>
+                            </tr>
+                        </thead>
+                        <tbody id="waitingListBody">
+                            <!-- Populated via WS/AJAX -->
+                            <tr><td colspan="2" class="text-center py-4 text-muted">Waiting for data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Live Clock
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('clock').textContent = now.toLocaleTimeString();
+        document.getElementById('date').textContent = now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Setup WebSocket
+    const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+    const wsUrl = protocol + window.location.host + '/ws/queues/live/';
+    
+    let queueSocket;
+    
+    function connectWebSocket() {
+        queueSocket = new WebSocket(wsUrl);
+
+        queueSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            
+            if (data.type === 'queue_update') {
+                if (data.status === 'SERVING') {
+                    // Update Now Serving card
+                    document.getElementById('servingToken').textContent = data.token_number;
+                    document.getElementById('servingService').textContent = data.service;
+                    
+                    const badge = document.getElementById('proceedBadge');
+                    badge.classList.remove('d-none');
+                    
+                    // Play sound
+                    const bell = document.getElementById('bellSound');
+                    bell.play().catch(e => console.log("Audio play blocked by browser policy"));
+                    
+                    setTimeout(() => {
+                        badge.classList.add('d-none');
+                    }, 10000); // Hide blink after 10s
+                }
+                
+                // Trigger an AJAX reload of the waiting list
+                reloadWaitingList();
+            }
+        };
+
+        queueSocket.onclose = function(e) {
+            console.error('WebSocket closed unexpectedly. Reconnecting in 3s...');
+            setTimeout(connectWebSocket, 3000);
+        };
+    }
+    
+    connectWebSocket();
+    
+    function reloadWaitingList() {
+        // In a full implementation, we'd fetch the latest 5 waiting tokens via an API endpoint.
+        // For Phase 6, we demonstrate the WebSocket connection receiving the trigger.
+        console.log("WebSocket triggered waiting list reload.");
+    }
+</script>
+{% endblock %}

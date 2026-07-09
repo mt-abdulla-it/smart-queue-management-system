@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Queue Management — {{ site_name }}{% endblock %}
+{% block page_header %}Queue Management Panel{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row g-4">
+        <!-- Now Serving -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm border-top border-info border-3 h-100">
+                <div class="card-header bg-transparent border-0 pt-4">
+                    <h5 class="fw-bold mb-0"><i class="fas fa-bullhorn text-info me-2"></i>Now Serving</h5>
+                </div>
+                <div class="card-body">
+                    {% for token in serving_tokens %}
+                    <div class="p-3 border rounded-3 mb-3 bg-light">
+                        <h2 class="fw-bold text-center text-primary mb-2">{{ token.token_number }}</h2>
+                        <p class="text-center text-muted mb-3">{{ token.service.name }}</p>
+                        <div class="d-grid gap-2">
+                            <form method="post" action="{% url 'queues:change_status' token.pk 'complete' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success w-100"><i class="fas fa-check me-2"></i>Mark Completed</button>
+                            </form>
+                            <form method="post" action="{% url 'queues:change_status' token.pk 'hold' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-warning w-100"><i class="fas fa-pause me-2"></i>Put on Hold</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-5 text-muted">
+                        <i class="fas fa-coffee fa-3x mb-3 opacity-25"></i>
+                        <p>No tokens currently being served.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Waiting List -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm border-top border-warning border-3 h-100">
+                <div class="card-header bg-transparent border-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0"><i class="fas fa-users text-warning me-2"></i>Waiting List</h5>
+                    <span class="badge bg-warning text-dark">{{ waiting_tokens.count }} Waiting</span>
+                </div>
+                <div class="card-body p-0 mt-3">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">Token</th>
+                                    <th>Service</th>
+                                    <th>Wait Time</th>
+                                    <th class="text-end pe-4">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for token in waiting_tokens %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <span class="fw-bold text-dark fs-5">{{ token.token_number }}</span>
+                                    </td>
+                                    <td>{{ token.service.name }}</td>
+                                    <td>{{ token.created_at|timesince }} ago</td>
+                                    <td class="text-end pe-4">
+                                        <div class="btn-group">
+                                            <form method="post" action="{% url 'queues:change_status' token.pk 'call' %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-primary" title="Call Next">
+                                                    <i class="fas fa-bullhorn"></i> Call
+                                                </button>
+                                            </form>
+                                            <form method="post" action="{% url 'queues:change_status' token.pk 'skip' %}" class="d-inline ms-1">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Skip">
+                                                    <i class="fas fa-step-forward"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-5 text-muted">
+                                        The queue is empty.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

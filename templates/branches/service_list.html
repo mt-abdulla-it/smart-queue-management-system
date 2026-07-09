@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Services — {{ site_name }}{% endblock %}
+{% block page_header %}Manage Services{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="fw-bold mb-0">Service List</h5>
+        <div>
+            <a href="{% url 'branches:branch_list' %}" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-arrow-left me-1"></i> Back to Branches
+            </a>
+            <a href="{% url 'branches:service_add' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i> Add Service
+            </a>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover data-table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Department</th>
+                            <th>Service Name</th>
+                            <th>Prefix</th>
+                            <th>Est. Time (min)</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for service in services %}
+                        <tr>
+                            <td><span class="text-muted">{{ service.department.branch.name }}</span> <br> <strong>{{ service.department.name }}</strong></td>
+                            <td class="fw-semibold">{{ service.name }}</td>
+                            <td><span class="badge bg-primary fs-6">{{ service.token_prefix }}</span></td>
+                            <td>{{ service.estimated_time_mins }}</td>
+                            <td>
+                                {% if service.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <a href="{% url 'branches:service_edit' service.pk %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">No services found.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

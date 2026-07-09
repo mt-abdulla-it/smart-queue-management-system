@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Token {{ token.token_number }} — {{ site_name }}{% endblock %}
+{% block page_header %}Token Details{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-lg text-center overflow-hidden">
+                <div class="card-header bg-gradient-primary text-white border-0 py-3">
+                    <h5 class="mb-0">Smart Queue Token</h5>
+                </div>
+                
+                <div class="card-body p-4 p-md-5">
+                    <h1 class="display-3 fw-bold text-primary mb-3">{{ token.token_number }}</h1>
+                    
+                    <div class="mb-4">
+                        {% if token.status == 'WAITING' %}
+                            <span class="badge bg-warning text-dark fs-5 px-4 py-2 rounded-pill">
+                                <i class="fas fa-clock me-2"></i>WAITING
+                            </span>
+                        {% elif token.status == 'SERVING' %}
+                            <span class="badge bg-info fs-5 px-4 py-2 rounded-pill animate-pulse">
+                                <i class="fas fa-bullhorn me-2"></i>PLEASE PROCEED TO COUNTER
+                            </span>
+                        {% elif token.status == 'COMPLETED' %}
+                            <span class="badge bg-success fs-5 px-4 py-2 rounded-pill">
+                                <i class="fas fa-check-circle me-2"></i>COMPLETED
+                            </span>
+                        {% else %}
+                            <span class="badge bg-secondary fs-5 px-4 py-2 rounded-pill">{{ token.status }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    {% if token.status == 'WAITING' %}
+                    <div class="row g-2 mb-4">
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded-3">
+                                <p class="text-muted mb-1 small text-uppercase fw-bold">Position</p>
+                                <h3 class="mb-0 text-dark">{{ position }}</h3>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 bg-light rounded-3">
+                                <p class="text-muted mb-1 small text-uppercase fw-bold">Est. Wait</p>
+                                <h3 class="mb-0 text-dark">~{{ estimated_wait }}<span class="fs-6 text-muted ms-1">min</span></h3>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="text-start bg-light p-3 rounded-3 mb-4">
+                        <div class="mb-2"><strong>Branch:</strong> {{ token.service.department.branch.name }}</div>
+                        <div class="mb-2"><strong>Department:</strong> {{ token.service.department.name }}</div>
+                        <div class="mb-2"><strong>Service:</strong> {{ token.service.name }}</div>
+                        <div class="mb-0"><strong>Issued:</strong> {{ token.created_at|date:"M d, Y - h:i A" }}</div>
+                    </div>
+                    
+                    {% if token.qr_code %}
+                    <div class="mb-4">
+                        <img src="{{ token.qr_code.url }}" alt="QR Code" class="img-fluid border p-2 bg-white rounded-3" style="max-width: 200px;">
+                        <p class="text-muted small mt-2">Scan to track status</p>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'queues:download_pdf' token.pk %}" class="btn btn-outline-primary">
+                            <i class="fas fa-file-pdf me-2"></i>Download PDF
+                        </a>
+                        <a href="{% url 'queues:my_tokens' %}" class="btn btn-light">Back to List</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
