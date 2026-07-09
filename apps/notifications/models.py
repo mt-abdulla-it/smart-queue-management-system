@@ -5,7 +5,7 @@ Stores all notifications sent to users (email, SMS, push, in-app).
 """
 from django.conf import settings
 from django.db import models
-from core.models import TimeStampedModel
+from apps.core.models import TimeStampedModel
 
 
 class Notification(TimeStampedModel):

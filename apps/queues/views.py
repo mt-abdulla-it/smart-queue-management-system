@@ -152,7 +152,7 @@ def load_services(request):
 
 # ---------- STAFF VIEWS ---------- #
 
-class StaffManageQueueView(LoginRequiredMixin, RoleRequiredMixin, TemplateView):
+class StaffManageQueueView(RoleRequiredMixin, TemplateView):
     """Staff dashboard for managing the queue."""
     template_name = 'dashboard/staff_manage.html'
     allowed_roles = ['STAFF', 'ADMIN']
@@ -175,7 +175,7 @@ class StaffManageQueueView(LoginRequiredMixin, RoleRequiredMixin, TemplateView):
         return context
 
 
-class ChangeTokenStatusView(LoginRequiredMixin, RoleRequiredMixin, View):
+class ChangeTokenStatusView(RoleRequiredMixin, View):
     """Handle status changes by staff (Call, Skip, Complete)."""
     allowed_roles = ['STAFF', 'ADMIN']
     

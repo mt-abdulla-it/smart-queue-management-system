@@ -7,7 +7,7 @@ from .models import Branch, Department, Service
 class BranchForm(forms.ModelForm):
     class Meta:
         model = Branch
-        fields = ['name', 'code', 'address', 'contact_number', 'email', 'is_active']
+        fields = ['name', 'code', 'address', 'phone', 'email', 'is_active']
         
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -33,7 +33,7 @@ class DepartmentForm(forms.ModelForm):
 class ServiceForm(forms.ModelForm):
     class Meta:
         model = Service
-        fields = ['department', 'name', 'token_prefix', 'estimated_time_mins', 'is_active']
+        fields = ['department', 'name', 'code', 'prefix', 'avg_service_time_minutes', 'is_active']
         
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

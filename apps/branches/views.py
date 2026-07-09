@@ -14,13 +14,13 @@ from .forms import BranchForm, DepartmentForm, ServiceForm
 
 # ---------- Branch Views ---------- #
 
-class BranchListView(LoginRequiredMixin, RoleRequiredMixin, ListView):
+class BranchListView(RoleRequiredMixin, ListView):
     model = Branch
     template_name = 'branches/branch_list.html'
     context_object_name = 'branches'
     allowed_roles = ['ADMIN']
     
-class BranchCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
+class BranchCreateView(RoleRequiredMixin, CreateView):
     model = Branch
     form_class = BranchForm
     template_name = 'branches/branch_form.html'
@@ -31,7 +31,7 @@ class BranchCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
         messages.success(self.request, 'Branch created successfully.')
         return super().form_valid(form)
 
-class BranchUpdateView(LoginRequiredMixin, RoleRequiredMixin, UpdateView):
+class BranchUpdateView(RoleRequiredMixin, UpdateView):
     model = Branch
     form_class = BranchForm
     template_name = 'branches/branch_form.html'
@@ -42,7 +42,7 @@ class BranchUpdateView(LoginRequiredMixin, RoleRequiredMixin, UpdateView):
         messages.success(self.request, 'Branch updated successfully.')
         return super().form_valid(form)
 
-class BranchDeleteView(LoginRequiredMixin, RoleRequiredMixin, DeleteView):
+class BranchDeleteView(RoleRequiredMixin, DeleteView):
     model = Branch
     template_name = 'branches/branch_confirm_delete.html'
     success_url = reverse_lazy('branches:branch_list')
@@ -55,13 +55,13 @@ class BranchDeleteView(LoginRequiredMixin, RoleRequiredMixin, DeleteView):
 
 # ---------- Department Views ---------- #
 
-class DepartmentListView(LoginRequiredMixin, RoleRequiredMixin, ListView):
+class DepartmentListView(RoleRequiredMixin, ListView):
     model = Department
     template_name = 'branches/department_list.html'
     context_object_name = 'departments'
     allowed_roles = ['ADMIN']
     
-class DepartmentCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
+class DepartmentCreateView(RoleRequiredMixin, CreateView):
     model = Department
     form_class = DepartmentForm
     template_name = 'branches/department_form.html'
@@ -72,7 +72,7 @@ class DepartmentCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
         messages.success(self.request, 'Department created successfully.')
         return super().form_valid(form)
 
-class DepartmentUpdateView(LoginRequiredMixin, RoleRequiredMixin, UpdateView):
+class DepartmentUpdateView(RoleRequiredMixin, UpdateView):
     model = Department
     form_class = DepartmentForm
     template_name = 'branches/department_form.html'
@@ -86,13 +86,13 @@ class DepartmentUpdateView(LoginRequiredMixin, RoleRequiredMixin, UpdateView):
 
 # ---------- Service Views ---------- #
 
-class ServiceListView(LoginRequiredMixin, RoleRequiredMixin, ListView):
+class ServiceListView(RoleRequiredMixin, ListView):
     model = Service
     template_name = 'branches/service_list.html'
     context_object_name = 'services'
     allowed_roles = ['ADMIN']
     
-class ServiceCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
+class ServiceCreateView(RoleRequiredMixin, CreateView):
     model = Service
     form_class = ServiceForm
     template_name = 'branches/service_form.html'
@@ -103,7 +103,7 @@ class ServiceCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
         messages.success(self.request, 'Service created successfully.')
         return super().form_valid(form)
 
-class ServiceUpdateView(LoginRequiredMixin, RoleRequiredMixin, UpdateView):
+class ServiceUpdateView(RoleRequiredMixin, UpdateView):
     model = Service
     form_class = ServiceForm
     template_name = 'branches/service_form.html'

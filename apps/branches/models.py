@@ -7,7 +7,7 @@ Branch → Department → Service
 Each service generates its own queue tokens with a unique prefix.
 """
 from django.db import models
-from core.models import TimeStampedModel
+from apps.core.models import TimeStampedModel
 
 
 class Branch(TimeStampedModel):

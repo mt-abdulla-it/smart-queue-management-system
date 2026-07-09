@@ -47,7 +47,7 @@ class UserDashboardView(LoginRequiredMixin, TemplateView):
         
         return context
 
-class AdminDashboardView(LoginRequiredMixin, RoleRequiredMixin, TemplateView):
+class AdminDashboardView(RoleRequiredMixin, TemplateView):
     """Dashboard for Administrators with real-time analytics."""
     template_name = 'dashboard/admin_dashboard.html'
     allowed_roles = ['ADMIN']

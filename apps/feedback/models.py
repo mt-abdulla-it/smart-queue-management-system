@@ -6,7 +6,7 @@ Allows users to submit feedback about their queue experience.
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from core.models import TimeStampedModel
+from apps.core.models import TimeStampedModel
 
 
 class Feedback(TimeStampedModel):

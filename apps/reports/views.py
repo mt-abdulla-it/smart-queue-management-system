@@ -17,7 +17,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 from apps.core.mixins import RoleRequiredMixin
 from apps.queues.models import QueueToken
 
-class ExportExcelView(LoginRequiredMixin, RoleRequiredMixin, View):
+class ExportExcelView(RoleRequiredMixin, View):
     allowed_roles = ['ADMIN']
     
     def get(self, request, *args, **kwargs):
@@ -51,7 +51,7 @@ class ExportExcelView(LoginRequiredMixin, RoleRequiredMixin, View):
         return response
 
 
-class ExportPDFView(LoginRequiredMixin, RoleRequiredMixin, View):
+class ExportPDFView(RoleRequiredMixin, View):
     allowed_roles = ['ADMIN']
     
     def get(self, request, *args, **kwargs):

@@ -25,7 +25,7 @@ class FeedbackSubmitView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class AdminFeedbackListView(LoginRequiredMixin, RoleRequiredMixin, ListView):
+class AdminFeedbackListView(RoleRequiredMixin, ListView):
     """View for admins to see all feedback."""
     model = Feedback
     template_name = 'feedback/admin_list.html'
