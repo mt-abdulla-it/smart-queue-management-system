@@ -20,7 +20,7 @@ class FeedbackForm(forms.ModelForm):
     
     class Meta:
         model = Feedback
-        fields = ['branch', 'rating', 'comments']
+        fields = ['branch', 'rating', 'comment']
         widgets = {
-            'comments': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Tell us about your experience...'}),
+            'comment': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Tell us about your experience...'}),
         }
