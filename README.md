@@ -127,7 +127,7 @@ This project is developed as a university final-year project.
 
 ## 👤 Author
 
-**AAbdulla Thaslim**
+**Abdulla Thaslim**
 
 ---
 
