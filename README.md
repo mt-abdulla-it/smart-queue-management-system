@@ -127,9 +127,7 @@ This project is developed as a university final-year project.
 
 ## 👤 Author
 
-**Your Name**
-- University: [Your University]
-- Supervisor: [Your Supervisor]
+**AAbdulla Thaslim**
 
 ---
 
