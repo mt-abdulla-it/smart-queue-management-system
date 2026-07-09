@@ -19,9 +19,7 @@ import environ
 # Build paths: BASE_DIR = d:\smart-queue-management-system\
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-# Add 'apps' directory to Python path so apps can be imported directly
-# e.g., 'accounts' instead of 'apps.accounts'
-sys.path.insert(0, str(BASE_DIR / 'apps'))
+# No sys.path modification needed; we import apps via 'apps.appname'
 
 # =============================================================================
 # ENVIRONMENT VARIABLES
@@ -78,14 +76,15 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
-    'core.apps.CoreConfig',
-    'accounts.apps.AccountsConfig',
-    'branches.apps.BranchesConfig',
-    'queues.apps.QueuesConfig',
-    'notifications.apps.NotificationsConfig',
-    'feedback.apps.FeedbackConfig',
-    'reports.apps.ReportsConfig',
-    'dashboard.apps.DashboardConfig',
+    'apps.core',
+    'apps.accounts',
+    'apps.branches',
+    'apps.queues',
+    'apps.notifications',
+    'apps.feedback',
+    'apps.reports',
+    'apps.dashboard',
+    'apps.api.v1',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

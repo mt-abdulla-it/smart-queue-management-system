@@ -29,17 +29,17 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # App URLs
-    path('', include('core.urls', namespace='core')),
-    path('accounts/', include('accounts.urls', namespace='accounts')),
-    path('branches/', include('branches.urls', namespace='branches')),
-    path('queues/', include('queues.urls', namespace='queues')),
-    path('notifications/', include('notifications.urls', namespace='notifications')),
-    path('feedback/', include('feedback.urls', namespace='feedback')),
-    path('reports/', include('reports.urls', namespace='reports')),
-    path('dashboard/', include('dashboard.urls', namespace='dashboard')),
+    path('', include('apps.core.urls', namespace='core')),
+    path('accounts/', include('apps.accounts.urls', namespace='accounts')),
+    path('branches/', include('apps.branches.urls', namespace='branches')),
+    path('queues/', include('apps.queues.urls', namespace='queues')),
+    path('notifications/', include('apps.notifications.urls', namespace='notifications')),
+    path('feedback/', include('apps.feedback.urls', namespace='feedback')),
+    path('reports/', include('apps.reports.urls', namespace='reports')),
+    path('dashboard/', include('apps.dashboard.urls', namespace='dashboard')),
 
     # REST API (versioned)
-    path('api/v1/', include('api.v1.urls', namespace='api-v1')),
+    path('api/v1/', include('apps.api.v1.urls', namespace='api-v1')),
 
     # API Documentation
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
