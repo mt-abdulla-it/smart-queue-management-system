@@ -93,21 +93,29 @@
 {% endblock %}
 
 {% block extra_js %}
+<script type="application/json" id="chartData">
+{
+    "labels": {{ chart_labels|safe }},
+    "data": {{ chart_data|safe }}
+}
+</script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const ctx = document.getElementById('queueChart');
-    if (ctx) {
+    var ctx = document.getElementById('queueChart');
+    var rawData = document.getElementById('chartData');
+    if (ctx && rawData) {
+        var chartData = JSON.parse(rawData.textContent);
         new Chart(ctx, {
             type: 'line',
             data: {
-                labels: {{ chart_labels|safe }},
+                labels: chartData.labels,
                 datasets: [{
                     label: 'Tokens Issued',
-                    data: {{ chart_data|safe }},
+                    data: chartData.data,
                     borderColor: '#6366f1',
                     backgroundColor: 'rgba(99, 102, 241, 0.1)',
                     fill: true,
-                    tension: 0.4,
+                    tension: 0.4
                 }]
             },
             options: {
