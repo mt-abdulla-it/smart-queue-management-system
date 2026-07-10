@@ -4,36 +4,67 @@
 {% block title %}Login — {{ site_name }}{% endblock %}
 
 {% block public_content %}
-<div class="d-flex align-items-center justify-content-center min-vh-100 bg-light">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-4">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body p-4 p-md-5">
-                        <div class="text-center mb-4">
-                            <div class="brand-icon mx-auto mb-3" style="width: 50px; height: 50px;">
-                                <i class="fas fa-hospital-user fs-4 text-white"></i>
-                            </div>
-                            <h4 class="fw-bold">Welcome Back</h4>
-                            <p class="text-muted">Sign in to your account</p>
+<div class="auth-wrapper">
+    <!-- Decorative Left Panel -->
+    <div class="auth-decorative d-none d-lg-flex">
+        <!-- Floating shapes -->
+        <div class="auth-shape auth-shape-1"></div>
+        <div class="auth-shape auth-shape-2"></div>
+        <div class="auth-shape auth-shape-3"></div>
+
+        <div class="auth-decorative-content">
+            <div class="brand-icon">
+                <i class="fas fa-hospital-user text-white"></i>
+            </div>
+            <h2>Smart Queue</h2>
+            <p>Skip the wait. Book your queue online, track your position in real-time, and get notified when it's your turn.</p>
+
+            <!-- Mini feature list -->
+            <div class="mt-4 text-start" style="color: #94a3b8;">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <i class="fas fa-check-circle" style="color: var(--primary-light);"></i>
+                    <span>Real-time queue tracking</span>
+                </div>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <i class="fas fa-check-circle" style="color: var(--primary-light);"></i>
+                    <span>Instant SMS & push notifications</span>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <i class="fas fa-check-circle" style="color: var(--primary-light);"></i>
+                    <span>QR code-based token management</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Form Side -->
+    <div class="auth-form-side">
+        <div class="auth-form-container">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <div class="brand-icon mx-auto mb-3 d-lg-none" style="width: 50px; height: 50px;">
+                            <i class="fas fa-hospital-user fs-4 text-white"></i>
+                        </div>
+                        <h4 class="fw-bold">Welcome Back</h4>
+                        <p class="text-muted">Sign in to your account</p>
+                    </div>
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <a href="{% url 'accounts:password_reset' %}" class="small text-decoration-none">Forgot password?</a>
                         </div>
 
-                        <form method="post" novalidate>
-                            {% csrf_token %}
-                            {{ form|crispy }}
-                            
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <a href="{% url 'accounts:password_reset' %}" class="small text-decoration-none">Forgot password?</a>
-                            </div>
+                        <button type="submit" class="btn btn-primary w-100 mb-3">
+                            <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                        </button>
+                    </form>
 
-                            <button type="submit" class="btn btn-primary w-100 mb-3">
-                                <i class="fas fa-sign-in-alt me-2"></i>Sign In
-                            </button>
-                        </form>
-
-                        <div class="text-center mt-4">
-                            <p class="text-muted mb-0">Don't have an account? <a href="{% url 'accounts:register' %}" class="text-decoration-none fw-semibold">Sign up</a></p>
-                        </div>
+                    <div class="text-center mt-4">
+                        <p class="text-muted mb-0">Don't have an account? <a href="{% url 'accounts:register' %}" class="text-decoration-none fw-semibold">Sign up</a></p>
                     </div>
                 </div>
             </div>

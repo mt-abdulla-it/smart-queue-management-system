@@ -4,8 +4,11 @@
 {% block content %}
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h4 class="fw-bold mb-1">Admin Dashboard</h4>
+        <div class="dashboard-greeting">
+            <h4 class="fw-bold mb-1">
+                <span class="greeting-emoji" id="greetingEmoji">👋</span>
+                <span id="greetingText">Hello</span>, {{ user.first_name }}!
+            </h4>
             <p class="text-muted mb-0">System overview and analytics.</p>
         </div>
         <div>
@@ -59,8 +62,11 @@
         <!-- Chart -->
         <div class="col-lg-8">
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-transparent border-0">
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
                     <h6 class="mb-0 fw-semibold">Queue Activity (Last 7 Days)</h6>
+                    <span class="badge bg-primary bg-opacity-10 text-primary">
+                        <i class="fas fa-chart-line me-1"></i>Live
+                    </span>
                 </div>
                 <div class="card-body">
                     <canvas id="queueChart" height="300"></canvas>
@@ -69,20 +75,38 @@
         </div>
         <!-- Quick Actions -->
         <div class="col-lg-4">
-            <div class="card border-0 shadow-sm">
+            <div class="card border-0 shadow-sm h-100">
                 <div class="card-header bg-transparent border-0">
                     <h6 class="mb-0 fw-semibold">Quick Actions</h6>
                 </div>
                 <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <a href="{% url 'admin:index' %}" class="btn btn-outline-danger">
-                            <i class="fas fa-cog me-2"></i>Django Admin
+                    <div class="d-flex flex-column gap-3">
+                        <a href="{% url 'admin:index' %}" class="quick-action-item">
+                            <div class="action-icon bg-danger bg-opacity-10 text-danger">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                            <div>
+                                <div class="action-label">Django Admin</div>
+                                <div class="action-desc">Manage system settings</div>
+                            </div>
                         </a>
-                        <a href="{% url 'reports:export_excel' %}" class="btn btn-outline-success">
-                            <i class="fas fa-file-excel me-2"></i>Export Excel
+                        <a href="{% url 'reports:export_excel' %}" class="quick-action-item">
+                            <div class="action-icon bg-success bg-opacity-10 text-success">
+                                <i class="fas fa-file-excel"></i>
+                            </div>
+                            <div>
+                                <div class="action-label">Export Excel</div>
+                                <div class="action-desc">Download queue data</div>
+                            </div>
                         </a>
-                        <a href="{% url 'reports:export_pdf' %}" class="btn btn-outline-danger">
-                            <i class="fas fa-file-pdf me-2"></i>Export PDF
+                        <a href="{% url 'reports:export_pdf' %}" class="quick-action-item">
+                            <div class="action-icon bg-danger bg-opacity-10 text-danger">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div>
+                                <div class="action-label">Export PDF</div>
+                                <div class="action-desc">Generate PDF report</div>
+                            </div>
                         </a>
                     </div>
                 </div>
@@ -113,18 +137,59 @@ document.addEventListener('DOMContentLoaded', function() {
                     label: 'Tokens Issued',
                     data: chartData.data,
                     borderColor: '#6366f1',
-                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    backgroundColor: function(context) {
+                        var chart = context.chart;
+                        var ctx2 = chart.ctx;
+                        var area = chart.chartArea;
+                        if (!area) return 'rgba(99, 102, 241, 0.1)';
+                        var gradient = ctx2.createLinearGradient(0, area.top, 0, area.bottom);
+                        gradient.addColorStop(0, 'rgba(99, 102, 241, 0.25)');
+                        gradient.addColorStop(1, 'rgba(99, 102, 241, 0.02)');
+                        return gradient;
+                    },
                     fill: true,
-                    tension: 0.4
+                    tension: 0.4,
+                    borderWidth: 2.5,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#6366f1',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 7,
+                    pointHoverBackgroundColor: '#6366f1',
+                    pointHoverBorderColor: '#ffffff',
+                    pointHoverBorderWidth: 3
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1e293b',
+                        titleColor: '#e2e8f0',
+                        bodyColor: '#94a3b8',
+                        borderColor: '#334155',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        padding: 12,
+                        displayColors: false
+                    }
+                },
                 scales: {
-                    y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
-                    x: { grid: { display: false } }
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0,0,0,0.04)', drawBorder: false },
+                        ticks: { font: { size: 11 }, color: '#94a3b8' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { size: 11 }, color: '#94a3b8' }
+                    }
                 }
             }
         });

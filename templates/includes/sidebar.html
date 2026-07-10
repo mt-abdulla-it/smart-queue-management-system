@@ -143,6 +143,21 @@
         </ul>
     </nav>
 
+    <!-- Sidebar User Card -->
+    <div class="sidebar-user-card">
+        <div class="sidebar-user-avatar">
+            {% if user.profile_image %}
+                <img src="{{ user.profile_image.url }}" alt="{{ user.get_full_name }}">
+            {% else %}
+                {{ user.first_name.0 }}{{ user.last_name.0 }}
+            {% endif %}
+        </div>
+        <div class="sidebar-user-info">
+            <div class="sidebar-user-name">{{ user.get_full_name }}</div>
+            <div class="sidebar-user-role">{{ user.get_role_display }}</div>
+        </div>
+    </div>
+
     <!-- Sidebar Footer -->
     <div class="sidebar-footer">
         <a href="{% url 'accounts:logout' %}" class="btn btn-outline-danger btn-sm w-100">

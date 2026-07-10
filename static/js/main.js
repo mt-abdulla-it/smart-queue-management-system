@@ -8,6 +8,10 @@
  * - Toast notification helper
  * - DataTables initialization
  * - Auto-dismiss flash messages
+ * - Animated number counters
+ * - Button ripple effects
+ * - Scroll-triggered animations
+ * - Time-of-day greeting
  */
 
 'use strict';
@@ -127,19 +131,22 @@ const csrfToken = getCookie('csrftoken');
 
 
 // =============================================================================
-// TOAST NOTIFICATIONS
+// TOAST NOTIFICATIONS (Enhanced with progress bar)
 // =============================================================================
 
 /**
- * Show a toast notification.
+ * Show a toast notification with slide-in animation and auto-dismiss progress.
  *
  * @param {string} message - The message to display.
  * @param {string} type - Bootstrap alert type: 'success', 'danger', 'warning', 'info'.
  * @param {number} duration - Auto-dismiss duration in ms (default: 5000).
  */
-function showToast(message, type = 'info', duration = 5000) {
+function showToast(message, type, duration) {
+    type = type || 'info';
+    duration = duration || 5000;
+
     // Create toast container if it doesn't exist
-    let container = document.getElementById('toastContainer');
+    var container = document.getElementById('toastContainer');
     if (!container) {
         container = document.createElement('div');
         container.id = 'toastContainer';
@@ -148,28 +155,30 @@ function showToast(message, type = 'info', duration = 5000) {
         document.body.appendChild(container);
     }
 
-    const icons = {
+    var icons = {
         success: 'fa-check-circle',
         danger: 'fa-exclamation-circle',
         warning: 'fa-exclamation-triangle',
         info: 'fa-info-circle'
     };
 
-    const toastId = 'toast-' + Date.now();
-    const toastHTML = `
-        <div id="${toastId}" class="toast align-items-center text-bg-${type} border-0 mb-2" role="alert">
-            <div class="d-flex">
-                <div class="toast-body">
-                    <i class="fas ${icons[type] || icons.info} me-2"></i>${message}
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        </div>
-    `;
+    var toastId = 'toast-' + Date.now();
+    var toastHTML = '' +
+        '<div id="' + toastId + '" class="toast align-items-center text-bg-' + type + ' border-0 mb-2" role="alert" style="animation: slideInRight 0.3s ease-out;">' +
+            '<div class="d-flex">' +
+                '<div class="toast-body">' +
+                    '<i class="fas ' + (icons[type] || icons.info) + ' me-2"></i>' + message +
+                '</div>' +
+                '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>' +
+            '</div>' +
+            '<div style="height: 3px; background: rgba(255,255,255,0.3); border-radius: 0 0 4px 4px;">' +
+                '<div style="height: 100%; background: rgba(255,255,255,0.7); border-radius: 0 0 4px 4px; animation: toastProgress ' + duration + 'ms linear forwards;"></div>' +
+            '</div>' +
+        '</div>';
 
     container.insertAdjacentHTML('beforeend', toastHTML);
-    const toastElement = document.getElementById(toastId);
-    const toast = new bootstrap.Toast(toastElement, { delay: duration });
+    var toastElement = document.getElementById(toastId);
+    var toast = new bootstrap.Toast(toastElement, { delay: duration });
     toast.show();
 
     // Remove from DOM after hidden
@@ -177,6 +186,15 @@ function showToast(message, type = 'info', duration = 5000) {
         toastElement.remove();
     });
 }
+
+// Inject toast keyframe animations
+(function () {
+    var style = document.createElement('style');
+    style.textContent = '' +
+        '@keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }' +
+        '@keyframes toastProgress { from { width: 100%; } to { width: 0%; } }';
+    document.head.appendChild(style);
+})();
 
 
 // =============================================================================
@@ -211,14 +229,167 @@ document.addEventListener('DOMContentLoaded', function () {
 
 document.addEventListener('DOMContentLoaded', function () {
     // Auto-dismiss alerts after 6 seconds
-    const alerts = document.querySelectorAll('.messages-container .alert');
+    var alerts = document.querySelectorAll('.messages-container .alert');
     alerts.forEach(function (alert) {
         setTimeout(function () {
-            const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+            var bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
             if (bsAlert) {
                 bsAlert.close();
             }
         }, 6000);
+    });
+});
+
+
+// =============================================================================
+// ANIMATED NUMBER COUNTERS
+// =============================================================================
+
+/**
+ * Animate a number from 0 to its target value.
+ * Elements with class `.counter-animate` or `.stat-info h3` will auto-animate.
+ */
+function animateCounter(element) {
+    var text = element.textContent.trim();
+    // Try to parse as a number (supports decimals like 4.5)
+    var target = parseFloat(text);
+    if (isNaN(target)) return;
+
+    var isFloat = text.indexOf('.') !== -1;
+    var decimals = isFloat ? (text.split('.')[1] || '').length : 0;
+    var duration = 1200;
+    var startTime = null;
+    var suffix = text.replace(/[\d.,\-]/g, '').trim();
+
+    element.textContent = isFloat ? '0.' + '0'.repeat(decimals) : '0';
+
+    function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        var progress = Math.min((timestamp - startTime) / duration, 1);
+        // Ease-out cubic
+        var easedProgress = 1 - Math.pow(1 - progress, 3);
+        var current = easedProgress * target;
+
+        if (isFloat) {
+            element.textContent = current.toFixed(decimals) + suffix;
+        } else {
+            element.textContent = Math.floor(current).toLocaleString() + suffix;
+        }
+
+        if (progress < 1) {
+            requestAnimationFrame(step);
+        } else {
+            element.textContent = text;
+        }
+    }
+
+    requestAnimationFrame(step);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Auto-animate stat card numbers
+    var statNumbers = document.querySelectorAll('.stat-info h3, .counter-animate');
+    statNumbers.forEach(function (el) {
+        animateCounter(el);
+    });
+});
+
+
+// =============================================================================
+// BUTTON RIPPLE EFFECT
+// =============================================================================
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('.btn');
+        if (!btn) return;
+
+        var ripple = document.createElement('span');
+        ripple.className = 'ripple';
+        var rect = btn.getBoundingClientRect();
+        var size = Math.max(rect.width, rect.height);
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+        ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+
+        btn.appendChild(ripple);
+        ripple.addEventListener('animationend', function () {
+            ripple.remove();
+        });
+    });
+});
+
+
+// =============================================================================
+// SCROLL-TRIGGERED ANIMATIONS
+// =============================================================================
+
+document.addEventListener('DOMContentLoaded', function () {
+    if (!('IntersectionObserver' in window)) return;
+
+    var animatedElements = document.querySelectorAll('.animate-on-scroll');
+    if (animatedElements.length === 0) return;
+
+    var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-fade-in-up');
+                entry.target.style.opacity = '1';
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+
+    animatedElements.forEach(function (el) {
+        el.style.opacity = '0';
+        observer.observe(el);
+    });
+});
+
+
+// =============================================================================
+// TIME-OF-DAY GREETING
+// =============================================================================
+
+/**
+ * Set greeting text and emoji based on current time.
+ * Targets element with id="greetingText" and id="greetingEmoji".
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    var greetingEl = document.getElementById('greetingText');
+    var emojiEl = document.getElementById('greetingEmoji');
+    if (!greetingEl) return;
+
+    var hour = new Date().getHours();
+    var greeting, emoji;
+
+    if (hour < 12) {
+        greeting = 'Good Morning';
+        emoji = '☀️';
+    } else if (hour < 17) {
+        greeting = 'Good Afternoon';
+        emoji = '🌤️';
+    } else {
+        greeting = 'Good Evening';
+        emoji = '🌙';
+    }
+
+    greetingEl.textContent = greeting;
+    if (emojiEl) emojiEl.textContent = emoji;
+});
+
+
+// =============================================================================
+// NOTIFICATION BELL ANIMATION
+// =============================================================================
+
+document.addEventListener('DOMContentLoaded', function () {
+    var notifBadges = document.querySelectorAll('.notification-badge');
+    notifBadges.forEach(function (badge) {
+        var btn = badge.closest('.btn, button');
+        if (btn) {
+            btn.classList.add('has-notifications');
+        }
     });
 });
 
@@ -234,7 +405,7 @@ document.addEventListener('DOMContentLoaded', function () {
  * @param {string} deleteUrl - URL to redirect to for deletion.
  */
 function confirmDelete(itemName, deleteUrl) {
-    if (confirm(`Are you sure you want to delete "${itemName}"? This action cannot be undone.`)) {
+    if (confirm('Are you sure you want to delete "' + itemName + '"? This action cannot be undone.')) {
         window.location.href = deleteUrl;
     }
 }

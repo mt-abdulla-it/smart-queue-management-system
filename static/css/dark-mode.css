@@ -1,6 +1,7 @@
 /* =============================================================================
    Smart Queue Management System — Dark Mode Theme
    Toggled via data-bs-theme="dark" on <html> element.
+   Enhanced with neon glow effects and glassmorphism.
    ============================================================================= */
 
 [data-bs-theme="dark"] {
@@ -16,6 +17,7 @@
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
     --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.4);
+    --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
 [data-bs-theme="dark"] body {
@@ -23,29 +25,97 @@
     color: var(--text-primary);
 }
 
+/* ---------- Navbar ---------- */
 [data-bs-theme="dark"] .top-navbar {
-    background: var(--bg-card);
+    background: rgba(30, 41, 59, 0.85);
     border-bottom-color: var(--border-color);
+    backdrop-filter: blur(12px);
 }
 
+/* ---------- Cards with subtle glow ---------- */
 [data-bs-theme="dark"] .card {
     background: var(--bg-card);
-    border-color: var(--border-color);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.04);
+}
+
+[data-bs-theme="dark"] .card:hover {
+    border-color: rgba(99, 102, 241, 0.15);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(99, 102, 241, 0.1);
 }
 
 [data-bs-theme="dark"] .card-header {
     border-bottom-color: var(--border-color);
 }
 
+/* ---------- Stat Cards — Neon Glass Effect ---------- */
 [data-bs-theme="dark"] .stat-card {
-    background: var(--bg-card);
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
+[data-bs-theme="dark"] .stat-card:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+[data-bs-theme="dark"] .stat-card.bg-primary.bg-opacity-10 {
+    background: rgba(99, 102, 241, 0.08) !important;
+    border-color: rgba(99, 102, 241, 0.15);
+}
+
+[data-bs-theme="dark"] .stat-card.bg-primary.bg-opacity-10:hover {
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.1), 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+[data-bs-theme="dark"] .stat-card.bg-success.bg-opacity-10 {
+    background: rgba(16, 185, 129, 0.08) !important;
+    border-color: rgba(16, 185, 129, 0.15);
+}
+
+[data-bs-theme="dark"] .stat-card.bg-success.bg-opacity-10:hover {
+    border-color: rgba(16, 185, 129, 0.3);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.1), 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+[data-bs-theme="dark"] .stat-card.bg-warning.bg-opacity-10 {
+    background: rgba(245, 158, 11, 0.08) !important;
+    border-color: rgba(245, 158, 11, 0.15);
+}
+
+[data-bs-theme="dark"] .stat-card.bg-warning.bg-opacity-10:hover {
+    border-color: rgba(245, 158, 11, 0.3);
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.1), 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+[data-bs-theme="dark"] .stat-card.bg-info.bg-opacity-10 {
+    background: rgba(59, 130, 246, 0.08) !important;
+    border-color: rgba(59, 130, 246, 0.15);
+}
+
+[data-bs-theme="dark"] .stat-card.bg-info.bg-opacity-10:hover {
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.1), 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+[data-bs-theme="dark"] .stat-card.bg-danger.bg-opacity-10 {
+    background: rgba(239, 68, 68, 0.08) !important;
+    border-color: rgba(239, 68, 68, 0.15);
+}
+
+[data-bs-theme="dark"] .stat-card.bg-danger.bg-opacity-10:hover {
+    border-color: rgba(239, 68, 68, 0.3);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.1), 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* ---------- Footer ---------- */
 [data-bs-theme="dark"] .app-footer {
     background: var(--bg-card);
     border-top-color: var(--border-color);
 }
 
+/* ---------- Form Controls ---------- */
 [data-bs-theme="dark"] .form-control,
 [data-bs-theme="dark"] .form-select {
     background-color: #0f172a;
@@ -53,6 +123,14 @@
     color: var(--text-primary);
 }
 
+[data-bs-theme="dark"] .form-control:focus,
+[data-bs-theme="dark"] .form-select:focus {
+    background-color: #0a0f1c;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+}
+
+/* ---------- Tables ---------- */
 [data-bs-theme="dark"] .table {
     color: var(--text-primary);
 }
@@ -70,13 +148,21 @@
     background-color: rgba(var(--primary-rgb), 0.08);
 }
 
+/* ---------- Search ---------- */
 [data-bs-theme="dark"] .search-box .input-group {
     background: #0f172a;
 }
 
+[data-bs-theme="dark"] .search-box .input-group:focus-within {
+    background: #0a0f1c;
+    border-color: rgba(99, 102, 241, 0.4);
+}
+
+/* ---------- Dropdowns ---------- */
 [data-bs-theme="dark"] .dropdown-menu {
     background: var(--bg-card);
     border-color: var(--border-color);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
 
 [data-bs-theme="dark"] .dropdown-item {
@@ -87,6 +173,7 @@
     background: #0f172a;
 }
 
+/* ---------- Feature cards / Landing ---------- */
 [data-bs-theme="dark"] .feature-card {
     background: var(--bg-card);
 }
@@ -95,11 +182,55 @@
     background-color: #0a0f1c !important;
 }
 
+/* ---------- Alerts ---------- */
 [data-bs-theme="dark"] .alert {
     border-color: var(--border-color);
 }
 
-/* Dark mode scrollbar */
+/* ---------- Quick Actions ---------- */
+[data-bs-theme="dark"] .quick-action-item {
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-bs-theme="dark"] .quick-action-item:hover {
+    background: rgba(99, 102, 241, 0.08);
+    border-color: rgba(99, 102, 241, 0.2);
+    color: var(--text-primary);
+}
+
+/* ---------- Token Cards ---------- */
+[data-bs-theme="dark"] .token-card {
+    border-color: var(--border-color);
+}
+
+/* ---------- Timeline ---------- */
+[data-bs-theme="dark"] .timeline-dot {
+    background: var(--border-color);
+    color: var(--text-muted);
+}
+
+[data-bs-theme="dark"] .timeline-line {
+    background: var(--border-color);
+}
+
+/* ---------- Sidebar User Card ---------- */
+[data-bs-theme="dark"] .sidebar-user-card {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.04);
+}
+
+/* ---------- Auth pages ---------- */
+[data-bs-theme="dark"] .auth-form-side {
+    background: var(--bg-body);
+}
+
+[data-bs-theme="dark"] .auth-form-container .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+}
+
+/* ---------- Scrollbar ---------- */
 [data-bs-theme="dark"] ::-webkit-scrollbar-thumb {
     background: #475569;
 }
@@ -108,7 +239,7 @@
     background: #64748b;
 }
 
-/* DataTables dark mode */
+/* ---------- DataTables ---------- */
 [data-bs-theme="dark"] .dataTables_wrapper .dataTables_filter input,
 [data-bs-theme="dark"] .dataTables_wrapper .dataTables_length select {
     background-color: #0f172a;
@@ -116,6 +247,7 @@
     color: var(--text-primary);
 }
 
+/* ---------- Pagination ---------- */
 [data-bs-theme="dark"] .page-link {
     background-color: var(--bg-card);
     border-color: var(--border-color);
@@ -125,4 +257,9 @@
 [data-bs-theme="dark"] .page-item.active .page-link {
     background-color: var(--primary);
     border-color: var(--primary);
+}
+
+/* ---------- Empty State ---------- */
+[data-bs-theme="dark"] .empty-state-icon {
+    opacity: 0.15;
 }
