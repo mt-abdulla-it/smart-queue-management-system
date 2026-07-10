@@ -4,7 +4,6 @@
 
 A production-ready, full-stack web application that digitizes queue management with real-time tracking, online booking, QR tokens, and live dashboards.
 
-**Final Year Project** | University of Sri Lanka
 
 ---
 
