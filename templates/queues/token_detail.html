@@ -9,7 +9,7 @@
         <div class="col-lg-6">
             <div class="card border-0 shadow-lg text-center overflow-hidden">
                 <div class="card-header bg-gradient-primary text-white border-0 py-3">
-                    <h5 class="mb-0">Smart Queue Token</h5>
+                    <h5 class="mb-0"><i class="fas fa-ticket-alt me-2"></i>Smart Queue Token</h5>
                 </div>
                 
                 <div class="card-body p-4 p-md-5">
@@ -21,7 +21,7 @@
                                 <i class="fas fa-clock me-2"></i>WAITING
                             </span>
                         {% elif token.status == 'SERVING' %}
-                            <span class="badge bg-info fs-5 px-4 py-2 rounded-pill animate-pulse">
+                            <span class="badge bg-info fs-5 px-4 py-2 rounded-pill badge-pulse">
                                 <i class="fas fa-bullhorn me-2"></i>PLEASE PROCEED TO COUNTER
                             </span>
                         {% elif token.status == 'COMPLETED' %}
@@ -32,13 +32,36 @@
                             <span class="badge bg-secondary fs-5 px-4 py-2 rounded-pill">{{ token.status }}</span>
                         {% endif %}
                     </div>
+
+                    <!-- Progress Timeline -->
+                    <div class="token-timeline mb-4">
+                        <div class="timeline-step {% if token.status == 'WAITING' or token.status == 'SERVING' or token.status == 'COMPLETED' %}completed{% endif %}">
+                            <div class="timeline-dot"><i class="fas fa-ticket-alt"></i></div>
+                            <div class="timeline-label">Booked</div>
+                        </div>
+                        <div class="timeline-line {% if token.status == 'WAITING' or token.status == 'SERVING' or token.status == 'COMPLETED' %}completed{% endif %}"></div>
+                        <div class="timeline-step {% if token.status == 'WAITING' %}active{% elif token.status == 'SERVING' or token.status == 'COMPLETED' %}completed{% endif %}">
+                            <div class="timeline-dot"><i class="fas fa-clock"></i></div>
+                            <div class="timeline-label">Waiting</div>
+                        </div>
+                        <div class="timeline-line {% if token.status == 'SERVING' or token.status == 'COMPLETED' %}completed{% endif %}"></div>
+                        <div class="timeline-step {% if token.status == 'SERVING' %}serving{% elif token.status == 'COMPLETED' %}completed{% endif %}">
+                            <div class="timeline-dot"><i class="fas fa-bullhorn"></i></div>
+                            <div class="timeline-label">Serving</div>
+                        </div>
+                        <div class="timeline-line {% if token.status == 'COMPLETED' %}completed{% endif %}"></div>
+                        <div class="timeline-step {% if token.status == 'COMPLETED' %}completed{% endif %}">
+                            <div class="timeline-dot"><i class="fas fa-check"></i></div>
+                            <div class="timeline-label">Done</div>
+                        </div>
+                    </div>
                     
                     {% if token.status == 'WAITING' %}
                     <div class="row g-2 mb-4">
                         <div class="col-6">
                             <div class="p-3 bg-light rounded-3">
                                 <p class="text-muted mb-1 small text-uppercase fw-bold">Position</p>
-                                <h3 class="mb-0 text-dark">{{ position }}</h3>
+                                <h3 class="mb-0 text-dark counter-animate">{{ position }}</h3>
                             </div>
                         </div>
                         <div class="col-6">
@@ -59,8 +82,10 @@
                     
                     {% if token.qr_code %}
                     <div class="mb-4">
-                        <img src="{{ token.qr_code.url }}" alt="QR Code" class="img-fluid border p-2 bg-white rounded-3" style="max-width: 200px;">
-                        <p class="text-muted small mt-2">Scan to track status</p>
+                        <div class="qr-glow">
+                            <img src="{{ token.qr_code.url }}" alt="QR Code" class="img-fluid border p-2 bg-white rounded-3" style="max-width: 200px;">
+                        </div>
+                        <p class="text-muted small mt-2"><i class="fas fa-qrcode me-1"></i>Scan to track status</p>
                     </div>
                     {% endif %}
                     
