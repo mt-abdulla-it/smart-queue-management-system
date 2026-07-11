@@ -544,9 +544,20 @@ document.addEventListener('DOMContentLoaded', function () {
                     observer.unobserve(entry.target);
                 }
             });
-        }, { threshold: 0.3 });
+        }, { threshold: 0.1 });
 
         observer.observe(statsSection);
+
+        // Fallback: if counters haven't animated after 4 seconds of page load,
+        // check if the stats section is in the viewport
+        setTimeout(function () {
+            if (!animated) {
+                var rect = statsSection.getBoundingClientRect();
+                if (rect.top < window.innerHeight && rect.bottom > 0) {
+                    animateCounters();
+                }
+            }
+        }, 4000);
     }
 });
 
