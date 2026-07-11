@@ -421,3 +421,157 @@ function confirmDelete(itemName, deleteUrl) {
 function formatNumber(num) {
     return new Intl.NumberFormat('en-US').format(num);
 }
+
+
+// =============================================================================
+// LANDING PAGE — Navbar Scroll Effect
+// =============================================================================
+
+document.addEventListener('DOMContentLoaded', function () {
+    var landingNavbar = document.getElementById('landingNavbar');
+    if (!landingNavbar) return;
+
+    function handleNavbarScroll() {
+        if (window.scrollY > 60) {
+            landingNavbar.classList.add('scrolled');
+        } else {
+            landingNavbar.classList.remove('scrolled');
+        }
+    }
+
+    window.addEventListener('scroll', handleNavbarScroll, { passive: true });
+    handleNavbarScroll(); // Check on load
+
+    // Mobile nav toggle
+    var mobileToggle = document.getElementById('navMobileToggle');
+    var mobileMenu = document.getElementById('navMobileMenu');
+    if (mobileToggle && mobileMenu) {
+        mobileToggle.addEventListener('click', function () {
+            mobileToggle.classList.toggle('active');
+            mobileMenu.classList.toggle('show');
+        });
+
+        // Close menu when clicking a link
+        mobileMenu.querySelectorAll('a').forEach(function (link) {
+            link.addEventListener('click', function () {
+                mobileToggle.classList.remove('active');
+                mobileMenu.classList.remove('show');
+            });
+        });
+    }
+});
+
+
+// =============================================================================
+// LANDING PAGE — Smooth Scroll for Anchor Links
+// =============================================================================
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
+        anchor.addEventListener('click', function (e) {
+            var targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            var targetEl = document.querySelector(targetId);
+            if (targetEl) {
+                e.preventDefault();
+                var navHeight = 70;
+                var targetPosition = targetEl.getBoundingClientRect().top + window.pageYOffset - navHeight;
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+});
+
+
+// =============================================================================
+// LANDING PAGE — Animated Number Counters
+// =============================================================================
+
+document.addEventListener('DOMContentLoaded', function () {
+    var counters = document.querySelectorAll('.stat-counter-value');
+    if (!counters.length) return;
+
+    var animated = false;
+
+    function animateCounters() {
+        if (animated) return;
+        animated = true;
+
+        counters.forEach(function (counter) {
+            var target = parseFloat(counter.getAttribute('data-target'));
+            var decimals = parseInt(counter.getAttribute('data-decimals')) || 0;
+            var duration = 2000;
+            var startTime = null;
+
+            function step(timestamp) {
+                if (!startTime) startTime = timestamp;
+                var progress = Math.min((timestamp - startTime) / duration, 1);
+                // Ease-out quad
+                var eased = 1 - Math.pow(1 - progress, 3);
+                var current = eased * target;
+
+                if (decimals > 0) {
+                    counter.textContent = current.toFixed(decimals);
+                } else {
+                    counter.textContent = Math.floor(current).toLocaleString();
+                }
+
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                } else {
+                    if (decimals > 0) {
+                        counter.textContent = target.toFixed(decimals);
+                    } else {
+                        counter.textContent = target.toLocaleString();
+                    }
+                }
+            }
+
+            requestAnimationFrame(step);
+        });
+    }
+
+    // Use IntersectionObserver to trigger when stats section is visible
+    var statsSection = document.getElementById('stats');
+    if (statsSection && 'IntersectionObserver' in window) {
+        var observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    animateCounters();
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.3 });
+
+        observer.observe(statsSection);
+    }
+});
+
+
+// =============================================================================
+// LANDING PAGE — Scroll Reveal Animation
+// =============================================================================
+
+document.addEventListener('DOMContentLoaded', function () {
+    var reveals = document.querySelectorAll('.scroll-reveal');
+    if (!reveals.length || !('IntersectionObserver' in window)) return;
+
+    var revealObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+                var delay = parseInt(entry.target.getAttribute('data-delay')) || 0;
+                setTimeout(function () {
+                    entry.target.classList.add('revealed');
+                }, delay);
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+    reveals.forEach(function (el) {
+        revealObserver.observe(el);
+    });
+});

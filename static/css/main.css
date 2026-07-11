@@ -2613,17 +2613,68 @@ a:hover {
         font-size: 1.2rem;
     }
 
-    .hero-content h1 {
-        font-size: 2rem;
+    /* Landing page mobile */
+    .hero-title {
+        font-size: 2.2rem;
+        letter-spacing: -0.5px;
     }
 
-    .hero-content .lead {
+    .hero-subtitle {
         font-size: 0.95rem;
     }
 
-    .hero-content .btn-lg {
-        padding: 10px 20px;
-        font-size: 0.875rem;
+    .hero-cta-group {
+        flex-direction: column;
+    }
+
+    .btn-hero-primary,
+    .btn-hero-outline {
+        padding: 12px 24px;
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    .hero-trust {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .section-title {
+        font-size: 1.6rem;
+    }
+
+    .stat-counter-value {
+        font-size: 1.8rem;
+    }
+
+    .stat-counter-suffix {
+        font-size: 1.3rem;
+    }
+
+    .cta-title {
+        font-size: 1.6rem;
+    }
+
+    .cta-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .btn-cta-glow,
+    .btn-cta-outline {
+        width: 100%;
+        max-width: 320px;
+        text-align: center;
+    }
+
+    .navbar-actions .btn-navbar-ghost,
+    .navbar-actions .btn-navbar-primary {
+        display: none;
     }
 
     .timeline-line {
