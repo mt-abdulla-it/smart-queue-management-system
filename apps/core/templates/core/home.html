@@ -1,42 +1,125 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ site_name }} — Smart Queue Management{% endblock %}
+{% block title %}{{ site_name }} — Smart Queue Management for Hospitals & Government Offices{% endblock %}
 
 {% block public_content %}
+<!-- ========== Sticky Navigation Bar ========== -->
+<nav class="landing-navbar" id="landingNavbar">
+    <div class="container">
+        <div class="navbar-inner">
+            <a href="{% url 'core:home' %}" class="navbar-brand-landing">
+                <div class="navbar-brand-icon">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <span class="navbar-brand-text">SmartQueue</span>
+            </a>
+            <div class="navbar-links d-none d-md-flex">
+                <a href="#features" class="navbar-link">Features</a>
+                <a href="#how-it-works" class="navbar-link">How It Works</a>
+                <a href="#stats" class="navbar-link">Stats</a>
+            </div>
+            <div class="navbar-actions">
+                <a href="{% url 'accounts:login' %}" class="btn btn-navbar-ghost">
+                    <i class="fas fa-sign-in-alt me-1"></i>Login
+                </a>
+                <a href="{% url 'accounts:register' %}" class="btn btn-navbar-primary">
+                    Get Started <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+                <button class="navbar-mobile-toggle d-md-none" id="navMobileToggle" aria-label="Toggle navigation">
+                    <span class="toggle-bar"></span>
+                    <span class="toggle-bar"></span>
+                    <span class="toggle-bar"></span>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div class="navbar-mobile-menu" id="navMobileMenu">
+            <a href="#features" class="mobile-nav-link">Features</a>
+            <a href="#how-it-works" class="mobile-nav-link">How It Works</a>
+            <a href="#stats" class="mobile-nav-link">Stats</a>
+            <div class="mobile-nav-actions">
+                <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-sm w-100">Login</a>
+                <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-sm w-100">Get Started</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
 <!-- ========== Hero Section ========== -->
-<section class="hero-section">
+<section class="hero-section" id="hero">
+    <!-- Animated gradient mesh background -->
+    <div class="hero-mesh"></div>
+    <div class="hero-mesh-2"></div>
+    <!-- Floating particles -->
+    <div class="hero-particles">
+        <span class="particle p-1"></span>
+        <span class="particle p-2"></span>
+        <span class="particle p-3"></span>
+        <span class="particle p-4"></span>
+        <span class="particle p-5"></span>
+        <span class="particle p-6"></span>
+        <span class="particle p-7"></span>
+        <span class="particle p-8"></span>
+    </div>
     <div class="hero-overlay"></div>
     <div class="container position-relative">
         <div class="row align-items-center min-vh-100">
             <div class="col-lg-6">
                 <div class="hero-content">
-                    <span class="badge bg-primary bg-opacity-25 text-primary px-3 py-2 mb-3 animate-fade-in">
+                    <div class="hero-badge animate-fade-in">
+                        <span class="hero-badge-dot"></span>
                         <i class="fas fa-hospital me-1"></i> For Hospitals & Government Offices
-                    </span>
-                    <h1 class="display-4 fw-bold mb-3 animate-fade-in-up">
-                        Smart Queue<br>
+                    </div>
+                    <h1 class="hero-title animate-fade-in-up">
+                        Smart Queue
                         <span class="text-gradient">Management System</span>
                     </h1>
-                    <p class="lead text-muted mb-4 animate-fade-in-up" style="animation-delay: 0.2s">
+                    <p class="hero-subtitle animate-fade-in-up stagger-2">
                         Eliminate long waiting lines in Sri Lankan hospitals and government offices.
                         Book your queue online, track your position in real-time, and get notified when it's your turn.
                     </p>
-                    <div class="d-flex gap-3 animate-fade-in-up" style="animation-delay: 0.4s">
-                        <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg px-4">
-                            <i class="fas fa-user-plus me-2"></i>Get Started
+                    <div class="hero-cta-group animate-fade-in-up stagger-3">
+                        <a href="{% url 'accounts:register' %}" class="btn btn-hero-primary">
+                            <i class="fas fa-rocket me-2"></i>Get Started Free
                         </a>
-                        <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-lg px-4">
+                        <a href="{% url 'accounts:login' %}" class="btn btn-hero-outline">
                             <i class="fas fa-sign-in-alt me-2"></i>Login
                         </a>
+                    </div>
+                    <div class="hero-trust animate-fade-in-up stagger-4">
+                        <div class="trust-avatars">
+                            <span class="trust-avatar" style="background: #6366f1;">A</span>
+                            <span class="trust-avatar" style="background: #06b6d4;">K</span>
+                            <span class="trust-avatar" style="background: #10b981;">S</span>
+                            <span class="trust-avatar" style="background: #f59e0b;">D</span>
+                        </div>
+                        <span class="trust-text">Trusted by <strong>10,000+</strong> users across Sri Lanka</span>
                     </div>
                 </div>
             </div>
             <div class="col-lg-6 d-none d-lg-block">
-                <div class="hero-illustration animate-float">
-                    <div class="queue-card-preview">
+                <div class="hero-illustration-wrapper">
+                    <!-- Decorative rings -->
+                    <div class="hero-ring hero-ring-1"></div>
+                    <div class="hero-ring hero-ring-2"></div>
+                    <!-- Shadow card behind -->
+                    <div class="queue-card-shadow">
+                        <div class="shadow-header">
+                            <i class="fas fa-user-clock me-2"></i>Next in Line
+                        </div>
+                        <div class="shadow-body">
+                            <div class="shadow-token">B-018</div>
+                            <div class="shadow-service">Pharmacy</div>
+                        </div>
+                    </div>
+                    <!-- Main token card -->
+                    <div class="queue-card-preview animate-float">
                         <div class="preview-header">
-                            <i class="fas fa-hospital-user me-2"></i>Your Queue Token
+                            <div class="preview-header-content">
+                                <i class="fas fa-hospital-user me-2"></i>Your Queue Token
+                            </div>
+                            <span class="preview-live-dot"></span>
                         </div>
                         <div class="preview-body">
                             <div class="token-number">A-042</div>
@@ -49,7 +132,82 @@
                             <div class="token-wait mt-2">
                                 <i class="fas fa-hourglass-half me-1"></i>Est. Wait: 15 min
                             </div>
+                            <div class="token-progress-bar">
+                                <div class="token-progress-fill"></div>
+                            </div>
                         </div>
+                    </div>
+                    <!-- Notification popup -->
+                    <div class="hero-notification animate-fade-in-up stagger-5">
+                        <div class="notif-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="notif-content">
+                            <strong>Your turn is next!</strong>
+                            <small>Please proceed to Counter 3</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Wave divider -->
+    <div class="hero-wave">
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0,60 C360,120 720,0 1080,60 C1260,90 1380,75 1440,60 L1440,120 L0,120 Z" fill="var(--bg-body)"/>
+        </svg>
+    </div>
+</section>
+
+<!-- ========== How It Works Section ========== -->
+<section class="how-it-works-section" id="how-it-works">
+    <div class="container py-5">
+        <div class="section-header text-center mb-5">
+            <span class="section-label">Simple Process</span>
+            <h2 class="section-title">How It Works</h2>
+            <p class="section-subtitle">Get started in 4 easy steps — no more waiting in line</p>
+        </div>
+        <div class="steps-timeline">
+            <div class="timeline-connector"></div>
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="step-card scroll-reveal" data-delay="0">
+                        <div class="step-number">1</div>
+                        <div class="step-icon-wrap">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <h5 class="step-title">Sign Up</h5>
+                        <p class="step-desc">Create your free account in seconds with just an email</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="step-card scroll-reveal" data-delay="150">
+                        <div class="step-number">2</div>
+                        <div class="step-icon-wrap">
+                            <i class="fas fa-hospital"></i>
+                        </div>
+                        <h5 class="step-title">Find a Branch</h5>
+                        <p class="step-desc">Select your nearest hospital or government office</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="step-card scroll-reveal" data-delay="300">
+                        <div class="step-number">3</div>
+                        <div class="step-icon-wrap">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                        <h5 class="step-title">Get Your Token</h5>
+                        <p class="step-desc">Book a queue slot online and receive your QR token</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="step-card scroll-reveal" data-delay="450">
+                        <div class="step-number">4</div>
+                        <div class="step-icon-wrap">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h5 class="step-title">Get Served</h5>
+                        <p class="step-desc">Arrive on time, skip the line, and get served instantly</p>
                     </div>
                 </div>
             </div>
@@ -58,65 +216,151 @@
 </section>
 
 <!-- ========== Features Section ========== -->
-<section class="py-5 bg-light" id="features">
+<section class="features-section" id="features">
     <div class="container py-5">
-        <div class="text-center mb-5">
-            <h2 class="fw-bold">Why Choose Smart Queue?</h2>
-            <p class="text-muted">Solving real queue problems in Sri Lanka</p>
+        <div class="section-header text-center mb-5">
+            <span class="section-label">Powerful Features</span>
+            <h2 class="section-title">Why Choose Smart Queue?</h2>
+            <p class="section-subtitle">Solving real queue problems in Sri Lanka with cutting-edge technology</p>
         </div>
         <div class="row g-4">
             <div class="col-md-4">
-                <div class="feature-card text-center p-4">
-                    <div class="feature-icon bg-primary bg-opacity-10 text-primary">
-                        <i class="fas fa-mobile-alt fa-2x"></i>
+                <div class="feature-card-pro scroll-reveal" data-delay="0">
+                    <div class="feature-card-accent" style="--accent-color: var(--primary);"></div>
+                    <div class="feature-icon-pro" style="--icon-bg: rgba(99,102,241,0.1); --icon-color: var(--primary);">
+                        <i class="fas fa-mobile-alt"></i>
                     </div>
-                    <h5 class="mt-3">Online Booking</h5>
-                    <p class="text-muted">Book your queue token from anywhere using your phone or computer. No need to wait in physical lines.</p>
+                    <h5 class="feature-title-pro">Online Booking</h5>
+                    <p class="feature-desc-pro">Book your queue token from anywhere using your phone or computer. No need to wait in physical lines.</p>
+                    <div class="feature-link-pro">
+                        <span>Learn more</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="feature-card text-center p-4">
-                    <div class="feature-icon bg-success bg-opacity-10 text-success">
-                        <i class="fas fa-broadcast-tower fa-2x"></i>
+                <div class="feature-card-pro scroll-reveal" data-delay="100">
+                    <div class="feature-card-accent" style="--accent-color: var(--success);"></div>
+                    <div class="feature-icon-pro" style="--icon-bg: rgba(16,185,129,0.1); --icon-color: var(--success);">
+                        <i class="fas fa-broadcast-tower"></i>
                     </div>
-                    <h5 class="mt-3">Real-Time Tracking</h5>
-                    <p class="text-muted">Track your queue position in real-time with WebSocket technology. Know exactly when it's your turn.</p>
+                    <h5 class="feature-title-pro">Real-Time Tracking</h5>
+                    <p class="feature-desc-pro">Track your queue position in real-time with WebSocket technology. Know exactly when it's your turn.</p>
+                    <div class="feature-link-pro">
+                        <span>Learn more</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="feature-card text-center p-4">
-                    <div class="feature-icon bg-warning bg-opacity-10 text-warning">
-                        <i class="fas fa-qrcode fa-2x"></i>
+                <div class="feature-card-pro scroll-reveal" data-delay="200">
+                    <div class="feature-card-accent" style="--accent-color: var(--warning);"></div>
+                    <div class="feature-icon-pro" style="--icon-bg: rgba(245,158,11,0.1); --icon-color: var(--warning);">
+                        <i class="fas fa-qrcode"></i>
                     </div>
-                    <h5 class="mt-3">QR Code Token</h5>
-                    <p class="text-muted">Get a QR code token that can be scanned at the service counter. Download as PDF for offline use.</p>
+                    <h5 class="feature-title-pro">QR Code Token</h5>
+                    <p class="feature-desc-pro">Get a QR code token that can be scanned at the service counter. Download as PDF for offline use.</p>
+                    <div class="feature-link-pro">
+                        <span>Learn more</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="feature-card text-center p-4">
-                    <div class="feature-icon bg-info bg-opacity-10 text-info">
-                        <i class="fas fa-bell fa-2x"></i>
+                <div class="feature-card-pro scroll-reveal" data-delay="300">
+                    <div class="feature-card-accent" style="--accent-color: var(--info);"></div>
+                    <div class="feature-icon-pro" style="--icon-bg: rgba(59,130,246,0.1); --icon-color: var(--info);">
+                        <i class="fas fa-bell"></i>
                     </div>
-                    <h5 class="mt-3">Smart Notifications</h5>
-                    <p class="text-muted">Receive email and SMS alerts when your turn is approaching. Never miss your queue number.</p>
+                    <h5 class="feature-title-pro">Smart Notifications</h5>
+                    <p class="feature-desc-pro">Receive email and SMS alerts when your turn is approaching. Never miss your queue number.</p>
+                    <div class="feature-link-pro">
+                        <span>Learn more</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="feature-card text-center p-4">
-                    <div class="feature-icon bg-danger bg-opacity-10 text-danger">
-                        <i class="fas fa-chart-line fa-2x"></i>
+                <div class="feature-card-pro scroll-reveal" data-delay="400">
+                    <div class="feature-card-accent" style="--accent-color: var(--danger);"></div>
+                    <div class="feature-icon-pro" style="--icon-bg: rgba(239,68,68,0.1); --icon-color: var(--danger);">
+                        <i class="fas fa-chart-line"></i>
                     </div>
-                    <h5 class="mt-3">Analytics Dashboard</h5>
-                    <p class="text-muted">Comprehensive analytics and reports for administrators to optimize service delivery.</p>
+                    <h5 class="feature-title-pro">Analytics Dashboard</h5>
+                    <p class="feature-desc-pro">Comprehensive analytics and reports for administrators to optimize service delivery.</p>
+                    <div class="feature-link-pro">
+                        <span>Learn more</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="feature-card text-center p-4">
-                    <div class="feature-icon bg-secondary bg-opacity-10 text-secondary">
-                        <i class="fas fa-tv fa-2x"></i>
+                <div class="feature-card-pro scroll-reveal" data-delay="500">
+                    <div class="feature-card-accent" style="--accent-color: var(--accent);"></div>
+                    <div class="feature-icon-pro" style="--icon-bg: rgba(6,182,212,0.1); --icon-color: var(--accent);">
+                        <i class="fas fa-tv"></i>
                     </div>
-                    <h5 class="mt-3">Live Display</h5>
-                    <p class="text-muted">Display live queue status on TV screens and kiosks in waiting areas for walk-in patients.</p>
+                    <h5 class="feature-title-pro">Live Display</h5>
+                    <p class="feature-desc-pro">Display live queue status on TV screens and kiosks in waiting areas for walk-in patients.</p>
+                    <div class="feature-link-pro">
+                        <span>Learn more</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== Stats / Social Proof Section ========== -->
+<section class="stats-section" id="stats">
+    <div class="stats-glow stats-glow-1"></div>
+    <div class="stats-glow stats-glow-2"></div>
+    <div class="container py-5 position-relative">
+        <div class="section-header text-center mb-5">
+            <span class="section-label section-label-light">Trusted Platform</span>
+            <h2 class="section-title text-white">Numbers That Speak</h2>
+            <p class="section-subtitle text-white-50">Proven results across Sri Lankan institutions</p>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <div class="col-6 col-lg-3">
+                <div class="stat-counter-card scroll-reveal" data-delay="0">
+                    <div class="stat-counter-icon">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                    <div class="stat-counter-value" data-target="10000">0</div>
+                    <div class="stat-counter-suffix">+</div>
+                    <div class="stat-counter-label">Queues Managed</div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-counter-card scroll-reveal" data-delay="150">
+                    <div class="stat-counter-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div class="stat-counter-value" data-target="50">0</div>
+                    <div class="stat-counter-suffix">+</div>
+                    <div class="stat-counter-label">Branches Connected</div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-counter-card scroll-reveal" data-delay="300">
+                    <div class="stat-counter-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-counter-value" data-target="15000">0</div>
+                    <div class="stat-counter-suffix">+</div>
+                    <div class="stat-counter-label">Happy Users</div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-counter-card scroll-reveal" data-delay="450">
+                    <div class="stat-counter-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="stat-counter-value" data-target="99.9" data-decimals="1">0</div>
+                    <div class="stat-counter-suffix">%</div>
+                    <div class="stat-counter-label">Uptime</div>
                 </div>
             </div>
         </div>
@@ -124,21 +368,101 @@
 </section>
 
 <!-- ========== CTA Section ========== -->
-<section class="cta-section py-5">
-    <div class="container text-center py-5">
-        <h2 class="fw-bold text-white mb-3">Ready to skip the queue?</h2>
-        <p class="text-white-50 mb-4">Join thousands of Sri Lankans who are already using Smart Queue.</p>
-        <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg px-5">
-            <i class="fas fa-rocket me-2"></i>Register Now — It's Free
-        </a>
+<section class="cta-section-pro">
+    <div class="cta-animated-bg"></div>
+    <!-- Floating decorative shapes -->
+    <div class="cta-shapes">
+        <span class="cta-shape cta-shape-1"></span>
+        <span class="cta-shape cta-shape-2"></span>
+        <span class="cta-shape cta-shape-3"></span>
+        <span class="cta-shape cta-shape-4"></span>
+    </div>
+    <div class="container text-center py-5 position-relative">
+        <div class="cta-content scroll-reveal">
+            <h2 class="cta-title">Ready to skip the queue?</h2>
+            <p class="cta-subtitle">Join thousands of Sri Lankans who are already saving time with Smart Queue. It's free to get started.</p>
+            <div class="cta-buttons">
+                <a href="{% url 'accounts:register' %}" class="btn btn-cta-glow">
+                    <i class="fas fa-rocket me-2"></i>Register Now — It's Free
+                </a>
+                <a href="{% url 'accounts:login' %}" class="btn btn-cta-outline">
+                    <i class="fas fa-sign-in-alt me-2"></i>Already have an account?
+                </a>
+            </div>
+        </div>
     </div>
 </section>
 
-<!-- ========== Landing Page Footer ========== -->
-<footer class="py-4 bg-dark text-center">
-    <p class="mb-0 text-muted">
-        &copy; {{ current_year }} {{ site_name }}. All Rights Reserved.
-        <br><small>A Final Year Project — Solving Real Problems in Sri Lanka</small>
-    </p>
+<!-- ========== Professional Footer ========== -->
+<footer class="landing-footer">
+    <div class="footer-gradient-line"></div>
+    <div class="container">
+        <div class="row g-4 py-5">
+            <!-- Brand Column -->
+            <div class="col-lg-4 col-md-6">
+                <div class="footer-brand">
+                    <div class="footer-brand-logo">
+                        <div class="navbar-brand-icon">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <span class="navbar-brand-text text-white">SmartQueue</span>
+                    </div>
+                    <p class="footer-brand-desc">
+                        The leading queue management platform for Sri Lankan hospitals and government offices.
+                        Reducing wait times, improving patient experience.
+                    </p>
+                    <div class="footer-social">
+                        <a href="#" class="social-link" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-link" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="social-link" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+            </div>
+            <!-- Quick Links -->
+            <div class="col-lg-2 col-md-6">
+                <h6 class="footer-heading">Product</h6>
+                <ul class="footer-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#how-it-works">How It Works</a></li>
+                    <li><a href="#stats">Statistics</a></li>
+                    <li><a href="{% url 'accounts:register' %}">Get Started</a></li>
+                </ul>
+            </div>
+            <!-- Company -->
+            <div class="col-lg-2 col-md-6">
+                <h6 class="footer-heading">Company</h6>
+                <ul class="footer-links">
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <!-- Contact Info -->
+            <div class="col-lg-4 col-md-6">
+                <h6 class="footer-heading">Get in Touch</h6>
+                <ul class="footer-contact">
+                    <li>
+                        <i class="fas fa-envelope"></i>
+                        <span>support@smartqueue.lk</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-phone"></i>
+                        <span>+94 11 234 5678</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Colombo, Sri Lanka</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- Bottom Bar -->
+        <div class="footer-bottom">
+            <p>&copy; {{ current_year }} {{ site_name }}. All Rights Reserved.</p>
+            <p class="footer-bottom-sub">A Final Year Project — Solving Real Problems in Sri Lanka</p>
+        </div>
+    </div>
 </footer>
 {% endblock %}
