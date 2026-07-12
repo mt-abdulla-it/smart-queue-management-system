@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Notifications — {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold mb-1">Your Notifications</h4>
+            <p class="text-muted mb-0">Stay updated on your queue status and important alerts.</p>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            {% if notifications %}
+                <ul class="list-group list-group-flush">
+                    {% for notification in notifications %}
+                        <li class="list-group-item p-4 {% if not notification.is_read %}bg-light border-start border-4 border-primary{% endif %}">
+                            <div class="d-flex w-100 justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1 fw-bold">{{ notification.title }}</h6>
+                                    <p class="mb-1 text-muted">{{ notification.message }}</p>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>{{ notification.sent_at|timesince }} ago
+                                    </small>
+                                </div>
+                                {% if notification.notification_type == 'EMAIL' %}
+                                    <span class="badge bg-secondary"><i class="fas fa-envelope"></i></span>
+                                {% elif notification.notification_type == 'SMS' %}
+                                    <span class="badge bg-success"><i class="fas fa-sms"></i></span>
+                                {% else %}
+                                    <span class="badge bg-primary"><i class="fas fa-bell"></i></span>
+                                {% endif %}
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="p-5 text-center">
+                    <div class="text-muted mb-3">
+                        <i class="fas fa-bell-slash fa-3x"></i>
+                    </div>
+                    <h5 class="fw-bold">No Notifications</h5>
+                    <p class="text-muted">You're all caught up! There are no new alerts.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

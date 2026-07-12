@@ -82,7 +82,7 @@
             <!-- ========== ADMIN Navigation ========== -->
             <li class="nav-section">Management</li>
             <li class="nav-item">
-                <a class="nav-link {% active_link_startswith '/accounts/manage/' %}" href="#">
+                <a class="nav-link {% active_link_startswith '/accounts/manage/' %}" href="/admin/accounts/customuser/">
                     <i class="fas fa-users"></i>
                     <span>Users</span>
                 </a>
@@ -110,7 +110,7 @@
 
             <li class="nav-section">Analytics</li>
             <li class="nav-item">
-                <a class="nav-link {% active_link_startswith '/reports/' %}" href="#">
+                <a class="nav-link {% active_link_startswith '/reports/' %}" href="{% url 'dashboard:admin' %}">
                     <i class="fas fa-chart-bar"></i>
                     <span>Reports</span>
                 </a>
@@ -126,7 +126,7 @@
             <!-- Common -->
             <li class="nav-section">Account</li>
             <li class="nav-item">
-                <a class="nav-link {% active_link_startswith '/notifications/' %}" href="#">
+                <a class="nav-link {% active_link_startswith '/notifications/' %}" href="{% url 'notifications:list' %}">
                     <i class="fas fa-bell"></i>
                     <span>Notifications</span>
                     {% if unread_notifications_count > 0 %}
