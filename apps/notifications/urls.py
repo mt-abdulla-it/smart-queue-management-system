@@ -1,6 +1,8 @@
-"""Notifications URL stubs — will be fully implemented in Phase 7."""
 from django.urls import path
+from . import views
 
 app_name = 'notifications'
 
-urlpatterns = []
+urlpatterns = [
+    path('', views.NotificationListView.as_view(), name='list'),
+]
