@@ -18,9 +18,9 @@ urlpatterns = [
     path('manage/', views.StaffManageQueueView.as_view(), name='staff_manage'),
     path('token/<int:pk>/status/<str:action>/', views.ChangeTokenStatusView.as_view(), name='change_status'),
     
-    # Placeholder URLs (will be implemented in later phases if needed)
-    path('history/', views.MyTokensListView.as_view(), name='history'),
+    # Queue Views
+    path('history/', views.QueueHistoryListView.as_view(), name='history'),
     path('today/', views.StaffManageQueueView.as_view(), name='today'),
-    path('display/', views.StaffManageQueueView.as_view(), name='live_display'),
-    path('admin-list/', views.StaffManageQueueView.as_view(), name='admin_list'),
+    path('display/', views.LiveDisplayView.as_view(), name='live_display'),
+    path('admin-list/', views.AdminQueueListView.as_view(), name='admin_list'),
 ]

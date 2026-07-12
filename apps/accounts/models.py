@@ -1,4 +1,4 @@
-"""Accounts models — will be fully implemented in Phase 2."""
+"""Accounts models."""
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 

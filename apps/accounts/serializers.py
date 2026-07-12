@@ -1,4 +1,4 @@
-"""Accounts serializers — stub for Phase 2."""
+"""Accounts serializers."""
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 

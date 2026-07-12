@@ -1,4 +1,4 @@
-"""Accounts admin — stub for Phase 2."""
+"""Accounts admin."""
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import User, StaffProfile

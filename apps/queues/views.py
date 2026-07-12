@@ -204,6 +204,42 @@ class ChangeTokenStatusView(RoleRequiredMixin, View):
                 notes=f"Status changed to {new_status} via staff panel."
             )
             
-            messages.success(request, f"Token {token.token_number} marked as {new_status}.")
-            
         return redirect('queues:staff_manage')
+
+class QueueHistoryListView(RoleRequiredMixin, ListView):
+    """View to see history of all tokens (for STAFF/ADMIN)."""
+    model = QueueToken
+    template_name = 'queues/my_tokens.html'
+    context_object_name = 'tokens'
+    allowed_roles = ['STAFF', 'ADMIN']
+
+    def get_queryset(self):
+        return QueueToken.objects.all().order_by('-created_at')
+
+class AdminQueueListView(RoleRequiredMixin, ListView):
+    """View to see all tokens across all branches (ADMIN only)."""
+    model = QueueToken
+    template_name = 'queues/admin_list.html'
+    context_object_name = 'tokens'
+    allowed_roles = ['ADMIN']
+
+    def get_queryset(self):
+        return QueueToken.objects.all().order_by('-created_at')
+
+class LiveDisplayView(TemplateView):
+    """Public view for the live queue display screen."""
+    template_name = 'queues/live_display.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        today = timezone.now().date()
+        
+        context['serving_tokens'] = QueueToken.objects.filter(
+            status='SERVING', created_at__date=today
+        ).order_by('-updated_at')[:5]
+        
+        context['waiting_tokens'] = QueueToken.objects.filter(
+            status='WAITING', created_at__date=today
+        ).order_by('created_at')[:10]
+        
+        return context
