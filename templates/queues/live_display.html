@@ -145,9 +145,30 @@
     connectWebSocket();
     
     function reloadWaitingList() {
-        // In a full implementation, we'd fetch the latest 5 waiting tokens via an API endpoint.
-        // For Phase 6, we demonstrate the WebSocket connection receiving the trigger.
-        console.log("WebSocket triggered waiting list reload.");
+        fetch('/queues/api/waiting-list/')
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.getElementById('waitingListBody');
+                tbody.innerHTML = '';
+                
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="2" class="text-center py-4 text-muted">No tokens waiting</td></tr>';
+                    return;
+                }
+                
+                data.forEach(token => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="py-3 px-4 fw-bold text-white">${token.token_number}</td>
+                        <td class="py-3 px-4 text-white">${token.service}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            })
+            .catch(error => console.error('Error fetching waiting list:', error));
     }
+    
+    // Initial load
+    reloadWaitingList();
 </script>
 {% endblock %}

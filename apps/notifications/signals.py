@@ -10,6 +10,7 @@ from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 
 from apps.queues.models import QueueHistory, QueueToken
+from .models import Notification
 
 @receiver(post_save, sender=QueueHistory)
 def handle_queue_status_change(sender, instance, created, **kwargs):
@@ -50,6 +51,13 @@ def handle_queue_status_change(sender, instance, created, **kwargs):
                 [user_email],
                 fail_silently=True,
             )
+            # Create persistent notification
+            Notification.objects.create(
+                user=token.user,
+                title=subject,
+                message=message,
+                notification_type='EMAIL'
+            )
         except Exception as e:
             print(f"Failed to send email to {user_email}: {e}")
             
@@ -66,5 +74,13 @@ def handle_queue_status_change(sender, instance, created, **kwargs):
                 [user_email],
                 fail_silently=True,
             )
+            # Create persistent notification
+            Notification.objects.create(
+                user=token.user,
+                title=subject,
+                message=message,
+                notification_type='EMAIL'
+            )
         except Exception as e:
             print(f"Failed to send email: {e}")
+

@@ -23,4 +23,7 @@ urlpatterns = [
     path('today/', views.StaffManageQueueView.as_view(), name='today'),
     path('display/', views.LiveDisplayView.as_view(), name='live_display'),
     path('admin-list/', views.AdminQueueListView.as_view(), name='admin_list'),
+    
+    # API endpoints
+    path('api/waiting-list/', views.LiveWaitingListAPIView.as_view(), name='api_waiting_list'),
 ]

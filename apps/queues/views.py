@@ -160,17 +160,14 @@ class StaffManageQueueView(RoleRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # In a real app, we'd filter by the staff member's assigned service.
-        # For Phase 1-5, we'll just show all active tokens for today.
         today = timezone.now().date()
         
-        context['waiting_tokens'] = QueueToken.objects.filter(
-            status='WAITING', created_at__date=today
-        ).order_by('created_at')
+        qs = QueueToken.objects.filter(created_at__date=today)
+        if hasattr(self.request.user, 'staff_profile') and self.request.user.staff_profile.department:
+            qs = qs.filter(service__department=self.request.user.staff_profile.department)
         
-        context['serving_tokens'] = QueueToken.objects.filter(
-            status='SERVING', created_at__date=today
-        ).order_by('-updated_at')
+        context['waiting_tokens'] = qs.filter(status='WAITING').order_by('created_at')
+        context['serving_tokens'] = qs.filter(status='SERVING').order_by('-updated_at')
         
         return context
 
@@ -243,3 +240,19 @@ class LiveDisplayView(TemplateView):
         ).order_by('created_at')[:10]
         
         return context
+
+class LiveWaitingListAPIView(View):
+    """API endpoint to return the current waiting list for the live display."""
+    def get(self, request, *args, **kwargs):
+        today = timezone.now().date()
+        waiting_tokens = QueueToken.objects.filter(
+            status='WAITING', created_at__date=today
+        ).order_by('created_at')[:10]
+        
+        data = [
+            {
+                'token_number': t.token_number,
+                'service': t.service.name
+            } for t in waiting_tokens
+        ]
+        return JsonResponse(data, safe=False)
