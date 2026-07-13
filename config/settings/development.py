@@ -67,6 +67,9 @@ CSRF_TRUSTED_ORIGINS = [
 # =============================================================================
 
 STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
     'staticfiles': {
         'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
     },

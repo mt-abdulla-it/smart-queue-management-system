@@ -58,6 +58,7 @@ class BookQueueView(LoginRequiredMixin, CreateView):
         token.user = self.request.user
         token.token_number = token_number
         token.status = 'WAITING'
+        token.queue_date = today
         token.save()
         
         # Generate QR Code storing the token detail URL
