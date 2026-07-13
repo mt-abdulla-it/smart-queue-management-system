@@ -51,7 +51,7 @@ class BookQueueView(LoginRequiredMixin, CreateView):
         else:
             next_num = 1
             
-        token_number = f"{service.token_prefix}-{next_num:03d}"
+        token_number = f"{service.prefix}-{next_num:03d}"
         
         # Save the token
         token = form.save(commit=False)
