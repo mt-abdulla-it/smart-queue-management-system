@@ -9,6 +9,7 @@ Classes:
     TimeStampedModel: Adds created_at and updated_at timestamps.
     SoftDeleteModel: Adds soft-delete functionality (is_deleted flag).
 """
+from typing import Any
 import uuid
 
 from django.db import models
@@ -62,11 +63,11 @@ class SoftDeleteModel(TimeStampedModel):
     with is_deleted=True. This is important for audit trails
     and data integrity in a queue management system.
     """
-    is_deleted = models.BooleanField(
+    is_deleted: Any = models.BooleanField(
         default=False,
         help_text='Soft-delete flag. If True, the record is considered deleted.'
     )
-    deleted_at = models.DateTimeField(
+    deleted_at: Any = models.DateTimeField(
         null=True,
         blank=True,
         help_text='Timestamp when the record was soft-deleted.'

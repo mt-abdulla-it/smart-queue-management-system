@@ -1,4 +1,6 @@
 {
   "venvPath": ".",
-  "venv": "venv"
+  "venv": "venv",
+  "reportMissingTypeStubs": false,
+  "reportIncompatibleMethodOverride": false
 }

@@ -3,6 +3,8 @@ Notification Model.
 
 Stores all notifications sent to users (email, SMS, push, in-app).
 """
+from typing import Any
+
 from django.conf import settings
 from django.db import models
 from apps.core.models import TimeStampedModel
@@ -17,8 +19,8 @@ class Notification(TimeStampedModel):
         PUSH = 'PUSH', 'Push Notification'
         IN_APP = 'IN_APP', 'In-App'
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
-                             related_name='notifications')
+    user: Any = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+                                 related_name='notifications')
     title = models.CharField('Title', max_length=200)
     message = models.TextField('Message')
     notification_type = models.CharField(max_length=10, choices=NotificationType.choices,
