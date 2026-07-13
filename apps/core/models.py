@@ -31,6 +31,7 @@ class TimeStampedModel(models.Model):
         auto_now=True,
         help_text='Timestamp when the record was last updated.'
     )
+    objects: Any = models.Manager()
 
     class Meta:
         abstract = True

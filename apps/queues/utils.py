@@ -28,7 +28,7 @@ def generate_qr_code(data):
     img = qr.make_image(fill_color="black", back_color="white")
     
     buffer = io.BytesIO()
-    img.save(buffer, format="PNG")
+    img.save(buffer, format="PNG")  # type: ignore
     
     return ContentFile(buffer.getvalue())
 

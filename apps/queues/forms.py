@@ -32,14 +32,14 @@ class QueueBookingForm(forms.ModelForm):
         # AJAX handling for dependent dropdowns
         if 'branch' in self.data:
             try:
-                branch_id = int(self.data.get('branch'))
+                branch_id = int(self.data.get('branch'))  # type: ignore
                 self.fields['department'].queryset = Department.objects.filter(branch_id=branch_id, is_active=True)
             except (ValueError, TypeError):
                 pass  # invalid input from the client; ignore and fallback to empty queryset
         
         if 'department' in self.data:
             try:
-                department_id = int(self.data.get('department'))
+                department_id = int(self.data.get('department'))  # type: ignore
                 self.fields['service'].queryset = Service.objects.filter(department_id=department_id, is_active=True)
             except (ValueError, TypeError):
                 pass

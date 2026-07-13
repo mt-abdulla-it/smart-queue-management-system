@@ -101,7 +101,7 @@ def format_wait(minutes):
     Usage in templates:
         {{ token.estimated_wait_minutes|format_wait }}
     """
-    from core.utils import format_wait_time
+    from apps.core.utils import format_wait_time
     return format_wait_time(minutes)
 
 

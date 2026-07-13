@@ -28,7 +28,7 @@ def site_settings(request):
     # Add unread notification count for authenticated users
     if request.user.is_authenticated:
         try:
-            from notifications.models import Notification
+            from apps.notifications.models import Notification
             context['unread_notifications_count'] = Notification.objects.filter(
                 user=request.user,
                 is_read=False,

@@ -48,7 +48,7 @@ def generate_qr_code(data, filename=None):
 
         # Save to buffer
         buffer = io.BytesIO()
-        img.save(buffer, format='PNG')
+        img.save(buffer, format='PNG')  # type: ignore
         buffer.seek(0)
 
         if not filename:
@@ -142,7 +142,7 @@ def ensure_media_directory(subdirectory):
     Returns:
         str: Full path to the directory.
     """
-    full_path = os.path.join(settings.MEDIA_ROOT, subdirectory)
+    full_path = os.path.join(settings.MEDIA_ROOT or '', subdirectory)
     os.makedirs(full_path, exist_ok=True)
     return full_path
 

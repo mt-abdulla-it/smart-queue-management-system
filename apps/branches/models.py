@@ -6,6 +6,7 @@ Branch → Department → Service
 
 Each service generates its own queue tokens with a unique prefix.
 """
+from typing import Any
 from django.db import models
 from apps.core.models import TimeStampedModel
 
@@ -86,7 +87,7 @@ class Service(TimeStampedModel):
         'Max Daily Tokens', default=100,
         help_text='Maximum tokens that can be issued per day'
     )
-    current_token_number = models.PositiveIntegerField('Current Token Number', default=0)
+    current_token_number: Any = models.PositiveIntegerField('Current Token Number', default=0)
     is_active = models.BooleanField('Active', default=True)
 
     class Meta:

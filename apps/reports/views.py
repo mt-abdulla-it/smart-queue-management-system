@@ -2,6 +2,7 @@
 Reports Views.
 Handles Excel and PDF report generation for Queue Tokens.
 """
+from typing import Any
 import io
 import openpyxl
 from datetime import datetime
@@ -23,7 +24,7 @@ class ExportExcelView(RoleRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         # Create an Excel workbook
         wb = openpyxl.Workbook()
-        ws = wb.active
+        ws: Any = wb.active
         ws.title = "Queue Tokens Report"
         
         # Headers

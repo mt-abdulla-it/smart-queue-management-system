@@ -10,6 +10,7 @@ Classes:
     StaffRequiredMixin: Restricts access to staff users only.
     AjaxResponseMixin: Adds AJAX/JSON response capability.
 """
+from typing import Any
 import json
 import logging
 
@@ -100,6 +101,7 @@ class PaginationMixin:
             paginate_by = 20
     """
     paginate_by = 20
+    request: Any
 
     def get_paginate_by(self, queryset):
         """Allow page size to be set via query parameter."""
