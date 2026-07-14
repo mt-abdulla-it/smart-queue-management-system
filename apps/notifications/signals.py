@@ -18,7 +18,7 @@ def handle_queue_status_change(sender, instance, created, **kwargs):
         return
         
     token = instance.token
-    new_status = instance.to_status
+    action = instance.action
     
     # 1. Trigger WebSocket Event for Live Display
     channel_layer = get_channel_layer()
@@ -26,9 +26,9 @@ def handle_queue_status_change(sender, instance, created, **kwargs):
         'live_queue',
         {
             'type': 'queue_update',
-            'message': f'Token {token.token_number} is now {new_status}',
+            'message': f'Token {token.token_number} action: {action}',
             'token_number': token.token_number,
-            'status': new_status,
+            'status': token.status,
             'service': token.service.name
         }
     )
@@ -39,7 +39,7 @@ def handle_queue_status_change(sender, instance, created, **kwargs):
         
     user_email = token.user.email
     
-    if new_status == 'SERVING':
+    if action == 'SERVING':
         subject = f"Your Turn: {token.token_number}"
         message = f"Hello {token.user.first_name},\n\nIt is your turn! Please proceed to the counter for {token.service.name} at {token.service.department.branch.name}.\n\nThank you for using Smart Queue."
         
@@ -61,7 +61,7 @@ def handle_queue_status_change(sender, instance, created, **kwargs):
         except Exception as e:
             print(f"Failed to send email to {user_email}: {e}")
             
-    elif new_status == 'WAITING' and instance.from_status != 'WAITING':
+    elif action == 'CREATED':
         # E.g., someone booked online.
         subject = f"Queue Booked: {token.token_number}"
         message = f"Hello {token.user.first_name},\n\nYou have successfully booked {token.token_number} for {token.service.name}.\n\nThank you for using Smart Queue."
