@@ -70,9 +70,8 @@ class BookQueueView(LoginRequiredMixin, CreateView):
         # Log History
         QueueHistory.objects.create(
             token=token,
-            changed_by=self.request.user,
-            from_status='',
-            to_status='WAITING',
+            action_by=self.request.user,
+            action=QueueHistory.Action.CREATED,
             notes="Token generated online."
         )
 
@@ -194,11 +193,18 @@ class ChangeTokenStatusView(RoleRequiredMixin, View):
             token.status = new_status
             token.save()
             
+            action_mapping = {
+                'SERVING': QueueHistory.Action.SERVING,
+                'SKIPPED': QueueHistory.Action.SKIPPED,
+                'COMPLETED': QueueHistory.Action.COMPLETED,
+                'HOLD': QueueHistory.Action.ON_HOLD,
+            }
+            history_action = action_mapping.get(new_status, QueueHistory.Action.CREATED)
+            
             QueueHistory.objects.create(
                 token=token,
-                changed_by=request.user,
-                from_status=old_status,
-                to_status=new_status,
+                action_by=request.user,
+                action=history_action,
                 notes=f"Status changed to {new_status} via staff panel."
             )
             
