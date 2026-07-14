@@ -23,16 +23,19 @@ def handle_queue_status_change(sender, instance, created, **kwargs):
     # 1. Trigger WebSocket Event for Live Display
     channel_layer = get_channel_layer()
     if channel_layer is not None:
-        async_to_sync(channel_layer.group_send)(
-            'live_queue',
-            {
-                'type': 'queue_update',
-                'message': f'Token {token.token_number} action: {action}',
-                'token_number': token.token_number,
-                'status': token.status,
-                'service': token.service.name
-            }
-        )
+        try:
+            async_to_sync(channel_layer.group_send)(
+                'live_queue',
+                {
+                    'type': 'queue_update',
+                    'message': f'Token {token.token_number} action: {action}',
+                    'token_number': token.token_number,
+                    'status': token.status,
+                    'service': token.service.name
+                }
+            )
+        except Exception as e:
+            print(f"WebSocket broadcast failed (Redis might be down): {e}")
     
     # 2. Trigger Email Notification (if user exists)
     if not token.user:
