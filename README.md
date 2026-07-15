@@ -123,11 +123,7 @@ smart-queue-management-system/
 
 ---
 
-## 📄 License
 
-This project is developed as a university final-year project.
-
----
 
 ## 👤 Author
 
