@@ -132,8 +132,8 @@ This project is developed as a university final-year project.
 ## 👤 Author
 
 **Abdulla Thaslim**  
-[![GitHub](https://img.shields.io/badge/GitHub-mt--abdullah-181717?style=flat-square&logo=github)](https://github.com/mt-abdulla-it)
-[![Email](https://img.shields.io/badge/Email-iammtabdullah%40gmail.com-D14836?style=flat-square&logo=gmail&logoColor=white)](mailto:iammtabdullah@gmail.com)
+[![GitHub](https://img.shields.io/badge/GitHub-mt--abdulla--it-181717?style=flat-square&logo=github)](https://github.com/mt-abdulla-it)
+[![Email](https://img.shields.io/badge/Email-mt.abdulla.it%40gmail.com-D14836?style=flat-square&logo=gmail&logoColor=white)](mailto:mt.abdulla.it@gmail.com)
 
 ---
 
