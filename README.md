@@ -1,4 +1,4 @@
-# 🏥 Smart Queue Management System
+# 🏥 Smart Queue Management System.
 
 ![Django](https://img.shields.io/badge/Django-5+-092E20?style=flat-square&logo=django&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14+-316192?style=flat-square&logo=postgresql&logoColor=white)
