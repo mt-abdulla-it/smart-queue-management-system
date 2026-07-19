@@ -1,37 +1,92 @@
 {% extends 'base.html' %}
 
 {% block title %}Queue Management — {{ site_name }}{% endblock %}
-{% block page_header %}Queue Management Panel{% endblock %}
+{% block page_header %}Counter Queue Control Panel{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
+    <!-- Stat Summary Bar -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card glass-card border-0 rounded-4 p-3 shadow-sm h-100">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="stat-icon bg-info bg-opacity-10 text-info rounded-3 p-3">
+                        <i class="fas fa-bullhorn fa-2x"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted small text-uppercase tracking-wider fw-bold">Now Serving</span>
+                        <h3 class="mb-0 fw-extrabold text-info">{{ serving_tokens|length }} Token{% if serving_tokens|length != 1 %}s{% endif %}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card glass-card border-0 rounded-4 p-3 shadow-sm h-100">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="stat-icon bg-warning bg-opacity-10 text-warning rounded-3 p-3">
+                        <i class="fas fa-user-clock fa-2x"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted small text-uppercase tracking-wider fw-bold">Waiting Queue</span>
+                        <h3 class="mb-0 fw-extrabold text-warning">{{ waiting_tokens.count }} People</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card glass-card border-0 rounded-4 p-3 shadow-sm h-100">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="stat-icon bg-success bg-opacity-10 text-success rounded-3 p-3">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted small text-uppercase tracking-wider fw-bold">Counter Status</span>
+                        <h3 class="mb-0 fw-extrabold text-success">Online & Active</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row g-4">
         <!-- Now Serving -->
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm border-top border-info border-3 h-100">
-                <div class="card-header bg-transparent border-0 pt-4">
-                    <h5 class="fw-bold mb-0"><i class="fas fa-bullhorn text-info me-2"></i>Now Serving</h5>
+        <div class="col-lg-5 col-xl-4">
+            <div class="card glass-card border-0 shadow-lg rounded-4 overflow-hidden h-100">
+                <div class="card-header bg-gradient bg-primary text-white p-4 border-0">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h5 class="fw-bold mb-0 text-white"><i class="fas fa-bullhorn me-2"></i>Active Serving Token</h5>
+                        <span class="badge bg-white text-primary rounded-pill px-3 py-2 fw-bold">Live</span>
+                    </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4">
                     {% for token in serving_tokens %}
-                    <div class="p-3 border rounded-3 mb-3 bg-light">
-                        <h2 class="fw-bold text-center text-primary mb-2">{{ token.token_number }}</h2>
-                        <p class="text-center text-muted mb-3">{{ token.service.name }}</p>
+                    <div class="p-4 border border-primary border-opacity-25 rounded-4 mb-3 bg-primary bg-opacity-10 text-center pulse-glow position-relative">
+                        <span class="badge bg-primary px-3 py-1 rounded-pill mb-2">In Service</span>
+                        <h1 class="display-2 fw-black text-primary mb-1 tracking-tight" style="font-size: 4rem;">{{ token.token_number }}</h1>
+                        <p class="text-muted fw-semibold mb-4">{{ token.service.name }}</p>
+                        
                         <div class="d-grid gap-2">
                             <form method="post" action="{% url 'queues:change_status' token.pk 'complete' %}">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-success w-100"><i class="fas fa-check me-2"></i>Mark Completed</button>
+                                <button type="submit" class="btn btn-success btn-lg w-100 rounded-3 shadow-sm fw-bold">
+                                    <i class="fas fa-check-circle me-2"></i>Mark Completed
+                                </button>
                             </form>
                             <form method="post" action="{% url 'queues:change_status' token.pk 'hold' %}">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-outline-warning w-100"><i class="fas fa-pause me-2"></i>Put on Hold</button>
+                                <button type="submit" class="btn btn-outline-warning w-100 rounded-3 fw-semibold">
+                                    <i class="fas fa-pause-circle me-2"></i>Put on Hold
+                                </button>
                             </form>
                         </div>
                     </div>
                     {% empty %}
                     <div class="text-center py-5 text-muted">
-                        <i class="fas fa-coffee fa-3x mb-3 opacity-25"></i>
-                        <p>No tokens currently being served.</p>
+                        <div class="avatar-icon bg-light rounded-circle p-4 d-inline-block mb-3 shadow-sm">
+                            <i class="fas fa-coffee fa-3x text-muted opacity-50"></i>
+                        </div>
+                        <h5 class="fw-semibold">No token currently called</h5>
+                        <p class="small text-muted mb-0">Select a token from the waiting list to call your next customer.</p>
                     </div>
                     {% endfor %}
                 </div>
@@ -39,43 +94,52 @@
         </div>
 
         <!-- Waiting List -->
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm border-top border-warning border-3 h-100">
-                <div class="card-header bg-transparent border-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
-                    <h5 class="fw-bold mb-0"><i class="fas fa-users text-warning me-2"></i>Waiting List</h5>
-                    <span class="badge bg-warning text-dark">{{ waiting_tokens.count }} Waiting</span>
+        <div class="col-lg-7 col-xl-8">
+            <div class="card glass-card border-0 shadow-lg rounded-4 overflow-hidden h-100">
+                <div class="card-header bg-transparent p-4 border-bottom border-light d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="fw-bold mb-0"><i class="fas fa-users text-warning me-2"></i>Customer Queue List</h5>
+                        <small class="text-muted">Real-time ordered token list</small>
+                    </div>
+                    <span class="badge bg-warning bg-opacity-20 text-warning px-3 py-2 rounded-pill fw-bold border border-warning border-opacity-30">
+                        {{ waiting_tokens.count }} Waiting
+                    </span>
                 </div>
-                <div class="card-body p-0 mt-3">
+                <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
+                            <thead class="bg-light">
                                 <tr>
-                                    <th class="ps-4">Token</th>
-                                    <th>Service</th>
-                                    <th>Wait Time</th>
-                                    <th class="text-end pe-4">Actions</th>
+                                    <th class="ps-4 text-uppercase fs-7 text-muted tracking-wider">Token</th>
+                                    <th class="text-uppercase fs-7 text-muted tracking-wider">Service</th>
+                                    <th class="text-uppercase fs-7 text-muted tracking-wider">Wait Time</th>
+                                    <th class="text-end pe-4 text-uppercase fs-7 text-muted tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for token in waiting_tokens %}
                                 <tr>
                                     <td class="ps-4">
-                                        <span class="fw-bold text-dark fs-5">{{ token.token_number }}</span>
+                                        <span class="badge bg-primary bg-opacity-10 text-primary fs-5 fw-bold px-3 py-2 rounded-3 border border-primary border-opacity-20">
+                                            {{ token.token_number }}
+                                        </span>
                                     </td>
-                                    <td>{{ token.service.name }}</td>
-                                    <td>{{ token.created_at|timesince }} ago</td>
+                                    <td><span class="fw-semibold text-body">{{ token.service.name }}</span></td>
+                                    <td>
+                                        <small class="text-muted"><i class="far fa-clock me-1"></i>{{ token.created_at|timesince }} ago</small>
+                                    </td>
                                     <td class="text-end pe-4">
-                                        <div class="btn-group">
+                                        <div class="btn-group gap-2">
                                             <form method="post" action="{% url 'queues:change_status' token.pk 'call' %}" class="d-inline">
                                                 {% csrf_token %}
-                                                <button type="submit" class="btn btn-sm btn-primary" title="Call Next">
-                                                    <i class="fas fa-bullhorn"></i> Call
+                                                <button type="submit" class="btn btn-sm btn-primary rounded-3 px-3 py-2 fw-bold shadow-sm" title="Call Next Customer">
+                                                    <i class="fas fa-bullhorn me-1"></i> Call Next
                                                 </button>
                                             </form>
-                                            <form method="post" action="{% url 'queues:change_status' token.pk 'skip' %}" class="d-inline ms-1">
+                                            <form method="post" action="{% url 'queues:change_status' token.pk 'skip' %}" class="d-inline">
                                                 {% csrf_token %}
-                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Skip">
-                                                    <i class="fas fa-step-forward"></i>
+                                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-3 px-2 py-2" title="Mark No-Show / Skip">
+                                                    <i class="fas fa-step-forward me-1"></i> Skip
                                                 </button>
                                             </form>
                                         </div>
@@ -84,7 +148,8 @@
                                 {% empty %}
                                 <tr>
                                     <td colspan="4" class="text-center py-5 text-muted">
-                                        The queue is empty.
+                                        <i class="fas fa-check-circle fa-2x text-success mb-2 opacity-50"></i>
+                                        <p class="mb-0 fw-medium">All queues are clear! No customers currently waiting.</p>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -97,3 +162,4 @@
     </div>
 </div>
 {% endblock %}
+

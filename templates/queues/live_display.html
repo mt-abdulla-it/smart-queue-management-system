@@ -5,21 +5,45 @@
 {% block extra_css %}
 <style>
     /* TV Display specific styling */
-    body { background-color: #0f172a; color: white; }
+    body {
+        background: var(--gradient-live-display, linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%));
+        color: white;
+        min-height: 100vh;
+    }
     .top-navbar, .sidebar, .app-footer, .sidebar-toggle { display: none !important; }
-    .main-content { margin-left: 0 !important; padding: 20px; }
+    .main-content { margin-left: 0 !important; padding: 24px; }
     
     .serving-card {
-        background: linear-gradient(135deg, #1e293b, #0f172a);
-        border: 2px solid #3b82f6;
-        box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+        background: rgba(30, 41, 59, 0.75);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 2px solid rgba(99, 102, 241, 0.5);
+        box-shadow: 0 0 40px rgba(99, 102, 241, 0.3), inset 0 0 20px rgba(99, 102, 241, 0.1);
+        transition: all 0.5s ease-in-out;
+    }
+
+    .serving-card.called-active {
+        border-color: #10b981;
+        box-shadow: 0 0 60px rgba(16, 185, 129, 0.6), inset 0 0 30px rgba(16, 185, 129, 0.2);
+        transform: scale(1.02);
     }
     
-    .blink {
-        animation: blinker 1.5s linear infinite;
+    .blink-glow {
+        animation: blinkGlow 1.2s infinite ease-in-out;
     }
-    @keyframes blinker {
-        50% { opacity: 0; }
+    @keyframes blinkGlow {
+        0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 20px rgba(239, 68, 68, 0.8); }
+        50% { opacity: 0.6; transform: scale(1.04); box-shadow: 0 0 40px rgba(239, 68, 68, 1); }
+    }
+
+    .live-dot {
+        width: 10px;
+        height: 10px;
+        background-color: #10b981;
+        border-radius: 50%;
+        display: inline-block;
+        box-shadow: 0 0 10px #10b981;
+        animation: ringPulse 2s infinite;
     }
 </style>
 {% endblock %}
@@ -27,59 +51,72 @@
 {% block content %}
 <div class="container-fluid h-100">
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-5 border-bottom border-secondary pb-3">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-secondary border-opacity-50 pb-3">
         <div class="d-flex align-items-center gap-3">
-            <div class="brand-icon" style="width: 60px; height: 60px; font-size: 2rem;">
+            <div class="brand-icon rounded-4 bg-primary bg-gradient p-3 d-flex align-items-center justify-content-center shadow-lg" style="width: 64px; height: 64px; font-size: 2rem;">
                 <i class="fas fa-hospital-user text-white"></i>
             </div>
             <div>
-                <h2 class="mb-0 fw-bold">{{ site_name }}</h2>
-                <h4 class="text-info mb-0">Live Queue Status</h4>
+                <h2 class="mb-0 fw-extrabold text-white tracking-wide">{{ site_name }}</h2>
+                <div class="d-flex align-items-center gap-2 mt-1">
+                    <span class="live-dot"></span>
+                    <span class="text-info fw-semibold text-uppercase tracking-wider fs-6">Live Queue Display</span>
+                </div>
             </div>
         </div>
         <div class="text-end">
-            <h3 class="mb-0" id="clock">--:--:--</h3>
-            <p class="text-secondary mb-0" id="date">Loading date...</p>
+            <h2 class="mb-0 fw-bold text-white font-monospace" id="clock">--:--:--</h2>
+            <p class="text-secondary mb-0 fw-medium" id="date">Loading date...</p>
         </div>
     </div>
 
-    <div class="row g-5">
+    <div class="row g-4">
         <!-- Now Serving (Left Side) -->
         <div class="col-lg-7">
-            <h2 class="text-warning mb-4"><i class="fas fa-bullhorn me-2"></i>NOW SERVING</h2>
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h3 class="text-warning fw-bold mb-0 text-uppercase tracking-wider"><i class="fas fa-bullhorn me-2"></i>Now Serving</h3>
+                <span class="badge bg-warning bg-opacity-20 text-warning px-3 py-2 rounded-pill fs-6 border border-warning border-opacity-30">Active Call</span>
+            </div>
             
             <div id="nowServingContainer">
-                <div class="card serving-card rounded-4 p-5 mb-4 text-center">
-                    <h1 class="display-1 fw-bold text-white mb-2" id="servingToken">--</h1>
-                    <h3 class="text-info" id="servingService">Waiting for next token...</h3>
+                <div class="card serving-card rounded-4 p-5 mb-4 text-center position-relative overflow-hidden" id="servingCard">
+                    <div class="position-absolute top-0 end-0 p-3">
+                        <i class="fas fa-broadcast-tower text-primary opacity-50 fs-3"></i>
+                    </div>
+                    <p class="text-uppercase tracking-widest text-muted fw-bold mb-1">Token Number</p>
+                    <h1 class="display-1 fw-black text-white mb-2 tracking-tight" id="servingToken" style="font-size: 5.5rem;">--</h1>
+                    <h3 class="text-info fw-semibold" id="servingService">Waiting for next token...</h3>
                     <div class="mt-4">
-                        <span class="badge bg-danger fs-4 px-4 py-2 blink d-none" id="proceedBadge">PLEASE PROCEED TO COUNTER</span>
+                        <span class="badge bg-danger fs-4 px-5 py-3 rounded-pill blink-glow d-none" id="proceedBadge">
+                            <i class="fas fa-arrow-circle-right me-2"></i>PLEASE PROCEED TO COUNTER
+                        </span>
                     </div>
                 </div>
             </div>
             
             <!-- Audio for bell chime -->
             <audio id="bellSound" preload="auto">
-                <!-- Using a placeholder data URI for a tiny beep, in production use a real MP3/WAV file -->
                 <source src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU" type="audio/wav">
             </audio>
         </div>
 
         <!-- Waiting List (Right Side) -->
         <div class="col-lg-5">
-            <h3 class="text-secondary mb-4"><i class="fas fa-users me-2"></i>UPCOMING</h3>
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h3 class="text-secondary fw-bold mb-0 text-uppercase tracking-wider"><i class="fas fa-users me-2"></i>Upcoming</h3>
+                <span class="badge bg-secondary bg-opacity-20 text-light px-3 py-2 rounded-pill fs-6 border border-secondary border-opacity-30" id="queueCountBadge">0 Waiting</span>
+            </div>
             
-            <div class="card bg-dark border-secondary rounded-4">
+            <div class="card glass-card border-secondary border-opacity-25 rounded-4 shadow-lg overflow-hidden">
                 <div class="card-body p-0">
-                    <table class="table table-dark table-striped table-borderless mb-0 fs-4">
-                        <thead>
-                            <tr class="text-secondary border-bottom border-secondary">
-                                <th class="py-3 px-4">Token</th>
-                                <th class="py-3 px-4">Service</th>
+                    <table class="table table-dark table-hover table-borderless mb-0 fs-4 align-middle">
+                        <thead class="bg-black bg-opacity-40">
+                            <tr class="text-secondary border-bottom border-secondary border-opacity-50">
+                                <th class="py-3 px-4 text-uppercase fs-6 tracking-wider">Token</th>
+                                <th class="py-3 px-4 text-uppercase fs-6 tracking-wider">Service</th>
                             </tr>
                         </thead>
                         <tbody id="waitingListBody">
-                            <!-- Populated via WS/AJAX -->
                             <tr><td colspan="2" class="text-center py-4 text-muted">Waiting for data...</td></tr>
                         </tbody>
                     </table>
@@ -101,6 +138,26 @@
     setInterval(updateClock, 1000);
     updateClock();
 
+    // Synthesize Chime Sound via Web Audio API as fallback
+    function playChimeSound() {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, audioCtx.currentTime); // A5 note
+            osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.6);
+            gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.6);
+        } catch(e) {
+            console.log("Audio synth error:", e);
+        }
+    }
+
     // Setup WebSocket
     const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
     const wsUrl = protocol + window.location.host + '/ws/queues/live/';
@@ -120,14 +177,19 @@
                     document.getElementById('servingService').textContent = data.service;
                     
                     const badge = document.getElementById('proceedBadge');
-                    badge.classList.remove('d-none');
+                    const servingCard = document.getElementById('servingCard');
                     
-                    // Play sound
+                    badge.classList.remove('d-none');
+                    if (servingCard) servingCard.classList.add('called-active');
+                    
+                    // Play sound feedback
+                    playChimeSound();
                     const bell = document.getElementById('bellSound');
-                    bell.play().catch(e => console.log("Audio play blocked by browser policy"));
+                    if (bell) bell.play().catch(e => console.log("Audio play policy"));
                     
                     setTimeout(() => {
                         badge.classList.add('d-none');
+                        if (servingCard) servingCard.classList.remove('called-active');
                     }, 10000); // Hide blink after 10s
                 }
                 
@@ -149,8 +211,11 @@
             .then(response => response.json())
             .then(data => {
                 const tbody = document.getElementById('waitingListBody');
+                const countBadge = document.getElementById('queueCountBadge');
                 tbody.innerHTML = '';
                 
+                if (countBadge) countBadge.textContent = `${data.length} Waiting`;
+
                 if (data.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="2" class="text-center py-4 text-muted">No tokens waiting</td></tr>';
                     return;
@@ -158,9 +223,10 @@
                 
                 data.forEach(token => {
                     const tr = document.createElement('tr');
+                    tr.className = 'animated-fade-in';
                     tr.innerHTML = `
-                        <td class="py-3 px-4 fw-bold text-white">${token.token_number}</td>
-                        <td class="py-3 px-4 text-white">${token.service}</td>
+                        <td class="py-3 px-4 fw-bold text-white"><span class="badge bg-primary bg-opacity-20 text-info px-3 py-2 rounded-3">${token.token_number}</span></td>
+                        <td class="py-3 px-4 text-white fw-medium">${token.service}</td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -172,3 +238,4 @@
     reloadWaitingList();
 </script>
 {% endblock %}
+

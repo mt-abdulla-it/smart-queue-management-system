@@ -32,6 +32,14 @@
     backdrop-filter: blur(12px);
 }
 
+[data-bs-theme="dark"] .glass-card {
+    background: rgba(30, 41, 59, 0.75);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
 /* ---------- Cards with subtle glow ---------- */
 [data-bs-theme="dark"] .card {
     background: var(--bg-card);
@@ -40,8 +48,8 @@
 }
 
 [data-bs-theme="dark"] .card:hover {
-    border-color: rgba(99, 102, 241, 0.15);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(99, 102, 241, 0.1);
+    border-color: rgba(99, 102, 241, 0.25);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(99, 102, 241, 0.15);
 }
 
 [data-bs-theme="dark"] .card-header {
@@ -53,6 +61,7 @@
     background: rgba(30, 41, 59, 0.7);
     backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: all var(--transition-normal);
 }
 
 [data-bs-theme="dark"] .stat-card:hover {
