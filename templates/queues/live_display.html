@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Live Queue Display — {{ site_name }}{% endblock %}
+{% block title %}Live Queue TV Display — {{ site_name }}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -9,22 +9,23 @@
         background: var(--gradient-live-display, linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%));
         color: white;
         min-height: 100vh;
+        overflow: hidden;
     }
     .top-navbar, .sidebar, .app-footer, .sidebar-toggle { display: none !important; }
-    .main-content { margin-left: 0 !important; padding: 24px; }
+    .main-content { margin-left: 0 !important; padding: 20px; }
     
     .serving-card {
-        background: rgba(30, 41, 59, 0.75);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
+        background: rgba(30, 41, 59, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
         border: 2px solid rgba(99, 102, 241, 0.5);
-        box-shadow: 0 0 40px rgba(99, 102, 241, 0.3), inset 0 0 20px rgba(99, 102, 241, 0.1);
-        transition: all 0.5s ease-in-out;
+        box-shadow: 0 0 50px rgba(99, 102, 241, 0.3), inset 0 0 25px rgba(99, 102, 241, 0.15);
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .serving-card.called-active {
         border-color: #10b981;
-        box-shadow: 0 0 60px rgba(16, 185, 129, 0.6), inset 0 0 30px rgba(16, 185, 129, 0.2);
+        box-shadow: 0 0 80px rgba(16, 185, 129, 0.7), inset 0 0 40px rgba(16, 185, 129, 0.3);
         transform: scale(1.02);
     }
     
@@ -32,24 +33,37 @@
         animation: blinkGlow 1.2s infinite ease-in-out;
     }
     @keyframes blinkGlow {
-        0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 20px rgba(239, 68, 68, 0.8); }
-        50% { opacity: 0.6; transform: scale(1.04); box-shadow: 0 0 40px rgba(239, 68, 68, 1); }
+        0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 30px rgba(239, 68, 68, 0.9); }
+        50% { opacity: 0.6; transform: scale(1.05); box-shadow: 0 0 50px rgba(239, 68, 68, 1); }
     }
 
     .live-dot {
-        width: 10px;
-        height: 10px;
+        width: 12px;
+        height: 12px;
         background-color: #10b981;
         border-radius: 50%;
         display: inline-block;
-        box-shadow: 0 0 10px #10b981;
+        box-shadow: 0 0 12px #10b981;
         animation: ringPulse 2s infinite;
+    }
+
+    .tv-ticker-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(15, 23, 42, 0.95);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 12px 24px;
+        font-size: 1.1rem;
+        z-index: 999;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid h-100">
+<div class="container-fluid h-100 pb-5">
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-secondary border-opacity-50 pb-3">
         <div class="d-flex align-items-center gap-3">
@@ -60,13 +74,18 @@
                 <h2 class="mb-0 fw-extrabold text-white tracking-wide">{{ site_name }}</h2>
                 <div class="d-flex align-items-center gap-2 mt-1">
                     <span class="live-dot"></span>
-                    <span class="text-info fw-semibold text-uppercase tracking-wider fs-6">Live Queue Display</span>
+                    <span class="text-info fw-semibold text-uppercase tracking-wider fs-6">Live TV Queue Display</span>
                 </div>
             </div>
         </div>
-        <div class="text-end">
-            <h2 class="mb-0 fw-bold text-white font-monospace" id="clock">--:--:--</h2>
-            <p class="text-secondary mb-0 fw-medium" id="date">Loading date...</p>
+        <div class="d-flex align-items-center gap-3 text-end">
+            <button id="fullscreenBtn" class="btn btn-outline-light btn-sm rounded-pill px-3 py-2">
+                <i class="fas fa-expand me-1"></i> Fullscreen TV Mode
+            </button>
+            <div>
+                <h2 class="mb-0 fw-bold text-white font-monospace" id="clock">--:--:--</h2>
+                <p class="text-secondary mb-0 fw-medium" id="date">Loading date...</p>
+            </div>
         </div>
     </div>
 
@@ -83,8 +102,8 @@
                     <div class="position-absolute top-0 end-0 p-3">
                         <i class="fas fa-broadcast-tower text-primary opacity-50 fs-3"></i>
                     </div>
-                    <p class="text-uppercase tracking-widest text-muted fw-bold mb-1">Token Number</p>
-                    <h1 class="display-1 fw-black text-white mb-2 tracking-tight" id="servingToken" style="font-size: 5.5rem;">--</h1>
+                    <p class="text-uppercase tracking-widest text-white-50 fw-bold mb-1">Token Number</p>
+                    <h1 class="display-1 fw-black text-white mb-2 tracking-tight tv-token-giant" id="servingToken" style="font-size: 6rem;">--</h1>
                     <h3 class="text-info fw-semibold" id="servingService">Waiting for next token...</h3>
                     <div class="mt-4">
                         <span class="badge bg-danger fs-4 px-5 py-3 rounded-pill blink-glow d-none" id="proceedBadge">
@@ -125,6 +144,19 @@
         </div>
     </div>
 </div>
+
+<!-- Multi-Language Announcement Ticker -->
+<div class="tv-ticker-bar d-flex align-items-center justify-content-between">
+    <div class="d-flex align-items-center gap-3">
+        <span class="badge bg-primary rounded-pill px-3 py-1 fw-bold">ANNOUNCEMENT</span>
+        <span class="text-white font-medium" id="tickerText">
+            Please listen carefully for your token number. Maintain physical distancing in the waiting area.
+        </span>
+    </div>
+    <div class="text-white-50 small">
+        <i class="fas fa-globe me-1"></i> EN | සිංහල | தமிழ்
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -138,7 +170,29 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Synthesize Chime Sound via Web Audio API as fallback
+    // Multi-language Ticker Rotation
+    const tickerMessages = [
+        "Please listen carefully for your token number. Maintain physical distancing in waiting areas.",
+        "ඔබගේ ටෝකන් අංකය සඳහා කරුණාකර අවධානයෙන් සිටින්න.",
+        "உங்கள் டோக்கன் எண்ணை கவனமாகக் கேளுங்கள்."
+    ];
+    let tickerIdx = 0;
+    setInterval(() => {
+        tickerIdx = (tickerIdx + 1) % tickerMessages.length;
+        const elem = document.getElementById('tickerText');
+        if (elem) elem.textContent = tickerMessages[tickerIdx];
+    }, 6000);
+
+    // Fullscreen TV Mode Toggle
+    document.getElementById('fullscreenBtn')?.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => console.log(err));
+        } else {
+            document.exitFullscreen();
+        }
+    });
+
+    // Synthesize Chime Sound via Web Audio API
     function playChimeSound() {
         try {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -172,7 +226,6 @@
             
             if (data.type === 'queue_update') {
                 if (data.status === 'SERVING') {
-                    // Update Now Serving card
                     document.getElementById('servingToken').textContent = data.token_number;
                     document.getElementById('servingService').textContent = data.service;
                     
@@ -182,7 +235,6 @@
                     badge.classList.remove('d-none');
                     if (servingCard) servingCard.classList.add('called-active');
                     
-                    // Play sound feedback
                     playChimeSound();
                     const bell = document.getElementById('bellSound');
                     if (bell) bell.play().catch(e => console.log("Audio play policy"));
@@ -190,10 +242,8 @@
                     setTimeout(() => {
                         badge.classList.add('d-none');
                         if (servingCard) servingCard.classList.remove('called-active');
-                    }, 10000); // Hide blink after 10s
+                    }, 10000);
                 }
-                
-                // Trigger an AJAX reload of the waiting list
                 reloadWaitingList();
             }
         };
@@ -234,8 +284,8 @@
             .catch(error => console.error('Error fetching waiting list:', error));
     }
     
-    // Initial load
     reloadWaitingList();
 </script>
 {% endblock %}
+
 
