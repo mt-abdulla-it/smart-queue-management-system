@@ -5,6 +5,17 @@
 
 {% block content %}
 <div class="container-fluid py-4">
+    <!-- Keyboard Shortcut Bar -->
+    <div class="keyboard-hints-bar mb-4 shadow-sm">
+        <div class="d-flex align-items-center gap-2 text-white">
+            <i class="fas fa-keyboard text-primary me-1"></i> <strong>Counter Hotkeys:</strong>
+        </div>
+        <div><span class="counter-hotkey-badge">Space</span> Call Next</div>
+        <div><span class="counter-hotkey-badge">Alt + C</span> Mark Complete</div>
+        <div><span class="counter-hotkey-badge">Alt + S</span> Skip Patient</div>
+        <div><span class="counter-hotkey-badge">Alt + H</span> Hold Token</div>
+    </div>
+
     <!-- Stat Summary Bar -->
     <div class="row g-3 mb-4">
         <div class="col-md-4">
@@ -51,42 +62,42 @@
     <div class="row g-4">
         <!-- Now Serving -->
         <div class="col-lg-5 col-xl-4">
-            <div class="card glass-card border-0 shadow-lg rounded-4 overflow-hidden h-100">
-                <div class="card-header bg-gradient bg-primary text-white p-4 border-0">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <h5 class="fw-bold mb-0 text-white"><i class="fas fa-bullhorn me-2"></i>Active Serving Token</h5>
-                        <span class="badge bg-white text-primary rounded-pill px-3 py-2 fw-bold">Live</span>
+            <div class="counter-hero-card h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-1 fw-bold text-uppercase">
+                            <i class="fas fa-bullhorn me-1"></i> Active Serving Token
+                        </span>
+                        <span class="badge bg-success text-white rounded-pill px-3 py-1 fw-bold">Live</span>
                     </div>
-                </div>
-                <div class="card-body p-4">
+                    
                     {% for token in serving_tokens %}
-                    <div class="p-4 border border-primary border-opacity-25 rounded-4 mb-3 bg-primary bg-opacity-10 text-center pulse-glow position-relative">
-                        <span class="badge bg-primary px-3 py-1 rounded-pill mb-2">In Service</span>
-                        <h1 class="display-2 fw-black text-primary mb-1 tracking-tight" style="font-size: 4rem;">{{ token.token_number }}</h1>
-                        <p class="text-muted fw-semibold mb-4">{{ token.service.name }}</p>
+                    <div class="text-center py-3">
+                        <div class="counter-serving-number mb-2">{{ token.token_number }}</div>
+                        <h5 class="text-white-50 mb-4">{{ token.service.name }}</h5>
                         
                         <div class="d-grid gap-2">
-                            <form method="post" action="{% url 'queues:change_status' token.pk 'complete' %}">
+                            <form method="post" action="{% url 'queues:change_status' token.pk 'complete' %}" id="completeForm">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-success btn-lg w-100 rounded-3 shadow-sm fw-bold">
-                                    <i class="fas fa-check-circle me-2"></i>Mark Completed
+                                <button type="submit" class="btn btn-success btn-lg w-100 rounded-3 shadow-md fw-bold py-3 hover-lift">
+                                    <i class="fas fa-check-circle me-2"></i>Mark Completed <span class="counter-hotkey-badge">Alt + C</span>
                                 </button>
                             </form>
-                            <form method="post" action="{% url 'queues:change_status' token.pk 'hold' %}">
+                            <form method="post" action="{% url 'queues:change_status' token.pk 'hold' %}" id="holdForm">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-outline-warning w-100 rounded-3 fw-semibold">
-                                    <i class="fas fa-pause-circle me-2"></i>Put on Hold
+                                <button type="submit" class="btn btn-outline-light w-100 rounded-3 py-2 fw-semibold">
+                                    <i class="fas fa-pause-circle me-2"></i>Put on Hold <span class="counter-hotkey-badge">Alt + H</span>
                                 </button>
                             </form>
                         </div>
                     </div>
                     {% empty %}
-                    <div class="text-center py-5 text-muted">
-                        <div class="avatar-icon bg-light rounded-circle p-4 d-inline-block mb-3 shadow-sm">
-                            <i class="fas fa-coffee fa-3x text-muted opacity-50"></i>
+                    <div class="text-center py-5">
+                        <div class="bg-white bg-opacity-10 rounded-circle p-4 d-inline-block mb-3">
+                            <i class="fas fa-coffee fa-3x text-white-50"></i>
                         </div>
-                        <h5 class="fw-semibold">No token currently called</h5>
-                        <p class="small text-muted mb-0">Select a token from the waiting list to call your next customer.</p>
+                        <h5 class="fw-semibold text-white">No token currently active</h5>
+                        <p class="small text-white-50 mb-0">Press <span class="counter-hotkey-badge">Space</span> or click "Call Next" in the list below to serve your next customer.</p>
                     </div>
                     {% endfor %}
                 </div>
@@ -96,7 +107,7 @@
         <!-- Waiting List -->
         <div class="col-lg-7 col-xl-8">
             <div class="card glass-card border-0 shadow-lg rounded-4 overflow-hidden h-100">
-                <div class="card-header bg-transparent p-4 border-bottom border-light d-flex justify-content-between align-items-center">
+                <div class="card-header bg-transparent p-4 border-bottom d-flex justify-content-between align-items-center">
                     <div>
                         <h5 class="fw-bold mb-0"><i class="fas fa-users text-warning me-2"></i>Customer Queue List</h5>
                         <small class="text-muted">Real-time ordered token list</small>
@@ -108,7 +119,7 @@
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
-                            <thead class="bg-light">
+                            <thead class="bg-body-tertiary">
                                 <tr>
                                     <th class="ps-4 text-uppercase fs-7 text-muted tracking-wider">Token</th>
                                     <th class="text-uppercase fs-7 text-muted tracking-wider">Service</th>
@@ -130,13 +141,13 @@
                                     </td>
                                     <td class="text-end pe-4">
                                         <div class="btn-group gap-2">
-                                            <form method="post" action="{% url 'queues:change_status' token.pk 'call' %}" class="d-inline">
+                                            <form method="post" action="{% url 'queues:change_status' token.pk 'call' %}" class="call-next-form d-inline">
                                                 {% csrf_token %}
-                                                <button type="submit" class="btn btn-sm btn-primary rounded-3 px-3 py-2 fw-bold shadow-sm" title="Call Next Customer">
+                                                <button type="submit" class="btn btn-sm btn-primary rounded-3 px-3 py-2 fw-bold shadow-sm call-next-btn">
                                                     <i class="fas fa-bullhorn me-1"></i> Call Next
                                                 </button>
                                             </form>
-                                            <form method="post" action="{% url 'queues:change_status' token.pk 'skip' %}" class="d-inline">
+                                            <form method="post" action="{% url 'queues:change_status' token.pk 'skip' %}" class="skip-form d-inline">
                                                 {% csrf_token %}
                                                 <button type="submit" class="btn btn-sm btn-outline-danger rounded-3 px-2 py-2" title="Mark No-Show / Skip">
                                                     <i class="fas fa-step-forward me-1"></i> Skip
@@ -162,4 +173,31 @@
     </div>
 </div>
 {% endblock %}
+
+{% block extra_js %}
+<script>
+    // Keyboard Hotkey Listener
+    document.addEventListener('keydown', function(event) {
+        // Space bar calls next token
+        if (event.code === 'Space' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+            event.preventDefault();
+            const firstCallBtn = document.querySelector('.call-next-btn');
+            if (firstCallBtn) firstCallBtn.click();
+        }
+        // Alt + C completes token
+        if (event.altKey && event.key.toLowerCase() === 'c') {
+            event.preventDefault();
+            const completeForm = document.getElementById('completeForm');
+            if (completeForm) completeForm.submit();
+        }
+        // Alt + H puts token on hold
+        if (event.altKey && event.key.toLowerCase() === 'h') {
+            event.preventDefault();
+            const holdForm = document.getElementById('holdForm');
+            if (holdForm) holdForm.submit();
+        }
+    });
+</script>
+{% endblock %}
+
 
