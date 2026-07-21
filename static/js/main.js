@@ -64,28 +64,52 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Load saved preference
     const savedTheme = localStorage.getItem('sqms-theme') || 'light';
-    htmlElement.setAttribute('data-bs-theme', savedTheme);
-    updateDarkModeIcon(savedTheme);
+    setTheme(savedTheme, false);
 
     if (darkModeToggle) {
         darkModeToggle.addEventListener('click', function () {
             const currentTheme = htmlElement.getAttribute('data-bs-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
 
-            htmlElement.setAttribute('data-bs-theme', newTheme);
-            localStorage.setItem('sqms-theme', newTheme);
-            updateDarkModeIcon(newTheme);
+            // Spin animation
+            if (darkModeIcon) {
+                darkModeIcon.style.transition = 'transform 0.5s ease';
+                darkModeIcon.style.transform = 'rotate(360deg)';
+                setTimeout(function() { darkModeIcon.style.transform = ''; }, 500);
+            }
+
+            setTheme(newTheme, true);
         });
+    }
+
+    // Real-time theme sync across open browser tabs
+    window.addEventListener('storage', function (e) {
+        if (e.key === 'sqms-theme' && e.newValue) {
+            setTheme(e.newValue, false);
+        }
+    });
+
+    function setTheme(theme, notify) {
+        htmlElement.setAttribute('data-bs-theme', theme);
+        localStorage.setItem('sqms-theme', theme);
+        updateDarkModeIcon(theme);
+
+        if (notify && typeof showToast === 'function') {
+            const themeLabel = theme === 'dark' ? 'Dark Mode' : 'Light Mode';
+            showToast('Switched to ' + themeLabel, 'info', 2000);
+        }
     }
 
     function updateDarkModeIcon(theme) {
         if (darkModeIcon) {
             if (theme === 'dark') {
                 darkModeIcon.classList.remove('fa-moon');
-                darkModeIcon.classList.add('fa-sun');
+                darkModeIcon.classList.add('fa-sun', 'text-warning');
+                if (darkModeToggle) darkModeToggle.setAttribute('title', 'Switch to Light Mode');
             } else {
-                darkModeIcon.classList.remove('fa-sun');
+                darkModeIcon.classList.remove('fa-sun', 'text-warning');
                 darkModeIcon.classList.add('fa-moon');
+                if (darkModeToggle) darkModeToggle.setAttribute('title', 'Switch to Dark Mode');
             }
         }
     }
