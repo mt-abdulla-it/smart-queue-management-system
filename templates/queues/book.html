@@ -74,18 +74,217 @@
 </div>
 {% endblock %}
 
+{% block extra_css %}
+<style>
+    .step-wizard {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        margin-bottom: 2rem;
+    }
+    .step-wizard::before {
+        content: '';
+        position: absolute;
+        top: 24px;
+        left: 15%;
+        right: 15%;
+        height: 3px;
+        background: var(--bs-border-color, #e2e8f0);
+        z-index: 1;
+    }
+    .step-wizard-progress {
+        position: absolute;
+        top: 24px;
+        left: 15%;
+        height: 3px;
+        background: linear-gradient(90deg, #4f46e5 0%, #06b6d4 100%);
+        z-index: 2;
+        transition: width 0.4s ease-in-out;
+        width: 0%;
+    }
+    .step-item {
+        position: relative;
+        z-index: 3;
+        text-align: center;
+        flex: 1;
+    }
+    .step-number {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: var(--bs-body-bg, #ffffff);
+        border: 3px solid var(--bs-border-color, #cbd5e1);
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin: 0 auto 8px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    .step-item.active .step-number {
+        border-color: #4f46e5;
+        background: #4f46e5;
+        color: #ffffff;
+        transform: scale(1.1);
+        box-shadow: 0 0 15px rgba(79, 70, 229, 0.4);
+    }
+    .step-item.completed .step-number {
+        border-color: #10b981;
+        background: #10b981;
+        color: #ffffff;
+    }
+    .step-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--bs-secondary-color, #64748b);
+        transition: color 0.3s ease;
+    }
+    .step-item.active .step-label {
+        color: #4f46e5;
+        font-weight: 700;
+    }
+    .step-item.completed .step-label {
+        color: #10b981;
+    }
+    
+    .estimate-card {
+        background: linear-gradient(135deg, rgba(6, 182, 212, 0.08) 0%, rgba(79, 70, 229, 0.08) 100%);
+        border: 1.5px solid rgba(6, 182, 212, 0.25);
+        border-radius: 1rem;
+        transition: all 0.4s ease-in-out;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Stepper Header Wizard -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-lg-8">
+            <div class="step-wizard">
+                <div class="step-wizard-progress" id="stepProgress"></div>
+                <div class="step-item active" id="stepIndicator1">
+                    <div class="step-number" id="stepNum1">1</div>
+                    <div class="step-label">Select Branch</div>
+                </div>
+                <div class="step-item" id="stepIndicator2">
+                    <div class="step-number" id="stepNum2">2</div>
+                    <div class="step-label">Select Service</div>
+                </div>
+                <div class="step-item" id="stepIndicator3">
+                    <div class="step-number" id="stepNum3">3</div>
+                    <div class="step-label">Confirm & Issue</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-gradient-primary text-white p-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-white bg-opacity-20 rounded-3 p-3">
+                            <i class="fas fa-ticket-alt fa-2x"></i>
+                        </div>
+                        <div>
+                            <h4 class="fw-bold mb-1">Issue a New Queue Token</h4>
+                            <p class="mb-0 text-white-50">Select your destination branch, department, and service to generate your digital ticket.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body p-4 p-md-5">
+                    <form method="post" id="bookingForm" data-departments-url="{% url 'queues:ajax_load_departments' %}" data-services-url="{% url 'queues:ajax_load_services' %}" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="booking-fields-wrapper">
+                            {{ form|crispy }}
+                        </div>
+                        
+                        <!-- Dynamic Wait Estimate Card -->
+                        <div class="estimate-card p-4 mt-4 d-none" id="waitEstimateBox">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="bg-info bg-opacity-20 rounded-circle p-3 text-info">
+                                    <i class="fas fa-clock fa-2x"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <h6 class="fw-bold mb-1 text-info"><i class="fas fa-bolt me-1"></i> Estimated Wait Time Analysis</h6>
+                                        <span class="badge bg-info bg-opacity-20 text-info px-3 py-1 rounded-pill fw-medium">Live Queue Estimate</span>
+                                    </div>
+                                    <p class="mb-2 text-secondary small">Average serving duration for this service is approximately <strong id="estTime">10-15 minutes</strong>.</p>
+                                    <div class="d-flex gap-3 text-muted small border-top border-info border-opacity-20 pt-2">
+                                        <div><i class="fas fa-users text-primary me-1"></i> People Ahead: <strong id="estAhead" class="text-body">2-4 tokens</strong></div>
+                                        <div><i class="fas fa-mobile-alt text-success me-1"></i> SMS Alerts: <strong class="text-success">Enabled</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
+                            <a href="{% url 'core:home' %}" class="btn btn-outline-secondary px-4 rounded-pill">
+                                <i class="fas fa-arrow-left me-2"></i>Cancel
+                            </a>
+                            <button type="submit" id="submitBtn" class="btn btn-primary px-5 py-2 rounded-pill shadow-sm hover-lift">
+                                <i class="fas fa-check-circle me-2"></i>Confirm & Issue Token
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
 {% block extra_js %}
 <script>
-    // AJAX for dependent dropdowns & Wizard animation
     $(document).ready(function() {
+        function updateStepper() {
+            var branchVal = $("#id_branch").val();
+            var deptVal = $("#id_department").val();
+            var serviceVal = $("#id_service").val();
+
+            if (serviceVal) {
+                $('#stepProgress').css('width', '70%');
+                $('#stepIndicator1, #stepIndicator2').addClass('completed').removeClass('active');
+                $('#stepNum1').html('<i class="fas fa-check"></i>');
+                $('#stepNum2').html('<i class="fas fa-check"></i>');
+                $('#stepIndicator3').addClass('active').removeClass('completed');
+                $('#stepNum3').text('3');
+                
+                $('#waitEstimateBox').removeClass('d-none').addClass('animate-fade-in-up');
+            } else if (branchVal || deptVal) {
+                $('#stepProgress').css('width', '35%');
+                $('#stepIndicator1').addClass('completed').removeClass('active');
+                $('#stepNum1').html('<i class="fas fa-check"></i>');
+                $('#stepIndicator2').addClass('active').removeClass('completed');
+                $('#stepNum2').text('2');
+                $('#stepIndicator3').removeClass('active completed');
+                $('#stepNum3').text('3');
+                
+                $('#waitEstimateBox').addClass('d-none');
+            } else {
+                $('#stepProgress').css('width', '0%');
+                $('#stepIndicator1').addClass('active').removeClass('completed');
+                $('#stepNum1').text('1');
+                $('#stepIndicator2, #stepIndicator3').removeClass('active completed');
+                $('#stepNum2').text('2');
+                $('#stepNum3').text('3');
+                
+                $('#waitEstimateBox').addClass('d-none');
+            }
+        }
+
         $("#id_branch").change(function () {
             var url = $("#bookingForm").attr("data-departments-url");
             var branchId = $(this).val();
 
             if (branchId) {
-                $('#stepIndicator1').addClass('completed');
-                $('#stepIndicator2').addClass('active');
-                
                 $.ajax({
                     url: url,
                     data: { 'branch': branchId },
@@ -96,11 +295,13 @@
                         });
                         $("#id_department").html(html);
                         $("#id_service").html('<option value="">Select Service</option>');
+                        updateStepper();
                     }
                 });
             } else {
                 $("#id_department").html('<option value="">Select Department</option>');
                 $("#id_service").html('<option value="">Select Service</option>');
+                updateStepper();
             }
         });
 
@@ -118,19 +319,22 @@
                             html += '<option value="' + item.id + '">' + item.name + '</option>';
                         });
                         $("#id_service").html(html);
+                        updateStepper();
                     }
                 });
             } else {
                 $("#id_service").html('<option value="">Select Service</option>');
+                updateStepper();
             }
         });
 
         $("#id_service").change(function() {
-            if ($(this).val()) {
-                $('#stepIndicator2').addClass('completed');
-                $('#stepIndicator3').addClass('active');
-                $('#waitEstimateBox').removeClass('d-none').show();
-            }
+            updateStepper();
+        });
+
+        $('#bookingForm').on('submit', function() {
+            var $btn = $('#submitBtn');
+            $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Generating Ticket...');
         });
     });
 </script>
