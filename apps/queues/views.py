@@ -115,7 +115,7 @@ class TokenDetailView(LoginRequiredMixin, DetailView):
                 created_at__lt=token.created_at
             ).count() + 1
             context['position'] = position
-            context['estimated_wait'] = position * token.service.estimated_time_mins
+            context['estimated_wait'] = position * (getattr(token.service, 'avg_service_time_minutes', 10))
         
         return context
 
@@ -223,7 +223,7 @@ class QueueHistoryListView(RoleRequiredMixin, ListView):
 class AdminQueueListView(RoleRequiredMixin, ListView):
     """View to see all tokens across all branches (ADMIN only)."""
     model = QueueToken
-    template_name = 'queues/admin_list.html'
+    template_name = 'queues/my_tokens.html'
     context_object_name = 'tokens'
     allowed_roles = ['ADMIN']
 
