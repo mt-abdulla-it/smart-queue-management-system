@@ -22,6 +22,7 @@ urlpatterns = [
     path('history/', views.QueueHistoryListView.as_view(), name='history'),
     path('today/', views.StaffManageQueueView.as_view(), name='today'),
     path('display/', views.LiveDisplayView.as_view(), name='live_display'),
+    path('live/', views.LiveDisplayView.as_view(), name='live_display_alias'),
     path('admin-list/', views.AdminQueueListView.as_view(), name='admin_list'),
     
     # API endpoints
