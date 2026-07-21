@@ -2,7 +2,7 @@
 
 {% block title %}Live Queue TV Display — {{ site_name }}{% endblock %}
 
-{% block extra_css %}
+{{% block extra_css %}
 <style>
     /* TV Display specific styling */
     body {
@@ -47,6 +47,56 @@
         animation: ringPulse 2s infinite;
     }
 
+    /* Equalizer Audio Visualizer */
+    .audio-visualizer {
+        display: inline-flex;
+        align-items: flex-end;
+        gap: 3px;
+        height: 20px;
+    }
+    .equalizer-bar {
+        width: 4px;
+        background: #10b981;
+        border-radius: 2px;
+        height: 4px;
+        transition: height 0.2s ease;
+    }
+    .audio-visualizer.playing .equalizer-bar {
+        animation: soundWave 0.8s infinite ease-in-out alternate;
+    }
+    .audio-visualizer.playing .equalizer-bar:nth-child(1) { animation-delay: 0.1s; }
+    .audio-visualizer.playing .equalizer-bar:nth-child(2) { animation-delay: 0.3s; }
+    .audio-visualizer.playing .equalizer-bar:nth-child(3) { animation-delay: 0.2s; }
+    .audio-visualizer.playing .equalizer-bar:nth-child(4) { animation-delay: 0.4s; }
+
+    @keyframes soundWave {
+        0% { height: 4px; }
+        100% { height: 22px; background: #6366f1; }
+    }
+
+    /* Pop-up Alert Banner */
+    .tv-call-toast {
+        position: fixed;
+        top: 25px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-100px);
+        background: rgba(16, 185, 129, 0.95);
+        backdrop-filter: blur(15px);
+        color: white;
+        padding: 16px 36px;
+        border-radius: 50px;
+        box-shadow: 0 10px 40px rgba(16, 185, 129, 0.6);
+        z-index: 1050;
+        opacity: 0;
+        transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        font-weight: 700;
+        font-size: 1.3rem;
+    }
+    .tv-call-toast.show {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+
     .tv-ticker-bar {
         position: fixed;
         bottom: 0;
@@ -63,6 +113,12 @@
 {% endblock %}
 
 {% block content %}
+<!-- Floating Announcement Popup Toast -->
+<div id="callToast" class="tv-call-toast d-flex align-items-center gap-3">
+    <i class="fas fa-bell fa-bounce text-warning"></i>
+    <span id="callToastMessage">NOW CALLING: Token #--</span>
+</div>
+
 <div class="container-fluid h-100 pb-5">
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-secondary border-opacity-50 pb-3">
@@ -74,11 +130,21 @@
                 <h2 class="mb-0 fw-extrabold text-white tracking-wide">{{ site_name }}</h2>
                 <div class="d-flex align-items-center gap-2 mt-1">
                     <span class="live-dot"></span>
-                    <span class="text-info fw-semibold text-uppercase tracking-wider fs-6">Live TV Queue Display</span>
+                    <span class="text-info fw-semibold text-uppercase tracking-wider fs-6 me-2">Live TV Queue Display</span>
+                    <!-- Audio Equalizer Visualizer -->
+                    <div class="audio-visualizer ms-2" id="audioVisualizer" title="Sound Indicator">
+                        <div class="equalizer-bar"></div>
+                        <div class="equalizer-bar"></div>
+                        <div class="equalizer-bar"></div>
+                        <div class="equalizer-bar"></div>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="d-flex align-items-center gap-3 text-end">
+            <button id="audioMuteBtn" class="btn btn-outline-info btn-sm rounded-pill px-3 py-2" title="Toggle audio chime">
+                <i class="fas fa-volume-up me-1" id="audioIcon"></i> Sound ON
+            </button>
             <button id="fullscreenBtn" class="btn btn-outline-light btn-sm rounded-pill px-3 py-2">
                 <i class="fas fa-expand me-1"></i> Fullscreen TV Mode
             </button>
@@ -161,6 +227,26 @@
 
 {% block extra_js %}
 <script>
+    let isMuted = false;
+
+    // Audio Mute Toggle
+    const audioMuteBtn = document.getElementById('audioMuteBtn');
+    const audioIcon = document.getElementById('audioIcon');
+    if (audioMuteBtn) {
+        audioMuteBtn.addEventListener('click', () => {
+            isMuted = !isMuted;
+            if (isMuted) {
+                audioIcon.className = 'fas fa-volume-mute me-1';
+                audioMuteBtn.className = 'btn btn-outline-secondary btn-sm rounded-pill px-3 py-2';
+                audioMuteBtn.childNodes[2].textContent = ' Sound OFF';
+            } else {
+                audioIcon.className = 'fas fa-volume-up me-1';
+                audioMuteBtn.className = 'btn btn-outline-info btn-sm rounded-pill px-3 py-2';
+                audioMuteBtn.childNodes[2].textContent = ' Sound ON';
+            }
+        });
+    }
+
     // Live Clock
     function updateClock() {
         const now = new Date();
@@ -194,6 +280,12 @@
 
     // Synthesize Chime Sound via Web Audio API
     function playChimeSound() {
+        if (isMuted) return;
+        
+        // Trigger visualizer wave animation
+        const visualizer = document.getElementById('audioVisualizer');
+        if (visualizer) visualizer.classList.add('playing');
+        
         try {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const osc = audioCtx.createOscillator();
@@ -209,6 +301,23 @@
             osc.stop(audioCtx.currentTime + 0.6);
         } catch(e) {
             console.log("Audio synth error:", e);
+        }
+
+        setTimeout(() => {
+            if (visualizer) visualizer.classList.remove('playing');
+        }, 3000);
+    }
+
+    // Trigger Pop-up Toast Announcement
+    function triggerCallToast(tokenNumber, serviceName) {
+        const toast = document.getElementById('callToast');
+        const msg = document.getElementById('callToastMessage');
+        if (toast && msg) {
+            msg.textContent = `NOW CALLING: Token #${tokenNumber} — ${serviceName}`;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 6000);
         }
     }
 
@@ -236,8 +345,12 @@
                     if (servingCard) servingCard.classList.add('called-active');
                     
                     playChimeSound();
-                    const bell = document.getElementById('bellSound');
-                    if (bell) bell.play().catch(e => console.log("Audio play policy"));
+                    triggerCallToast(data.token_number, data.service);
+
+                    if (!isMuted) {
+                        const bell = document.getElementById('bellSound');
+                        if (bell) bell.play().catch(e => console.log("Audio play policy"));
+                    }
                     
                     setTimeout(() => {
                         badge.classList.add('d-none');
@@ -280,6 +393,13 @@
                     `;
                     tbody.appendChild(tr);
                 });
+            })
+            .catch(error => console.error('Error fetching waiting list:', error));
+    }
+    
+    reloadWaitingList();
+</script>
+{% endblock %}          });
             })
             .catch(error => console.error('Error fetching waiting list:', error));
     }
