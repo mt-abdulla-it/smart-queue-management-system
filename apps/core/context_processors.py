@@ -15,6 +15,8 @@ def site_settings(request):
         {{ site_name }}
         {{ site_url }}
         {{ current_year }}
+        {{ unread_notifications_count }}
+        {{ recent_notifications }}
     """
     from datetime import datetime
 
@@ -25,15 +27,15 @@ def site_settings(request):
         'debug': settings.DEBUG,
     }
 
-    # Add unread notification count for authenticated users
+    # Add unread notification count and recent notifications for authenticated users
     if request.user.is_authenticated:
         try:
             from apps.notifications.models import Notification
-            context['unread_notifications_count'] = Notification.objects.filter(
-                user=request.user,
-                is_read=False,
-            ).count()
+            user_notifications = Notification.objects.filter(user=request.user)
+            context['unread_notifications_count'] = user_notifications.filter(is_read=False).count()
+            context['recent_notifications'] = user_notifications.order_by('-sent_at')[:5]
         except Exception:
             context['unread_notifications_count'] = 0
+            context['recent_notifications'] = []
 
     return context
