@@ -20,7 +20,7 @@ class ServiceSerializer(serializers.ModelSerializer):
     department = DepartmentSerializer(read_only=True)
     class Meta:
         model = Service
-        fields = ['id', 'name', 'token_prefix', 'estimated_time_mins', 'department']
+        fields = ['id', 'name', 'prefix', 'avg_service_time_minutes', 'department']
 
 class QueueTokenSerializer(serializers.ModelSerializer):
     service = ServiceSerializer(read_only=True)
