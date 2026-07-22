@@ -18,7 +18,7 @@
 
     <!-- Stat Summary Bar -->
     <div class="row g-3 mb-4">
-        <div class="col-md-4">
+        <div class="col-md-4 stagger-1">
             <div class="card glass-card border-0 rounded-4 p-3 shadow-sm h-100">
                 <div class="d-flex align-items-center gap-3">
                     <div class="stat-icon bg-info bg-opacity-10 text-info rounded-3 p-3">
@@ -31,7 +31,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4 stagger-2">
             <div class="card glass-card border-0 rounded-4 p-3 shadow-sm h-100">
                 <div class="d-flex align-items-center gap-3">
                     <div class="stat-icon bg-warning bg-opacity-10 text-warning rounded-3 p-3">
@@ -44,7 +44,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4 stagger-3">
             <div class="card glass-card border-0 rounded-4 p-3 shadow-sm h-100">
                 <div class="d-flex align-items-center gap-3">
                     <div class="stat-icon bg-success bg-opacity-10 text-success rounded-3 p-3">
@@ -61,7 +61,7 @@
 
     <div class="row g-4">
         <!-- Now Serving -->
-        <div class="col-lg-5 col-xl-4">
+        <div class="col-lg-5 col-xl-4 stagger-4">
             <div class="counter-hero-card h-100 d-flex flex-column justify-content-between">
                 <div>
                     <div class="d-flex align-items-center justify-content-between mb-3">
@@ -79,7 +79,7 @@
                         <div class="d-grid gap-2">
                             <form method="post" action="{% url 'queues:change_status' token.pk 'complete' %}" id="completeForm">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-success btn-lg w-100 rounded-3 shadow-md fw-bold py-3 hover-lift">
+                                <button type="submit" class="btn btn-success btn-magnetic btn-lg w-100 rounded-3 shadow-md fw-bold py-3 hover-lift">
                                     <i class="fas fa-check-circle me-2"></i>Mark Completed <span class="counter-hotkey-badge">Alt + C</span>
                                 </button>
                             </form>
@@ -105,7 +105,7 @@
         </div>
 
         <!-- Waiting List -->
-        <div class="col-lg-7 col-xl-8">
+        <div class="col-lg-7 col-xl-8 stagger-5">
             <div class="card glass-card border-0 shadow-lg rounded-4 overflow-hidden h-100">
                 <div class="card-header bg-transparent p-4 border-bottom d-flex justify-content-between align-items-center">
                     <div>
@@ -129,7 +129,7 @@
                             </thead>
                             <tbody>
                                 {% for token in waiting_tokens %}
-                                <tr>
+                                <tr class="hover-action-row">
                                     <td class="ps-4">
                                         <span class="badge bg-primary bg-opacity-10 text-primary fs-5 fw-bold px-3 py-2 rounded-3 border border-primary border-opacity-20">
                                             {{ token.token_number }}
