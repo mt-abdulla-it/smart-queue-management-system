@@ -33,6 +33,7 @@
         z-index: 2;
         transition: width 0.4s ease-in-out;
         width: 0%;
+        box-shadow: 0 0 10px rgba(79, 70, 229, 0.6);
     }
     .step-item {
         position: relative;
@@ -87,6 +88,18 @@
         border: 1.5px solid rgba(6, 182, 212, 0.25);
         border-radius: 1rem;
         transition: all 0.4s ease-in-out;
+        position: relative;
+        overflow: hidden;
+    }
+    .estimate-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: -100%; width: 50%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        animation: shimmerEstimate 3s infinite;
+    }
+    @keyframes shimmerEstimate {
+        100% { left: 200%; }
     }
 </style>
 {% endblock %}
@@ -116,7 +129,7 @@
 
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="card glass-card border-0 rounded-4 overflow-hidden stagger-1">
                 <div class="card-header bg-gradient-primary text-white p-4">
                     <div class="d-flex align-items-center gap-3">
                         <div class="bg-white bg-opacity-20 rounded-3 p-3">
@@ -161,7 +174,7 @@
                             <a href="{% url 'core:home' %}" class="btn btn-outline-secondary px-4 rounded-pill">
                                 <i class="fas fa-arrow-left me-2"></i>Cancel
                             </a>
-                            <button type="submit" id="submitBtn" class="btn btn-primary px-5 py-2 rounded-pill shadow-sm hover-lift">
+                            <button type="submit" id="submitBtn" class="btn btn-primary btn-magnetic px-5 py-2 rounded-pill shadow-sm hover-lift">
                                 <i class="fas fa-check-circle me-2"></i>Confirm & Issue Token
                             </button>
                         </div>
