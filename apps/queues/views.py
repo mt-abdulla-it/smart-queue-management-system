@@ -263,3 +263,89 @@ class LiveWaitingListAPIView(View):
             } for t in waiting_tokens
         ]
         return JsonResponse(data, safe=False)
+
+
+class TokenLiveStatusAPIView(View):
+    """API endpoint returning live status, position, wait time, and progress for a specific token."""
+    def get(self, request, pk, *args, **kwargs):
+        qs = QueueToken.objects.all()
+        if request.user.is_authenticated and getattr(request.user, 'role', None) == 'USER':
+            qs = qs.filter(user=request.user)
+        
+        token = get_object_or_404(qs, pk=pk)
+        
+        position = 0
+        total_ahead = 0
+        estimated_wait = 0
+        progress_percent = 100
+        
+        avg_time = getattr(token.service, 'avg_service_time_minutes', 10)
+        
+        if token.status == 'WAITING':
+            # Count tokens ahead in WAITING status created before this token
+            waiting_ids = list(QueueToken.objects.filter(
+                service=token.service,
+                status='WAITING',
+                created_at__date=token.created_at.date()
+            ).order_by('created_at').values_list('id', flat=True))
+            
+            try:
+                position = waiting_ids.index(token.id) + 1
+            except ValueError:
+                position = 1
+                
+            total_ahead = position - 1
+            estimated_wait = position * avg_time
+            
+            # Calculate total issued tokens for this service today up to this token
+            total_issued = QueueToken.objects.filter(
+                service=token.service,
+                created_at__date=token.created_at.date(),
+                created_at__lte=token.created_at
+            ).count()
+            
+            processed_before = QueueToken.objects.filter(
+                service=token.service,
+                created_at__date=token.created_at.date(),
+                created_at__lt=token.created_at,
+                status__in=['SERVING', 'COMPLETED', 'SKIPPED']
+            ).count()
+            
+            if total_issued > 0:
+                calc_progress = int(15 + (processed_before / float(total_issued)) * 75)
+                progress_percent = min(max(calc_progress, 15), 90)
+            else:
+                progress_percent = 20
+        elif token.status == 'SERVING':
+            progress_percent = 95
+            position = 0
+            total_ahead = 0
+            estimated_wait = 0
+        elif token.status == 'COMPLETED':
+            progress_percent = 100
+            position = 0
+            total_ahead = 0
+            estimated_wait = 0
+        else:
+            progress_percent = 50
+        
+        currently_serving = QueueToken.objects.filter(
+            service=token.service,
+            created_at__date=token.created_at.date(),
+            status='SERVING'
+        ).order_by('-updated_at').first()
+        
+        return JsonResponse({
+            'id': token.id,
+            'token_number': token.token_number,
+            'status': token.status,
+            'status_display': token.get_status_display() if hasattr(token, 'get_status_display') else token.status,
+            'position': position,
+            'total_ahead': total_ahead,
+            'estimated_wait': estimated_wait,
+            'progress_percent': progress_percent,
+            'currently_serving': currently_serving.token_number if currently_serving else None,
+            'service_name': token.service.name,
+            'updated_at': token.updated_at.strftime('%H:%M:%S') if token.updated_at else None
+        })
+

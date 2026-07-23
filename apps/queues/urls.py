@@ -27,4 +27,5 @@ urlpatterns = [
     
     # API endpoints
     path('api/waiting-list/', views.LiveWaitingListAPIView.as_view(), name='api_waiting_list'),
+    path('api/token-status/<int:pk>/', views.TokenLiveStatusAPIView.as_view(), name='api_token_status'),
 ]
