@@ -1,14 +1,23 @@
-# 🏥 Smart Queue Management System.
+<div align="center">
+  <h1>🏥 Smart Queue Management System (SQMS)</h1>
+  <p><strong>A production-ready, full-stack web application that digitizes queue management with real-time tracking, online booking, QR tokens, and live dashboards.</strong></p>
 
-![Django](https://img.shields.io/badge/Django-5+-092E20?style=flat-square&logo=django&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14+-316192?style=flat-square&logo=postgresql&logoColor=white)
-![Redis](https://img.shields.io/badge/Redis-7+-DC382D?style=flat-square&logo=redis&logoColor=white)
-![Bootstrap](https://img.shields.io/badge/Bootstrap-5-563D7C?style=flat-square&logo=bootstrap&logoColor=white)
-![License](https://img.shields.io/badge/License-Academic-blue?style=flat-square)
+  <p>
+    <img src="https://img.shields.io/badge/Django-5+-092E20?style=for-the-badge&logo=django&logoColor=white" alt="Django" />
+    <img src="https://img.shields.io/badge/PostgreSQL-14+-316192?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+    <img src="https://img.shields.io/badge/Redis-7+-DC382D?style=for-the-badge&logo=redis&logoColor=white" alt="Redis" />
+    <img src="https://img.shields.io/badge/Bootstrap-5-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white" alt="Bootstrap" />
+  </p>
 
-### For Hospitals and Government Offices in Sri Lanka
+  <p><em>Built specifically for Hospitals and Government Offices in Sri Lanka 🇱🇰</em></p>
+</div>
 
-A production-ready, full-stack web application that digitizes queue management with real-time tracking, online booking, QR tokens, and live dashboards.
+<br />
+
+## 🎥 Cinematic Product Demo
+Check out the fully automated, 60FPS cinematic showcase of the Smart Queue Management System in action! It demonstrates the entire end-to-end flow from patient booking to staff queue management.
+
+> 📥 **[Download & Watch the Cinematic Demo Video (MP4) Here](./SQMS_Cinematic_Demo_Final.mp4)**
 
 ---
 
@@ -24,37 +33,39 @@ A production-ready, full-stack web application that digitizes queue management w
 | **Reports** | ReportLab (PDF), openpyxl (Excel), Chart.js |
 | **Other** | QR Code generation, Email & WebSocket notifications |
 
+---
+
 ## 📋 Features
 
-### 👤 User Features
-- ✅ Register, Login, Forgot Password, Edit Profile
-- ✅ Book Queue Online & View Current Position
-- ✅ Real-time Wait Time Tracking via WebSockets
-- ✅ QR Code Token Generation & PDF Download
-- ✅ Automated Email & WebSocket Notifications
-- ✅ Submit Feedback & View Queue History
+### 👤 User (Patient/Client) Features
+- ✅ **Secure Access:** Register, Login, Forgot Password, Edit Profile
+- ✅ **Online Booking:** Book Queue Online & View Current Position
+- ✅ **Live Tracking:** Real-time Wait Time Tracking via WebSockets
+- ✅ **Digital Tokens:** QR Code Token Generation & PDF Download
+- ✅ **Notifications:** Automated Email & WebSocket alerts
+- ✅ **History:** Submit Feedback & View Queue History
 
 ### 👨‍💼 Staff Features
-- ✅ Call Next, Skip, Hold, or Complete Tokens
-- ✅ Real-time Staff Dashboard & Queue Processing
-- ✅ Search Queue & View Today's Queue
-- ✅ Live Queue Statistics
+- ✅ **Queue Control:** Call Next, Skip, Hold, or Complete Tokens
+- ✅ **Dashboard:** Real-time Staff Dashboard & Queue Processing
+- ✅ **Management:** Search Queue & View Today's Queue roster
+- ✅ **Analytics:** Live Queue Statistics
 
 ### 🛡️ Admin Features
-- ✅ Manage Users, Staff, Branches, and Services
-- ✅ Advanced Dashboard with Analytics Charts
-- ✅ Generate Reports (PDF / Excel)
-- ✅ Feedback Management & System Settings
+- ✅ **System Control:** Manage Users, Staff, Branches, and Services
+- ✅ **Analytics:** Advanced Dashboard with Chart.js visual analytics
+- ✅ **Exporting:** Generate detailed Reports (PDF / Excel)
+- ✅ **Settings:** Feedback Management & System Settings
 
 ---
 
 ## 🛠️ Setup & Installation
 
 ### Prerequisites
-- Python 3.13+
-- PostgreSQL 14+
-- Redis 7+ (Required for WebSockets)
-- Git
+- **Python** 3.13+
+- **PostgreSQL** 14+
+- **Redis** 7+ (Required for WebSockets)
+- **Git**
 
 ### Installation Steps
 
@@ -72,7 +83,7 @@ venv\Scripts\activate  # Windows
 pip install -r requirements.txt
 
 # 4. Configure environment
-copy .env.example .env
+cp .env.example .env
 # Edit .env with your database and Redis credentials
 
 # 5. Create PostgreSQL database
@@ -94,9 +105,9 @@ python manage.py runserver
 ```
 
 ### Access the Application
-- **Homepage**: http://localhost:8000
-- **Admin Panel**: http://localhost:8000/admin/
-- **API Docs**: http://localhost:8000/api/docs/
+- **Homepage**: `http://localhost:8000`
+- **Admin Panel**: `http://localhost:8000/admin/`
+- **API Docs**: `http://localhost:8000/api/docs/`
 
 ---
 
@@ -123,8 +134,6 @@ smart-queue-management-system/
 
 ---
 
-
-
 ## 👤 Author
 
 **Abdulla Thaslim**  
@@ -132,5 +141,4 @@ smart-queue-management-system/
 [![Email](https://img.shields.io/badge/Email-mt.abdulla.it%40gmail.com-D14836?style=flat-square&logo=gmail&logoColor=white)](mailto:mt.abdulla.it@gmail.com)
 
 ---
-
 *Solving real-world queue problems in Sri Lanka 🇱🇰*
