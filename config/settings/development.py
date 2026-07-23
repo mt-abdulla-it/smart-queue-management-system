@@ -29,17 +29,20 @@ INSTALLED_APPS += [  # noqa: F405
     'django_extensions',
 ]
 
-# Only add debug toolbar if it's installed
-try:
-    import debug_toolbar  # noqa: F401
-    INSTALLED_APPS += ['debug_toolbar']
-    MIDDLEWARE.insert(  # noqa: F405
-        MIDDLEWARE.index('django.middleware.common.CommonMiddleware') + 1,  # noqa: F405
-        'debug_toolbar.middleware.DebugToolbarMiddleware'
-    )
-    INTERNAL_IPS = ['127.0.0.1', 'localhost']
-except ImportError:
-    pass
+# Set ENABLE_DEBUG_TOOLBAR = True if you need to inspect SQL queries / performance metrics
+ENABLE_DEBUG_TOOLBAR = False
+
+if ENABLE_DEBUG_TOOLBAR:
+    try:
+        import debug_toolbar  # noqa: F401
+        INSTALLED_APPS += ['debug_toolbar']
+        MIDDLEWARE.insert(  # noqa: F405
+            MIDDLEWARE.index('django.middleware.common.CommonMiddleware') + 1,  # noqa: F405
+            'debug_toolbar.middleware.DebugToolbarMiddleware'
+        )
+        INTERNAL_IPS = ['127.0.0.1', 'localhost']
+    except ImportError:
+        pass
 
 # =============================================================================
 # EMAIL (Console output for development)

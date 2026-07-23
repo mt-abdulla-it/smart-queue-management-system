@@ -54,10 +54,11 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
     # Django Debug Toolbar
-    try:
-        import debug_toolbar  # noqa: F401
-        urlpatterns += [
-            path('__debug__/', include('debug_toolbar.urls')),
-        ]
-    except ImportError:
-        pass
+    if 'debug_toolbar' in (settings.INSTALLED_APPS or []):
+        try:
+            import debug_toolbar  # noqa: F401
+            urlpatterns += [
+                path('__debug__/', include('debug_toolbar.urls')),
+            ]
+        except ImportError:
+            pass
