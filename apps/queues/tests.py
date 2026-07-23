@@ -27,6 +27,7 @@ class TokenLiveStatusAPITestCase(TestCase):
         self.token = QueueToken.objects.create(
             user=self.user,
             service=self.service,
+            branch=self.branch,
             token_number="GEN-001",
             status="WAITING",
             queue_date=timezone.now().date()
