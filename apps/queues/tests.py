@@ -1,5 +1,6 @@
 from django.test import TestCase, Client
 from django.urls import reverse
+from django.utils import timezone
 from django.contrib.auth import get_user_model
 from apps.branches.models import Branch, Department, Service
 from apps.queues.models import QueueToken
@@ -27,7 +28,8 @@ class TokenLiveStatusAPITestCase(TestCase):
             user=self.user,
             service=self.service,
             token_number="GEN-001",
-            status="WAITING"
+            status="WAITING",
+            queue_date=timezone.now().date()
         )
         self.client = Client()
 
