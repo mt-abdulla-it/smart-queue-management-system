@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}My Dashboard — {{ site_name }}{% endblock %}
+{% block page_header %}My Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Welcome Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4 stagger-1">
+        <div>
+            <h3 class="fw-extrabold mb-1">Hello, {{ request.user.first_name }}! 👋</h3>
+            <p class="text-muted mb-0">Track your queue tokens and manage your appointments.</p>
+        </div>
+        <a href="{% url 'queues:book' %}" class="btn btn-primary btn-magnetic rounded-pill px-4 shadow-sm hover-lift">
+            <i class="fas fa-plus-circle me-2"></i>Book New Token
+        </a>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4 stagger-1">
+            <div class="card glass-card border-0 rounded-4 p-3 shadow-sm h-100">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-3 d-flex align-items-center justify-content-center" style="width:56px;height:56px;">
+                        <i class="fas fa-clock fa-2x"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted small text-uppercase tracking-wider fw-bold">Active Tokens</span>
+                        <h3 class="mb-0 fw-extrabold text-primary">{{ active_tokens }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 stagger-2">
+            <div class="card glass-card border-0 rounded-4 p-3 shadow-sm h-100">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-success bg-opacity-10 text-success rounded-3 p-3 d-flex align-items-center justify-content-center" style="width:56px;height:56px;">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted small text-uppercase tracking-wider fw-bold">Completed</span>
+                        <h3 class="mb-0 fw-extrabold text-success">{{ completed_tokens }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 stagger-3">
+            <div class="card glass-card border-0 rounded-4 p-3 shadow-sm h-100">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-info bg-opacity-10 text-info rounded-3 p-3 d-flex align-items-center justify-content-center" style="width:56px;height:56px;">
+                        <i class="fas fa-comment-dots fa-2x"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted small text-uppercase tracking-wider fw-bold">Feedback Given</span>
+                        <h3 class="mb-0 fw-extrabold text-info">{{ feedback_given }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Tokens -->
+    <div class="row g-4">
+        <div class="col-lg-8 stagger-4">
+            <div class="card glass-card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-transparent p-4 border-bottom d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="fw-bold mb-0"><i class="fas fa-ticket text-primary me-2"></i>Recent Tokens</h5>
+                        <small class="text-muted">Your latest queue token activity</small>
+                    </div>
+                    <a href="{% url 'queues:my_tokens' %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                        <i class="fas fa-list me-1"></i>View All
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-body-tertiary">
+                                <tr>
+                                    <th class="ps-4 text-uppercase fs-7 text-muted tracking-wider">Token</th>
+                                    <th class="text-uppercase fs-7 text-muted tracking-wider">Service</th>
+                                    <th class="text-uppercase fs-7 text-muted tracking-wider">Date</th>
+                                    <th class="text-uppercase fs-7 text-muted tracking-wider">Status</th>
+                                    <th class="pe-4 text-uppercase fs-7 text-muted tracking-wider"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for token in recent_tokens %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <span class="badge bg-primary bg-opacity-10 text-primary fs-6 fw-bold px-3 py-2 rounded-3 border border-primary border-opacity-20">
+                                            {{ token.token_number }}
+                                        </span>
+                                    </td>
+                                    <td class="fw-semibold">{{ token.service.name }}</td>
+                                    <td class="text-muted small">{{ token.created_at|date:"M d, Y h:i A" }}</td>
+                                    <td>
+                                        {% if token.status == 'WAITING' %}
+                                            <span class="badge bg-warning text-dark rounded-pill px-3 py-1"><i class="fas fa-clock me-1"></i>Waiting</span>
+                                        {% elif token.status == 'SERVING' %}
+                                            <span class="badge bg-success rounded-pill px-3 py-1 pulse-glow"><i class="fas fa-bullhorn me-1"></i>Serving</span>
+                                        {% elif token.status == 'COMPLETED' %}
+                                            <span class="badge bg-secondary rounded-pill px-3 py-1"><i class="fas fa-check me-1"></i>Done</span>
+                                        {% else %}
+                                            <span class="badge bg-outline-secondary rounded-pill px-3 py-1">{{ token.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="pe-4">
+                                        <a href="{% url 'queues:token_detail' token.pk %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                            <i class="fas fa-eye me-1"></i>View
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 text-muted">
+                                        <i class="fas fa-ticket fa-2x opacity-25 mb-2 d-block"></i>
+                                        No tokens yet. Book your first queue!
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-lg-4 stagger-5">
+            <div class="card glass-card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-header bg-transparent border-bottom p-4">
+                    <h5 class="fw-bold mb-0"><i class="fas fa-bolt text-warning me-2"></i>Quick Actions</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="d-grid gap-3">
+                        <a href="{% url 'queues:book' %}" class="btn btn-primary rounded-3 py-3 text-start hover-lift shadow-sm">
+                            <i class="fas fa-plus-circle me-2"></i> Book a Queue Token
+                        </a>
+                        <a href="{% url 'queues:my_tokens' %}" class="btn btn-outline-primary rounded-3 py-3 text-start hover-lift">
+                            <i class="fas fa-list-check me-2"></i> My Tokens
+                        </a>
+                        <a href="{% url 'queues:live_display' %}" class="btn btn-outline-info rounded-3 py-3 text-start hover-lift">
+                            <i class="fas fa-tv me-2"></i> Live Queue Display
+                        </a>
+                        <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary rounded-3 py-3 text-start hover-lift">
+                            <i class="fas fa-user-cog me-2"></i> Edit Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
