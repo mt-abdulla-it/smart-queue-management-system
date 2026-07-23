@@ -16,6 +16,9 @@ class SQMSFullInteractiveTests(unittest.TestCase):
     def setUpClass(cls):
         chrome_options = Options()
         chrome_options.add_argument("--window-size=1280,720")
+        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+        chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        chrome_options.add_experimental_option("useAutomationExtension", False)
         
         cls.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
         cls.driver.implicitly_wait(5)
