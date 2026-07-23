@@ -139,6 +139,7 @@ smart-queue-management-system/
 **Abdulla Thaslim**  
 [![GitHub](https://img.shields.io/badge/GitHub-mt--abdulla--it-181717?style=flat-square&logo=github)](https://github.com/mt-abdulla-it)
 [![Email](https://img.shields.io/badge/Email-mt.abdulla.it%40gmail.com-D14836?style=flat-square&logo=gmail&logoColor=white)](mailto:mt.abdulla.it@gmail.com)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-mt--abdulla--it-0A66C2?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/mt-abdulla-it/)
 
 ---
 *Solving real-world queue problems in Sri Lanka 🇱🇰*
