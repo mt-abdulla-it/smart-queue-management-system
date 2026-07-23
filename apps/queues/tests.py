@@ -9,10 +9,11 @@ User = get_user_model()
 class TokenLiveStatusAPITestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
-            username='testuser',
             email='testuser@example.com',
             password='Password123!',
-            role='USER'
+            role='USER',
+            first_name='Test',
+            last_name='User'
         )
         self.branch = Branch.objects.create(name="Central Hospital", code="CH")
         self.department = Department.objects.create(name="OPD", branch=self.branch)
