@@ -1,7 +1,4 @@
-"""
-Smart Queue Management System (SQMS) — Full Interactive Demo Walkthrough
-Executes complete page demonstrations with full smooth page scrolling on every page.
-"""
+# Smart Queue Management System (SQMS) — Interactive Demo Script
 import time
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
