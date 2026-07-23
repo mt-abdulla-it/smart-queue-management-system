@@ -14,6 +14,7 @@ from channels.security.websocket import AllowedHostsOriginValidator
 from django.core.asgi import get_asgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.development')
+os.environ['DJANGO_ALLOW_ASYNC_UNSAFE'] = 'true'
 
 # Initialize Django ASGI application early to ensure AppRegistry is populated
 django_asgi_app = get_asgi_application()
