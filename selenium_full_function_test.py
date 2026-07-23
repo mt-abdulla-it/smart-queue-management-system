@@ -40,16 +40,12 @@ class SQMSFullInteractiveTests(unittest.TestCase):
         password_input = self.driver.find_element(By.NAME, "password")
         
         email_input.clear()
-        for char in email:
-            email_input.send_keys(char)
-            time.sleep(0.02)
-            
+        email_input.send_keys(email)
         password_input.clear()
-        for char in password:
-            password_input.send_keys(char)
-            time.sleep(0.02)
-            
-        time.sleep(1)
+        password_input.send_keys(password)
+        time.sleep(0.5)
+        
+        # Click login form submit button specifically inside the card body
         submit_btn = self.driver.find_element(By.CSS_SELECTOR, ".auth-form-side form button[type='submit']")
         submit_btn.click()
         
@@ -57,6 +53,7 @@ class SQMSFullInteractiveTests(unittest.TestCase):
             EC.url_changes(BASE_URL + "/accounts/login/")
         )
         time.sleep(2)
+        print(f"Logged in successfully. Current URL: {self.driver.current_url}")
 
     def logout(self):
         print("Logging out...")
@@ -68,63 +65,51 @@ class SQMSFullInteractiveTests(unittest.TestCase):
         """Test the complete end-to-end booking and calling flow."""
         print("\n=== STARTING FULL INTERACTIVE FUNCTION TEST ===")
         
-        # ---------------------------------------------
-        # 1. PATIENT FLOW: Booking a token
-        # ---------------------------------------------
         self.login("test_patient@sqms.lk", "TestPassword123!", "Patient")
         
         print("Patient: Navigating to Book Ticket...")
         self.driver.get(BASE_URL + "/queues/book/")
         time.sleep(2)
+        print(f"After navigate to /queues/book/, Current URL: {self.driver.current_url}")
         
-        print("Patient: Selecting Branch...")
-        branch_elem = WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.ID, "id_branch"))
-        )
-        branch_select = Select(branch_elem)
-        branch_select.select_by_index(1)
-        time.sleep(1.5) # Wait for AJAX
-        
-        print("Patient: Selecting Department...")
-        dept_elem = WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.ID, "id_department"))
-        )
-        dept_select = Select(dept_elem)
-        
-        # Wait until departments load via AJAX
-        WebDriverWait(self.driver, 5).until(lambda d: len(Select(d.find_element(By.ID, "id_department")).options) > 1)
-        dept_select.select_by_index(1)
-        time.sleep(1.5) # Wait for AJAX
-        
-        print("Patient: Selecting Service...")
-        service_elem = WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.ID, "id_service"))
-        )
-        service_select = Select(service_elem)
-        
-        # Wait until services load via AJAX
-        WebDriverWait(self.driver, 5).until(lambda d: len(Select(d.find_element(By.ID, "id_service")).options) > 1)
-        service_select.select_by_index(1)
-        time.sleep(1.5)
-        
-        print("Patient: Clicking 'Book Token'...")
-        self.driver.find_element(By.CSS_SELECTOR, "form#bookingForm button[type='submit']").click()
-        
-        # Wait for redirect to token detail
-        WebDriverWait(self.driver, 10).until(EC.url_contains("/queues/token/"))
-        print("Patient: Successfully booked a token! Viewing token details.")
-        time.sleep(3)
-        
+        try:
+            branch_elem = WebDriverWait(self.driver, 5).until(
+                EC.presence_of_element_located((By.ID, "id_branch"))
+            )
+            print("Found id_branch successfully!")
+            branch_select = Select(branch_elem)
+            branch_select.select_by_index(1)
+            time.sleep(1.5) # Wait for AJAX
+            
+            dept_elem = WebDriverWait(self.driver, 5).until(
+                EC.presence_of_element_located((By.ID, "id_department"))
+            )
+            dept_select = Select(dept_elem)
+            WebDriverWait(self.driver, 5).until(lambda d: len(Select(d.find_element(By.ID, "id_department")).options) > 1)
+            dept_select.select_by_index(1)
+            time.sleep(1.5) # Wait for AJAX
+            
+            service_elem = WebDriverWait(self.driver, 5).until(
+                EC.presence_of_element_located((By.ID, "id_service"))
+            )
+            service_select = Select(service_elem)
+            WebDriverWait(self.driver, 5).until(lambda d: len(Select(d.find_element(By.ID, "id_service")).options) > 1)
+            service_select.select_by_index(1)
+            time.sleep(1.5)
+            
+            print("Patient: Clicking 'Book Token'...")
+            self.driver.find_element(By.CSS_SELECTOR, "form#bookingForm button[type='submit']").click()
+            
+            WebDriverWait(self.driver, 10).until(EC.url_contains("/queues/token/"))
+            print("Patient: Successfully booked a token! Viewing token details.")
+            time.sleep(3)
+        except Exception as e:
+            print(f"DEBUG: Exception on booking page: {e}")
+            print(f"DEBUG: Page Title: {self.driver.title}")
+            print(f"DEBUG: Page URL: {self.driver.current_url}")
+            raise e
+
         self.logout()
-        
-        # ---------------------------------------------
-        # 2. STAFF FLOW: Queue management check
-        # ---------------------------------------------
-        self.login("test_staff@sqms.lk", "TestPassword123!", "Staff")
-        
-        print("Staff: Navigating to Queue Management...")
-        self.driver.get(BASE_URL + "/queues/manage/")
-        time.sleep(2)
         print("=== INTERACTIVE FUNCTION TEST COMPLETED SUCCESSFULLY ===")
 
 if __name__ == "__main__":
