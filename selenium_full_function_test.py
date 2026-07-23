@@ -45,9 +45,8 @@ class SQMSFullInteractiveTests(unittest.TestCase):
         password_input.send_keys(password)
         time.sleep(0.5)
         
-        # Click login form submit button specifically inside the card body
         submit_btn = self.driver.find_element(By.CSS_SELECTOR, ".auth-form-side form button[type='submit']")
-        submit_btn.click()
+        self.driver.execute_script("arguments[0].click();", submit_btn)
         
         WebDriverWait(self.driver, 10).until(
             EC.url_changes(BASE_URL + "/accounts/login/")
@@ -98,7 +97,8 @@ class SQMSFullInteractiveTests(unittest.TestCase):
             time.sleep(1.5)
             
             print("Patient: Clicking 'Book Token'...")
-            self.driver.find_element(By.CSS_SELECTOR, "form#bookingForm button[type='submit']").click()
+            submit_btn = self.driver.find_element(By.CSS_SELECTOR, "form#bookingForm button[type='submit']")
+            self.driver.execute_script("arguments[0].scrollIntoView(true); arguments[0].click();", submit_btn)
             
             WebDriverWait(self.driver, 10).until(EC.url_contains("/queues/token/"))
             print("Patient: Successfully booked a token! Viewing token details.")
