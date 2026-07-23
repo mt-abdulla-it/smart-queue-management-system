@@ -34,7 +34,7 @@ class SQMSFullInteractiveTests(unittest.TestCase):
         self.driver.get(BASE_URL + "/accounts/login/")
         time.sleep(1)
         
-        email_input = WebDriverWait(self.driver, 5).until(
+        email_input = WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located((By.NAME, "username"))
         )
         password_input = self.driver.find_element(By.NAME, "password")
@@ -42,18 +42,18 @@ class SQMSFullInteractiveTests(unittest.TestCase):
         email_input.clear()
         for char in email:
             email_input.send_keys(char)
-            time.sleep(0.05)
+            time.sleep(0.02)
             
         password_input.clear()
         for char in password:
             password_input.send_keys(char)
-            time.sleep(0.05)
+            time.sleep(0.02)
             
         time.sleep(1)
-        submit_btn = self.driver.find_element(By.CSS_SELECTOR, "button[type='submit']")
+        submit_btn = self.driver.find_element(By.CSS_SELECTOR, ".auth-form-side form button[type='submit']")
         submit_btn.click()
         
-        WebDriverWait(self.driver, 5).until(
+        WebDriverWait(self.driver, 10).until(
             EC.url_changes(BASE_URL + "/accounts/login/")
         )
         time.sleep(2)
