@@ -145,8 +145,8 @@ class DemoRecorder:
         self.driver.get(f"{BASE_URL}/accounts/login/")
         time.sleep(1.5)
 
-        # Fill email
-        email_field = self.wait.until(EC.presence_of_element_located((By.ID, "id_email")))
+        # Fill email (Django auth form uses 'username' field name even for email)
+        email_field = self.wait.until(EC.presence_of_element_located((By.ID, "id_username")))
         email_field.clear()
         email_field.send_keys(email)
         time.sleep(0.3)
@@ -192,8 +192,9 @@ class DemoRecorder:
         """Scene 1: Show the beautiful login page."""
         print("\n🎬 SCENE 1: Login Page")
         self.driver.get(f"{BASE_URL}/accounts/login/")
-        time.sleep(2)
-        self.hold_frame(3.0, "Login Page — Beautiful split-screen auth UI")
+        time.sleep(3)
+        self.hold_frame(6.0, "Login Page — Beautiful split-screen auth UI")
+        self.capture_sequence(3, 0.8, 800, "Login page micro-animations")
         last_frame = self.frames[-1][0]
         return last_frame
 
@@ -202,97 +203,123 @@ class DemoRecorder:
         print("\n🎬 SCENE 2: Patient Login")
 
         # Type email slowly (capture after each part)
-        email_field = self.wait.until(EC.presence_of_element_located((By.ID, "id_email")))
+        email_field = self.wait.until(EC.presence_of_element_located((By.ID, "id_username")))
         email_field.clear()
 
-        # Type email in chunks for visual effect
+        # Type email in smaller chunks for realistic typing
         email = PATIENT_EMAIL
-        chunks = [email[:4], email[:10], email[:18], email]
+        chunks = [email[:2], email[:5], email[:8], email[:13], email[:18], email[:22], email]
         for chunk in chunks:
             email_field.clear()
             email_field.send_keys(chunk)
-            time.sleep(0.2)
-            self.capture(300, f"Typing email: {chunk}")
+            time.sleep(0.15)
+            self.capture(400, f"Typing email: {chunk}")
 
-        time.sleep(0.5)
+        self.hold_frame(1.0, "Email fully typed")
 
-        # Type password
+        # Type password character by character
         pass_field = self.driver.find_element(By.ID, "id_password")
         pass_field.clear()
-        pass_field.send_keys(PASSWORD)
-        time.sleep(0.3)
-        self.capture(500, "Password filled")
+        for i in range(1, len(PASSWORD) + 1):
+            pass_field.clear()
+            pass_field.send_keys(PASSWORD[:i])
+            time.sleep(0.1)
+        self.capture(600, "Password filled")
 
         # Capture the filled form
-        self.hold_frame(1.5, "Filled login form")
+        self.hold_frame(3.0, "Filled login form — ready to sign in")
 
         before_login = self.frames[-1][0]
 
         # Click Sign In
         btn = self.driver.find_element(By.CSS_SELECTOR, "button[type='submit']")
         btn.click()
-        time.sleep(2.5)
+        time.sleep(1)
+        self.capture(400, "Loading after click")
+        time.sleep(2)
 
         # After login - should be on dashboard
-        self.capture(200, "After login redirect")
+        self.capture(500, "After login redirect")
         return before_login
 
     def scene_03_user_dashboard(self):
         """Scene 3: User dashboard overview."""
         print("\n🎬 SCENE 3: User Dashboard")
         self.driver.get(f"{BASE_URL}/dashboard/user/")
-        time.sleep(2)
-        self.hold_frame(3.0, "User Dashboard — Stats + Recent Tokens")
-        self.scroll_to_bottom(steps=3, pause=0.5)
+        time.sleep(2.5)
+        self.hold_frame(5.0, "User Dashboard — Welcome header + Stats cards")
+        self.capture_sequence(2, 0.5, 600, "Stats cards hover effects")
+        self.scroll_to_bottom(steps=5, pause=0.6)
+        self.hold_frame(4.0, "Recent Tokens table + Quick Actions")
         self.scroll_to_top()
         time.sleep(0.5)
-        last = self.capture(500, "Dashboard top view")
+        last = self.capture(600, "Dashboard top view")
         return last
 
     def scene_04_book_queue(self):
         """Scene 4: Book a queue token with cascading dropdowns."""
         print("\n🎬 SCENE 4: Book Queue — Branch → Dept → Service")
         self.driver.get(f"{BASE_URL}/queues/book/")
-        time.sleep(2)
+        time.sleep(2.5)
 
         # Show the booking page with step wizard
-        self.hold_frame(2.5, "Booking page — Step 1: Select Branch")
+        self.hold_frame(5.0, "Booking page — Step 1 active, wizard visible")
 
         # Select Branch
         branch_select = Select(self.wait.until(
             EC.presence_of_element_located((By.ID, "id_branch"))
         ))
-        self.capture(300, "Branch dropdown visible")
+        self.capture(600, "Branch dropdown ready")
 
-        # Select Colombo General Hospital
-        branch_select.select_by_visible_text("Colombo General Hospital")
-        time.sleep(2)  # Wait for AJAX
-        self.capture_sequence(2, 0.5, 400, "After branch selected — Step 2 active")
+        # Select Colombo General Hospital — text includes code suffix like "(CGH)"
+        for opt in branch_select.options:
+            if "Colombo General Hospital" in opt.text:
+                branch_select.select_by_visible_text(opt.text)
+                break
+        time.sleep(1)
+        self.capture(500, "Branch selected")
+        time.sleep(1.5)  # Wait for AJAX
+        self.hold_frame(3.0, "Step 2 active — Departments loaded via AJAX")
+        self.capture_sequence(2, 0.5, 500, "Step wizard animated to step 2")
 
-        # Select Department
+        # Select Department — match partial text
         dept_select = Select(self.driver.find_element(By.ID, "id_department"))
-        dept_select.select_by_visible_text("Cardiology Unit")
-        time.sleep(2)  # Wait for AJAX
-        self.capture_sequence(2, 0.5, 400, "After dept selected — services loading")
+        for opt in dept_select.options:
+            if "Cardiology" in opt.text:
+                dept_select.select_by_visible_text(opt.text)
+                break
+        time.sleep(1)
+        self.capture(500, "Department selected")
+        time.sleep(1.5)  # Wait for AJAX
+        self.hold_frame(3.0, "Services loaded for Cardiology Unit")
+        self.capture_sequence(2, 0.5, 500, "Services dropdown populated")
 
-        # Select Service
+        # Select Service — match partial text
         service_select = Select(self.driver.find_element(By.ID, "id_service"))
-        service_select.select_by_visible_text("ECG")
-        time.sleep(1.5)
-        self.capture_sequence(3, 0.4, 500, "Service selected — Step 3: Confirm")
+        for opt in service_select.options:
+            if "ECG" in opt.text:
+                service_select.select_by_visible_text(opt.text)
+                break
+        time.sleep(1)
+        self.capture(500, "ECG service selected")
+        time.sleep(1)
+        self.hold_frame(4.0, "Step 3 — All selections complete, wizard fully progressed")
+        self.capture_sequence(3, 0.5, 600, "Wait estimate card shimmer animation")
 
         # Show the wait estimate card
-        self.hold_frame(3.0, "Wait estimate card visible — Ready to submit")
+        self.hold_frame(4.0, "Wait estimate card — live queue estimate visible")
 
         before_submit = self.frames[-1][0]
 
         # Submit
         submit_btn = self.driver.find_element(By.ID, "submitBtn")
         submit_btn.click()
+        time.sleep(1)
+        self.capture(500, "Submitting — spinner visible")
         time.sleep(3)
 
         # After submit — token detail page
-        self.capture(300, "After submit — redirected to token detail")
+        self.capture(500, "After submit — redirected to token detail")
         return before_submit
 
     def scene_05_token_detail(self):
@@ -300,67 +327,114 @@ class DemoRecorder:
         print("\n🎬 SCENE 5: Token Detail — QR + Progress + Metrics")
 
         # We should already be on the token detail page after booking
-        time.sleep(2)
-        self.hold_frame(3.0, "Token Pass Card — Top section")
+        time.sleep(2.5)
+        self.hold_frame(5.0, "Token Pass Card — header + token number + status badge")
+        self.capture_sequence(2, 0.5, 600, "Live sync indicator")
+
+        # Scroll to show progress bar and metrics
+        self.driver.execute_script("window.scrollTo({top: 250, behavior: 'smooth'})")
+        time.sleep(0.8)
+        self.hold_frame(4.0, "Progress bar + timeline + position metrics")
 
         # Scroll to show QR code and full ticket
-        self.scroll_to_bottom(steps=4, pause=0.6)
-        self.hold_frame(2.5, "QR Code + Download button visible")
+        self.scroll_to_bottom(steps=5, pause=0.6)
+        self.hold_frame(4.0, "QR Code + Download PDF button visible")
 
         self.scroll_to_top()
         time.sleep(0.5)
 
         # Wait for live sync to update
         time.sleep(5)
-        self.capture_sequence(3, 1.0, 500, "Live sync updating — progress bar")
+        self.capture_sequence(4, 1.5, 700, "Live sync auto-refresh — progress bar updating")
 
         last = self.frames[-1][0]
+        return last
+
+    def scene_05b_my_tokens(self):
+        """Scene 5b: My Tokens list page."""
+        print("\n🎬 SCENE 5b: My Tokens List")
+        self.driver.get(f"{BASE_URL}/queues/my-tokens/")
+        time.sleep(2)
+        self.hold_frame(5.0, "My Tokens — List of all user tokens with status badges")
+        self.scroll_to_bottom(steps=3, pause=0.5)
+        self.hold_frame(3.0, "Token history table scrolled")
+        self.scroll_to_top()
+        time.sleep(0.5)
+        last = self.capture(500, "My Tokens top")
         return last
 
     def scene_06_live_display(self):
         """Scene 6: Live Queue TV Display."""
         print("\n🎬 SCENE 6: Live Queue TV Display")
         self.driver.get(f"{BASE_URL}/queues/display/")
-        time.sleep(3)
+        time.sleep(3.5)
 
-        self.hold_frame(3.5, "Live TV Display — Dark theme, serving + waiting list")
+        self.hold_frame(6.0, "Live TV Display — Dark theme, Now Serving + Upcoming")
 
         # Capture multiple frames to show clock ticking and ticker
-        self.capture_sequence(4, 1.5, 600, "Live display — clock + ticker rotating")
+        self.capture_sequence(6, 2.0, 800, "Live display — clock + multilingual ticker")
+
+        self.hold_frame(4.0, "TV display — fullscreen button + sound controls")
 
         last = self.frames[-1][0]
         return last
 
-    def scene_07_staff_manage(self):
-        """Scene 7: Staff logs in and manages queue."""
-        print("\n🎬 SCENE 7: Staff Queue Management")
-
-        # Logout patient and login as staff
+    def scene_07_staff_login(self):
+        """Scene 7a: Staff login page."""
+        print("\n🎬 SCENE 7a: Staff Login")
         self.logout()
-        self.login(STAFF_EMAIL)
-        time.sleep(1)
-
-        self.driver.get(f"{BASE_URL}/queues/manage/")
+        self.driver.get(f"{BASE_URL}/accounts/login/")
         time.sleep(2)
 
+        email_field = self.wait.until(EC.presence_of_element_located((By.ID, "id_username")))
+        email_field.clear()
+        email_field.send_keys(STAFF_EMAIL)
+        time.sleep(0.3)
+        self.capture(500, "Staff email entered")
+
+        pass_field = self.driver.find_element(By.ID, "id_password")
+        pass_field.clear()
+        pass_field.send_keys(PASSWORD)
+        time.sleep(0.3)
+        self.capture(500, "Staff password entered")
+        self.hold_frame(2.0, "Staff credentials filled")
+
+        btn = self.driver.find_element(By.CSS_SELECTOR, "button[type='submit']")
+        btn.click()
+        time.sleep(2.5)
+        self.capture(500, "Staff logged in")
+        last = self.frames[-1][0]
+        return last
+
+    def scene_07_staff_manage(self):
+        """Scene 7b: Staff manages queue — calls next token."""
+        print("\n🎬 SCENE 7b: Staff Queue Management")
+
+        self.driver.get(f"{BASE_URL}/queues/manage/")
+        time.sleep(2.5)
+
         # Show the staff panel
-        self.hold_frame(3.0, "Staff Counter Panel — Hotkeys + Stats")
+        self.hold_frame(5.0, "Staff Counter Panel — Hotkeys bar + Stats summary")
+        self.capture_sequence(2, 0.5, 600, "Counter panel cards")
 
         # Scroll to see the queue list
-        self.scroll_to_bottom(steps=3, pause=0.5)
-        self.hold_frame(2.0, "Waiting queue list with Call Next buttons")
+        self.scroll_to_bottom(steps=4, pause=0.5)
+        self.hold_frame(4.0, "Waiting queue list — tokens with Call Next + Skip buttons")
 
         self.scroll_to_top()
         time.sleep(0.5)
-        self.capture(400, "Staff panel top view")
+        self.capture(500, "Staff panel top view")
 
         # Click "Call Next" on the first waiting token
         try:
             call_btn = self.driver.find_element(By.CSS_SELECTOR, ".call-next-btn")
-            self.capture(500, "About to click Call Next")
+            self.hold_frame(2.0, "Highlighting Call Next button")
             call_btn.click()
-            time.sleep(2.5)
-            self.capture_sequence(2, 0.5, 500, "After calling next — token now SERVING")
+            time.sleep(1)
+            self.capture(500, "Calling next token...")
+            time.sleep(2)
+            self.hold_frame(4.0, "Token called — now SERVING at counter")
+            self.capture_sequence(2, 0.5, 600, "Serving token hero card updated")
         except Exception as e:
             print(f"  ⚠️ Could not find Call Next button: {e}")
             self.capture(500, "Staff panel (no waiting tokens to call)")
@@ -387,34 +461,71 @@ class DemoRecorder:
             # Wait for live sync to detect SERVING status
             time.sleep(6)
 
-            self.hold_frame(4.0, "IT'S YOUR TURN! — Green alert banner visible")
-            self.capture_sequence(3, 1.0, 600, "Serving alert pulsing")
+            self.hold_frame(6.0, "IT'S YOUR TURN! — Green alert banner + PROCEED TO COUNTER")
+            self.capture_sequence(4, 1.5, 800, "Serving alert pulsing — progress at 95%")
+
+            # Scroll to show full card
+            self.scroll_to_bottom(steps=3, pause=0.5)
+            self.hold_frame(3.0, "Token detail — serving status + QR code")
+            self.scroll_to_top()
+            time.sleep(0.5)
         else:
             print("  ⚠️ No serving token found, skipping IT'S YOUR TURN scene")
 
         last = self.frames[-1][0]
         return last
 
-    def scene_09_admin_dashboard(self):
-        """Scene 9: Admin dashboard with analytics."""
-        print("\n🎬 SCENE 9: Admin Dashboard — Analytics")
-
+    def scene_09_admin_login(self):
+        """Scene 9a: Admin login."""
+        print("\n🎬 SCENE 9a: Admin Login")
         self.logout()
-        self.login(ADMIN_EMAIL)
-        time.sleep(1)
+        self.driver.get(f"{BASE_URL}/accounts/login/")
+        time.sleep(2)
+
+        email_field = self.wait.until(EC.presence_of_element_located((By.ID, "id_username")))
+        email_field.clear()
+        email_field.send_keys(ADMIN_EMAIL)
+        time.sleep(0.3)
+
+        pass_field = self.driver.find_element(By.ID, "id_password")
+        pass_field.clear()
+        pass_field.send_keys(PASSWORD)
+        time.sleep(0.3)
+        self.capture(500, "Admin credentials filled")
+        self.hold_frame(2.0, "Admin login ready")
+
+        btn = self.driver.find_element(By.CSS_SELECTOR, "button[type='submit']")
+        btn.click()
+        time.sleep(2.5)
+        self.capture(500, "Admin logged in")
+        last = self.frames[-1][0]
+        return last
+
+    def scene_09_admin_dashboard(self):
+        """Scene 9b: Admin dashboard with analytics."""
+        print("\n🎬 SCENE 9b: Admin Dashboard — Analytics")
 
         self.driver.get(f"{BASE_URL}/dashboard/admin/")
-        time.sleep(3)
+        time.sleep(3.5)
 
-        self.hold_frame(3.5, "Admin Dashboard — Metrics cards")
+        self.hold_frame(6.0, "Admin Dashboard — Key metrics cards row")
+        self.capture_sequence(3, 0.5, 600, "Metrics cards — shimmer animation")
 
         # Scroll to show charts
-        self.scroll_to_bottom(steps=4, pause=0.6)
-        self.hold_frame(3.0, "Charts — Token trend + Service distribution")
+        self.driver.execute_script("window.scrollTo({top: 350, behavior: 'smooth'})")
+        time.sleep(0.8)
+        self.hold_frame(5.0, "7-Day Token Trend chart — line graph with gradient fill")
+
+        self.driver.execute_script("window.scrollTo({top: 600, behavior: 'smooth'})")
+        time.sleep(0.8)
+        self.hold_frame(4.0, "Service Distribution donut chart")
+
+        self.scroll_to_bottom(steps=3, pause=0.5)
+        self.hold_frame(5.0, "Quick Actions + System Status — all services operational")
 
         self.scroll_to_top()
         time.sleep(0.5)
-        self.hold_frame(2.0, "Admin Dashboard — Final overview")
+        self.hold_frame(4.0, "Admin Dashboard — Final overview")
 
         last = self.frames[-1][0]
         return last
@@ -471,19 +582,23 @@ class DemoRecorder:
         print("═" * 70)
         print(f"  Resolution: {WIDTH}×{HEIGHT}")
         print(f"  Output: {OUTPUT_FILE}")
+        print(f"  Target Duration: 150–300 seconds")
         print()
 
         try:
             # Run all scenes
-            f1 = self.scene_01_login_page()
-            f2 = self.scene_02_patient_login()
-            f3 = self.scene_03_user_dashboard()
-            f4 = self.scene_04_book_queue()
-            f5 = self.scene_05_token_detail()
-            f6 = self.scene_06_live_display()
-            f7 = self.scene_07_staff_manage()
-            f8 = self.scene_08_its_your_turn()
-            f9 = self.scene_09_admin_dashboard()
+            self.scene_01_login_page()
+            self.scene_02_patient_login()
+            self.scene_03_user_dashboard()
+            self.scene_04_book_queue()
+            self.scene_05_token_detail()
+            self.scene_05b_my_tokens()
+            self.scene_06_live_display()
+            self.scene_07_staff_login()
+            self.scene_07_staff_manage()
+            self.scene_08_its_your_turn()
+            self.scene_09_admin_login()
+            self.scene_09_admin_dashboard()
 
             # Assemble into WebP
             self.assemble_webp()
