@@ -67,7 +67,7 @@
                             <div id="live-progress-bar" class="live-progress-bar {% if token.status == 'SERVING' %}serving-progress{% endif %}" style="width: 15%;"></div>
                         </div>
                         <div class="progress-stage-labels">
-                            <span id="stage-issued" class="active-stage"><i class="fas fa-ticket-alt"></i> Issued</span>
+                            <span id="stage-issued" class="active-stage"><i class="fas fa-ticket"></i> Issued</span>
                             <span id="stage-waiting"><i class="fas fa-clock"></i> Waiting</span>
                             <span id="stage-next"><i class="fas fa-user-clock"></i> Next Up</span>
                             <span id="stage-serving"><i class="fas fa-bullhorn"></i> Counter</span>
@@ -77,7 +77,7 @@
                     <!-- Progress Timeline -->
                     <div class="token-timeline mb-4">
                         <div id="timeline-step-issued" class="timeline-step completed">
-                            <div class="timeline-dot"><i class="fas fa-ticket-alt"></i></div>
+                            <div class="timeline-dot"><i class="fas fa-ticket"></i></div>
                             <div class="timeline-label">Issued</div>
                         </div>
                         <div id="timeline-line-1" class="timeline-line completed"></div>
@@ -148,7 +148,7 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const tokenId = {{ token.id }};
+    const tokenId = parseInt("{{ token.id }}", 10);
     const statusApiUrl = "{% url 'queues:api_token_status' token.id %}";
     let previousStatus = "{{ token.status }}";
 
