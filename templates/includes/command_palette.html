@@ -1,0 +1,173 @@
+<!-- Command Palette Modal -->
+<div class="modal fade" id="commandPaletteModal" tabindex="-1" aria-labelledby="commandPaletteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content glass-card border-0 shadow-xl overflow-hidden rounded-4">
+            <div class="modal-header border-bottom border-light border-opacity-10 bg-transparent p-3">
+                <div class="input-group">
+                    <span class="input-group-text bg-transparent border-0 text-muted" id="search-icon">
+                        <i class="fas fa-search fs-5"></i>
+                    </span>
+                    <input type="text" class="form-control bg-transparent border-0 fs-4 text-primary shadow-none" id="commandInput" placeholder="Type a command or search... (e.g. 'book', 'dashboard')" aria-label="Search" aria-describedby="search-icon" autocomplete="off" autofocus>
+                </div>
+            </div>
+            <div class="modal-body p-0">
+                <div class="list-group list-group-flush" id="commandList">
+                    <!-- Dashboard -->
+                    <a href="{% url 'dashboard:index' %}" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center gap-3 command-item">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">Dashboard</h6>
+                            <small class="text-muted">Go to your main dashboard</small>
+                        </div>
+                        <div class="ms-auto text-muted small">Navigation</div>
+                    </a>
+                    
+                    <!-- Book Token -->
+                    <a href="{% url 'queues:book' %}" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center gap-3 command-item">
+                        <div class="bg-success bg-opacity-10 text-success rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="fas fa-plus-circle"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">Book Token</h6>
+                            <small class="text-muted">Book a new queue token</small>
+                        </div>
+                        <div class="ms-auto text-muted small">Action</div>
+                    </a>
+
+                    <!-- My Tokens -->
+                    <a href="{% url 'queues:my_tokens' %}" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center gap-3 command-item">
+                        <div class="bg-info bg-opacity-10 text-info rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">My Tokens</h6>
+                            <small class="text-muted">View all your queue tokens</small>
+                        </div>
+                        <div class="ms-auto text-muted small">Navigation</div>
+                    </a>
+
+                    <!-- Profile Settings -->
+                    <a href="{% url 'accounts:profile_update' %}" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center gap-3 command-item">
+                        <div class="bg-warning bg-opacity-10 text-warning rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="fas fa-user-cog"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">Profile Settings</h6>
+                            <small class="text-muted">Manage your account settings</small>
+                        </div>
+                        <div class="ms-auto text-muted small">Settings</div>
+                    </a>
+                </div>
+                <div class="p-3 text-center text-muted small border-top border-light border-opacity-10" id="noResults" style="display: none;">
+                    No commands found matching your search.
+                </div>
+            </div>
+            <div class="modal-footer border-0 bg-transparent justify-content-between p-3 text-muted small">
+                <span><kbd class="bg-body-secondary text-body px-2 py-1 rounded">↑</kbd> <kbd class="bg-body-secondary text-body px-2 py-1 rounded">↓</kbd> to navigate</span>
+                <span><kbd class="bg-body-secondary text-body px-2 py-1 rounded">Enter</kbd> to select</span>
+                <span><kbd class="bg-body-secondary text-body px-2 py-1 rounded">Esc</kbd> to close</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+#commandPaletteModal .modal-content {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(var(--bg-card-rgb, 255, 255, 255), 0.85);
+}
+[data-bs-theme="dark"] #commandPaletteModal .modal-content {
+    background: rgba(30, 41, 59, 0.85);
+}
+#commandPaletteModal .list-group-item {
+    background: transparent;
+    transition: all 0.2s ease;
+}
+#commandPaletteModal .list-group-item:hover,
+#commandPaletteModal .list-group-item.active-cmd {
+    background: rgba(var(--primary-rgb), 0.05);
+    border-radius: var(--radius-md);
+    transform: translateX(4px);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const commandModalEl = document.getElementById('commandPaletteModal');
+    if (!commandModalEl) return;
+    
+    const commandModal = new bootstrap.Modal(commandModalEl);
+    const commandInput = document.getElementById('commandInput');
+    const commandItems = document.querySelectorAll('.command-item');
+    const noResults = document.getElementById('noResults');
+    let currentIndex = -1;
+
+    // Toggle on Ctrl+K or Cmd+K
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            commandModal.toggle();
+        }
+    });
+
+    commandModalEl.addEventListener('shown.bs.modal', function () {
+        commandInput.focus();
+        resetSelection();
+    });
+
+    commandInput.addEventListener('input', function(e) {
+        const term = e.target.value.toLowerCase();
+        let hasVisible = false;
+        
+        commandItems.forEach(item => {
+            const text = item.innerText.toLowerCase();
+            if (text.includes(term)) {
+                item.style.display = 'flex';
+                hasVisible = true;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        noResults.style.display = hasVisible ? 'none' : 'block';
+        resetSelection();
+    });
+
+    commandInput.addEventListener('keydown', function(e) {
+        const visibleItems = Array.from(commandItems).filter(item => item.style.display !== 'none');
+        
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            currentIndex = Math.min(currentIndex + 1, visibleItems.length - 1);
+            updateSelection(visibleItems);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            currentIndex = Math.max(currentIndex - 1, 0);
+            updateSelection(visibleItems);
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (currentIndex >= 0 && currentIndex < visibleItems.length) {
+                window.location.href = visibleItems[currentIndex].getAttribute('href');
+            } else if (visibleItems.length > 0) {
+                window.location.href = visibleItems[0].getAttribute('href');
+            }
+        }
+    });
+
+    function updateSelection(items) {
+        commandItems.forEach(item => item.classList.remove('active-cmd'));
+        if (currentIndex >= 0 && items[currentIndex]) {
+            items[currentIndex].classList.add('active-cmd');
+            items[currentIndex].scrollIntoView({ block: 'nearest' });
+        }
+    }
+
+    function resetSelection() {
+        currentIndex = -1;
+        commandItems.forEach(item => item.classList.remove('active-cmd'));
+    }
+});
+</script>
