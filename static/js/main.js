@@ -610,3 +610,20 @@ document.addEventListener('DOMContentLoaded', function () {
         revealObserver.observe(el);
     });
 });
+
+
+// =============================================================================
+// ADVANCED MICRO-INTERACTIONS (3D TILT)
+// =============================================================================
+
+document.addEventListener('DOMContentLoaded', function () {
+    if (typeof VanillaTilt !== 'undefined') {
+        VanillaTilt.init(document.querySelectorAll(".stat-card, .glass-card:not(.modal-content)"), {
+            max: 5,
+            speed: 400,
+            glare: true,
+            "max-glare": 0.15,
+            scale: 1.02
+        });
+    }
+});
