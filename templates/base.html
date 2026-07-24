@@ -66,6 +66,11 @@
         </div>
     {% endif %}
 
+    <!-- Command Palette Modal -->
+    {% if user.is_authenticated %}
+        {% include 'includes/command_palette.html' %}
+    {% endif %}
+
     <!-- ========== JavaScript ========== -->
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -79,6 +84,9 @@
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- Vanilla Tilt for 3D Cards -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
 
     <!-- Custom JS -->
     <script src="{% static 'js/main.js' %}?v=2"></script>
