@@ -89,6 +89,9 @@
                                     <i class="fas fa-pause-circle me-2"></i>Put on Hold <span class="counter-hotkey-badge">Alt + H</span>
                                 </button>
                             </form>
+                            <button type="button" class="btn btn-outline-warning w-100 rounded-3 py-2 fw-semibold mt-1" data-bs-toggle="modal" data-bs-target="#transferModal" data-token-id="{{ token.pk }}" data-token-number="{{ token.token_number }}">
+                                <i class="fas fa-random me-2"></i>Transfer Ticket
+                            </button>
                         </div>
                     </div>
                     {% empty %}
@@ -147,6 +150,9 @@
                                                     <i class="fas fa-bullhorn me-1"></i> Call Next
                                                 </button>
                                             </form>
+                                            <button type="button" class="btn btn-sm btn-outline-warning rounded-3 px-2 py-2" data-bs-toggle="modal" data-bs-target="#transferModal" data-token-id="{{ token.pk }}" data-token-number="{{ token.token_number }}" title="Transfer Ticket">
+                                                <i class="fas fa-random me-1"></i> Transfer
+                                            </button>
                                             <form method="post" action="{% url 'queues:change_status' token.pk 'skip' %}" class="skip-form d-inline">
                                                 {% csrf_token %}
                                                 <button type="submit" class="btn btn-sm btn-outline-danger rounded-3 px-2 py-2" title="Mark No-Show / Skip">
@@ -172,6 +178,42 @@
         </div>
     </div>
 </div>
+
+<!-- Transfer Ticket Modal -->
+<div class="modal fade" id="transferModal" tabindex="-1" aria-labelledby="transferModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow-lg border-0">
+            <div class="modal-header bg-warning bg-opacity-10 border-0">
+                <h5 class="modal-title fw-bold text-dark mb-0" id="transferModalLabel">
+                    <i class="fas fa-random text-warning me-2"></i>Transfer Ticket <span id="transferTokenNumberDisplay" class="badge bg-warning text-dark ms-1"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" id="transferForm" action="">
+                {% csrf_token %}
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label for="id_target_service" class="form-label fw-bold small text-muted text-uppercase">Destination Service</label>
+                        <select name="target_service" id="id_target_service" class="form-select rounded-3 py-2" required>
+                            <option value="">-- Select Destination Service --</option>
+                            {% for service in services %}
+                            <option value="{{ service.id }}">{{ service.name }} ({{ service.department.name }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_notes" class="form-label fw-bold small text-muted text-uppercase">Reason / Notes (Optional)</label>
+                        <textarea name="notes" id="id_notes" class="form-control rounded-3" rows="2" placeholder="e.g., Referred for laboratory diagnosis"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-3 pt-0">
+                    <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning rounded-3 px-4 fw-bold"><i class="fas fa-paper-plane me-1"></i> Confirm Transfer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -179,7 +221,7 @@
     // Keyboard Hotkey Listener
     document.addEventListener('keydown', function(event) {
         // Space bar calls next token
-        if (event.code === 'Space' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        if (event.code === 'Space' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
             event.preventDefault();
             const firstCallBtn = document.querySelector('.call-next-btn');
             if (firstCallBtn) firstCallBtn.click();
@@ -197,7 +239,23 @@
             if (holdForm) holdForm.submit();
         }
     });
+
+    // Transfer Modal dynamic action URL setup
+    const transferModal = document.getElementById('transferModal');
+    if (transferModal) {
+        transferModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            if (button) {
+                const tokenId = button.getAttribute('data-token-id');
+                const tokenNumber = button.getAttribute('data-token-number');
+                
+                document.getElementById('transferTokenNumberDisplay').textContent = tokenNumber;
+                document.getElementById('transferForm').action = `/queues/token/${tokenId}/transfer/`;
+            }
+        });
+    }
 </script>
 {% endblock %}
+
 
 
