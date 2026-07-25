@@ -10,7 +10,7 @@ class Command(BaseCommand):
     help = 'Seeds the database with dummy data for presentation.'
 
     def handle(self, *args, **kwargs):
-        self.stdout.write(self.style.WARNING('Seeding database...'))  # type: ignore
+        self.stdout.write('Seeding database...')
 
         # 1. Create a Branch
         branch, created = Branch.objects.get_or_create(
@@ -80,4 +80,4 @@ class Command(BaseCommand):
                     # Manually override created_at since auto_now_add usually overrides it
                     QueueToken.objects.filter(id=token.id).update(created_at=day)
 
-        self.stdout.write(self.style.SUCCESS('Successfully seeded the database!'))  # type: ignore
+        self.stdout.write('Successfully seeded the database!')
