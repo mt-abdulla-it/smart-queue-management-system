@@ -17,6 +17,7 @@ urlpatterns = [
     # Staff Views
     path('manage/', views.StaffManageQueueView.as_view(), name='staff_manage'),
     path('token/<int:pk>/status/<str:action>/', views.ChangeTokenStatusView.as_view(), name='change_status'),
+    path('token/<int:pk>/transfer/', views.TransferTokenView.as_view(), name='transfer_token'),
     
     # Queue Views
     path('history/', views.QueueHistoryListView.as_view(), name='history'),
