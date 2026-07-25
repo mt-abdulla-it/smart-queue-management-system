@@ -89,6 +89,7 @@ class QueueHistory(TimeStampedModel):
         SKIPPED = 'SKIPPED', 'Skipped'
         ON_HOLD = 'ON_HOLD', 'Put On Hold'
         RECALLED = 'RECALLED', 'Recalled'
+        TRANSFERRED = 'TRANSFERRED', 'Transferred'
 
     token = models.ForeignKey(QueueToken, on_delete=models.CASCADE, related_name='history')
     action_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL,

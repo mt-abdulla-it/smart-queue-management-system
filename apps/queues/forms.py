@@ -43,3 +43,16 @@ class QueueBookingForm(forms.ModelForm):
                 self.fields['service'].queryset = Service.objects.filter(department_id=department_id, is_active=True)
             except (ValueError, TypeError):
                 pass
+
+
+class TransferTicketForm(forms.Form):
+    target_service = forms.ModelChoiceField(
+        queryset=Service.objects.filter(is_active=True),
+        empty_label="Select Destination Service",
+        widget=forms.Select(attrs={'class': 'form-select', 'required': 'required'})
+    )
+    notes = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Optional transfer reason or note'})
+    )
+
