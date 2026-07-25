@@ -15,7 +15,7 @@ from apps.core.mixins import RoleRequiredMixin
 from apps.branches.models import Department, Service
 
 from .models import QueueToken, QueueHistory
-from .forms import QueueBookingForm
+from .forms import QueueBookingForm, TransferTicketForm
 from .utils import generate_qr_code, generate_pdf_token
 
 
@@ -168,6 +168,7 @@ class StaffManageQueueView(RoleRequiredMixin, TemplateView):
         
         context['waiting_tokens'] = qs.filter(status='WAITING').order_by('created_at')
         context['serving_tokens'] = qs.filter(status='SERVING').order_by('-updated_at')
+        context['services'] = Service.objects.filter(is_active=True)
         
         return context
 
@@ -209,6 +210,45 @@ class ChangeTokenStatusView(RoleRequiredMixin, View):
             )
             
         return redirect('queues:staff_manage')
+
+
+class TransferTokenView(RoleRequiredMixin, View):
+    """Handle ticket transfer to a new service by staff/admin."""
+    allowed_roles = ['STAFF', 'ADMIN']
+
+    @transaction.atomic
+    def post(self, request, pk):
+        token = get_object_or_404(QueueToken, pk=pk)
+        service_id = request.POST.get('target_service')
+        transfer_notes = request.POST.get('notes', '').strip()
+        
+        if not service_id:
+            messages.error(request, "Please select a valid destination service.")
+            return redirect('queues:staff_manage')
+            
+        target_service = get_object_or_404(Service, pk=service_id, is_active=True)
+        old_service_name = token.service.name
+        
+        # Update service and reset status to WAITING
+        token.service = target_service
+        token.status = 'WAITING'
+        token.called_by = None
+        token.save()
+        
+        note_text = f"Transferred from '{old_service_name}' to '{target_service.name}'."
+        if transfer_notes:
+            note_text += f" Note: {transfer_notes}"
+            
+        QueueHistory.objects.create(
+            token=token,
+            action_by=request.user,
+            action=QueueHistory.Action.TRANSFERRED,
+            notes=note_text
+        )
+        
+        messages.success(request, f"Token {token.token_number} successfully transferred to {target_service.name}.")
+        return redirect('queues:staff_manage')
+
 
 class QueueHistoryListView(RoleRequiredMixin, ListView):
     """View to see history of all tokens (for STAFF/ADMIN)."""
