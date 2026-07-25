@@ -1,9 +1,10 @@
+from typing import Any
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from apps.branches.models import Branch, Department, Service
-from apps.queues.models import QueueToken
+from apps.queues.models import QueueToken, QueueHistory
 
 User = get_user_model()
 
@@ -21,6 +22,7 @@ class TokenLiveStatusAPITestCase(TestCase):
         self.service = Service.objects.create(
             name="General Consultation",
             department=self.department,
+            code="GEN",
             prefix="GEN",
             avg_service_time_minutes=10
         )
@@ -36,14 +38,14 @@ class TokenLiveStatusAPITestCase(TestCase):
 
     def test_token_detail_view(self):
         self.client.login(email='testuser@example.com', password='Password123!')
-        response = self.client.get(reverse('queues:token_detail', kwargs={'pk': self.token.pk}))
+        response: Any = self.client.get(reverse('queues:token_detail', kwargs={'pk': self.token.pk}))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'GEN-001')
         self.assertContains(response, 'Live Sync Active')
 
     def test_token_live_status_api(self):
         self.client.login(email='testuser@example.com', password='Password123!')
-        response = self.client.get(reverse('queues:api_token_status', kwargs={'pk': self.token.pk}))
+        response: Any = self.client.get(reverse('queues:api_token_status', kwargs={'pk': self.token.pk}))
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertEqual(data['token_number'], 'GEN-001')
@@ -52,8 +54,6 @@ class TokenLiveStatusAPITestCase(TestCase):
         self.assertEqual(data['total_ahead'], 0)
         self.assertIn('progress_percent', data)
 
-
-from apps.queues.models import QueueHistory
 
 class TransferTokenTestCase(TestCase):
     def setUp(self):
@@ -76,12 +76,14 @@ class TransferTokenTestCase(TestCase):
         self.service1 = Service.objects.create(
             name="General Consultation",
             department=self.department,
+            code="GEN",
             prefix="GEN",
             avg_service_time_minutes=10
         )
         self.service2 = Service.objects.create(
             name="Laboratory / Blood Test",
             department=self.department,
+            code="LAB",
             prefix="LAB",
             avg_service_time_minutes=15
         )
@@ -98,7 +100,7 @@ class TransferTokenTestCase(TestCase):
     def test_transfer_token(self):
         self.client.login(email='staff@example.com', password='Password123!')
         url = reverse('queues:transfer_token', kwargs={'pk': self.token.pk})
-        response = self.client.post(url, {
+        response: Any = self.client.post(url, {
             'target_service': self.service2.id,
             'notes': 'Referred for blood tests'
         })
