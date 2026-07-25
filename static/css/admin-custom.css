@@ -1,0 +1,389 @@
+/* =============================================================================
+   Django Admin Custom Modern Glassmorphic Theme
+   ============================================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --admin-bg: #0f172a;
+    --admin-card-bg: rgba(30, 41, 59, 0.7);
+    --admin-card-border: rgba(255, 255, 255, 0.08);
+    --admin-header-bg: rgba(15, 23, 42, 0.85);
+    --admin-primary: #6366f1;
+    --admin-primary-hover: #4f46e5;
+    --admin-accent: #06b6d4;
+    --admin-text-main: #f8fafc;
+    --admin-text-muted: #94a3b8;
+    --admin-border-radius: 16px;
+    --admin-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    --admin-glow: 0 0 20px rgba(99, 102, 241, 0.3);
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+    background: radial-gradient(circle at 15% 15%, #1e1b4b 0%, #0f172a 60%, #020617 100%) !important;
+    color: var(--admin-text-main) !important;
+    min-height: 100vh;
+}
+
+/* Base Headings */
+h1, h2, h3, h4, .module h2, #site-name a {
+    font-family: 'Outfit', sans-serif !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.02em !important;
+}
+
+/* Top Header Bar */
+#header {
+    background: var(--admin-header-bg) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--admin-card-border) !important;
+    padding: 16px 28px !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2) !important;
+}
+
+#site-name a {
+    font-size: 20px !important;
+    background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #38bdf8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800 !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#user-tools {
+    font-size: 13px !important;
+    color: var(--admin-text-muted) !important;
+    font-weight: 500;
+}
+
+#user-tools a {
+    color: #cbd5e1 !important;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 6px 14px !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    transition: all 0.2s ease !important;
+    text-decoration: none !important;
+    display: inline-block;
+    margin-left: 6px;
+}
+
+#user-tools a:hover {
+    background: rgba(99, 102, 241, 0.2) !important;
+    border-color: rgba(99, 102, 241, 0.4) !important;
+    color: #fff !important;
+    transform: translateY(-1px);
+}
+
+/* Breadcrumbs */
+div.breadcrumbs {
+    background: rgba(30, 41, 59, 0.4) !important;
+    border-bottom: 1px solid var(--admin-card-border) !important;
+    padding: 12px 28px !important;
+    color: var(--admin-text-muted) !important;
+    font-size: 13px !important;
+}
+
+div.breadcrumbs a {
+    color: #818cf8 !important;
+    text-decoration: none !important;
+    font-weight: 500;
+}
+
+div.breadcrumbs a:hover {
+    color: #a5b4fc !important;
+    text-decoration: underline !important;
+}
+
+/* Main Container & Layout */
+#container {
+    background: transparent !important;
+}
+
+#content {
+    padding: 28px !important;
+}
+
+#content h1 {
+    font-size: 26px !important;
+    margin-bottom: 24px !important;
+    color: #f8fafc !important;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Modern Analytics Summary Header for Users */
+.admin-user-analytics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.admin-stat-card {
+    background: var(--admin-card-bg);
+    border: 1px solid var(--admin-card-border);
+    backdrop-filter: blur(12px);
+    border-radius: var(--admin-border-radius);
+    padding: 20px;
+    box-shadow: var(--admin-shadow);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.admin-stat-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(99, 102, 241, 0.4);
+    box-shadow: 0 14px 35px -10px rgba(99, 102, 241, 0.25);
+}
+
+.admin-stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.icon-purple { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+.icon-cyan { background: rgba(6, 182, 212, 0.15); color: #22d3ee; }
+.icon-emerald { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+.icon-amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+
+.admin-stat-value {
+    font-family: 'Outfit', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.1;
+}
+
+.admin-stat-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--admin-text-muted);
+}
+
+/* Change List Main Wrapper */
+#changelist {
+    background: var(--admin-card-bg) !important;
+    border: 1px solid var(--admin-card-border) !important;
+    backdrop-filter: blur(16px);
+    border-radius: var(--admin-border-radius) !important;
+    padding: 24px !important;
+    box-shadow: var(--admin-shadow) !important;
+}
+
+/* Toolbar & Search Bar */
+#toolbar {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border: 1px solid var(--admin-card-border) !important;
+    border-radius: 12px !important;
+    padding: 14px 20px !important;
+    margin-bottom: 20px !important;
+}
+
+#toolbar form #searchbar {
+    background: rgba(15, 23, 42, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 8px !important;
+    color: #fff !important;
+    padding: 10px 16px !important;
+    font-size: 14px !important;
+    min-width: 300px;
+    transition: all 0.2s ease;
+}
+
+#toolbar form #searchbar:focus {
+    outline: none !important;
+    border-color: #818cf8 !important;
+    box-shadow: var(--admin-glow) !important;
+}
+
+#toolbar form input[type="submit"] {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 10px 20px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;
+}
+
+#toolbar form input[type="submit"]:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4) !important;
+}
+
+/* Action Buttons (Object Tools like Add User) */
+ul.object-tools li a {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+    border-radius: 10px !important;
+    padding: 10px 20px !important;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35) !important;
+    transition: all 0.25s ease !important;
+}
+
+ul.object-tools li a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.5) !important;
+}
+
+/* Results Table */
+#changelist table {
+    width: 100% !important;
+    border-collapse: separate !important;
+    border-spacing: 0 8px !important;
+    background: transparent !important;
+}
+
+#changelist table thead th {
+    background: rgba(15, 23, 42, 0.7) !important;
+    color: #94a3b8 !important;
+    font-family: 'Outfit', sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    padding: 14px 16px !important;
+    border-top: 1px solid var(--admin-card-border) !important;
+    border-bottom: 1px solid var(--admin-card-border) !important;
+}
+
+#changelist table thead th:first-child {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+#changelist table thead th:last-child {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+#changelist table tbody tr {
+    background: rgba(30, 41, 59, 0.5) !important;
+    transition: all 0.2s ease !important;
+}
+
+#changelist table tbody tr:hover {
+    background: rgba(51, 65, 85, 0.8) !important;
+    transform: scale(1.002);
+}
+
+#changelist table tbody td, #changelist table tbody th {
+    padding: 14px 16px !important;
+    color: #f1f5f9 !important;
+    font-size: 14px !important;
+    border: none !important;
+}
+
+#changelist table tbody td:first-child, #changelist table tbody th:first-child {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+#changelist table tbody td:last-child {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+#changelist table tbody th a {
+    color: #818cf8 !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+}
+
+#changelist table tbody th a:hover {
+    color: #38bdf8 !important;
+    text-decoration: underline !important;
+}
+
+/* Sidebar Filters */
+#changelist-filter {
+    background: rgba(15, 23, 42, 0.7) !important;
+    border: 1px solid var(--admin-card-border) !important;
+    border-radius: 14px !important;
+    padding: 20px !important;
+    box-shadow: var(--admin-shadow) !important;
+}
+
+#changelist-filter h2 {
+    font-size: 15px !important;
+    color: #cbd5e1 !important;
+    background: transparent !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    padding-bottom: 10px !important;
+    margin-bottom: 14px !important;
+}
+
+#changelist-filter h3 {
+    font-size: 13px !important;
+    color: #818cf8 !important;
+    font-weight: 700 !important;
+    margin-top: 14px !important;
+}
+
+#changelist-filter ul {
+    margin-bottom: 14px !important;
+}
+
+#changelist-filter li a {
+    color: #94a3b8 !important;
+    font-size: 13px !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease;
+}
+
+#changelist-filter li.selected a {
+    color: #38bdf8 !important;
+    font-weight: 700 !important;
+}
+
+#changelist-filter li a:hover {
+    color: #f1f5f9 !important;
+}
+
+/* Pagination */
+.paginator {
+    background: transparent !important;
+    border-top: 1px solid var(--admin-card-border) !important;
+    padding-top: 18px !important;
+    margin-top: 18px !important;
+    color: var(--admin-text-muted) !important;
+    font-size: 13px !important;
+}
+
+.paginator a {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #fff !important;
+    border-radius: 6px !important;
+    padding: 6px 12px !important;
+    margin: 0 4px !important;
+    text-decoration: none !important;
+}
+
+.paginator a:hover {
+    background: #6366f1 !important;
+}

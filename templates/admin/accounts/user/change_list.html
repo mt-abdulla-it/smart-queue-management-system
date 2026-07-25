@@ -1,0 +1,48 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{% block content %}
+<div class="admin-user-analytics">
+    <div class="admin-stat-card">
+        <div class="admin-stat-icon icon-purple">
+            <i class="fas fa-users"></i>
+        </div>
+        <div>
+            <div class="admin-stat-label">Total Accounts</div>
+            <div class="admin-stat-value">{{ cl.result_count }}</div>
+        </div>
+    </div>
+    
+    <div class="admin-stat-card">
+        <div class="admin-stat-icon icon-cyan">
+            <i class="fas fa-user-shield"></i>
+        </div>
+        <div>
+            <div class="admin-stat-label">Staff & Admins</div>
+            <div class="admin-stat-value">Active Roles</div>
+        </div>
+    </div>
+
+    <div class="admin-stat-card">
+        <div class="admin-stat-icon icon-emerald">
+            <i class="fas fa-user-check"></i>
+        </div>
+        <div>
+            <div class="admin-stat-label">Account Status</div>
+            <div class="admin-stat-value">Operational</div>
+        </div>
+    </div>
+
+    <div class="admin-stat-card">
+        <div class="admin-stat-icon icon-amber">
+            <i class="fas fa-key"></i>
+        </div>
+        <div>
+            <div class="admin-stat-label">Permissions</div>
+            <div class="admin-stat-value">RBAC Guard</div>
+        </div>
+    </div>
+</div>
+
+{{ block.super }}
+{% endblock %}
