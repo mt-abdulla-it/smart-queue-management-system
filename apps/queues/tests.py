@@ -131,14 +131,14 @@ class KioskAndInteractiveTestCase(TestCase):
         self.client = Client()
 
     def test_kiosk_page_render(self):
-        response = self.client.get(reverse('queues:kiosk'))
+        response: Any = self.client.get(reverse('queues:kiosk'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Smart Queue Self-Service Kiosk')
         self.assertContains(response, 'General Consultation')
 
     def test_kiosk_issue_token_api(self):
         url = reverse('queues:api_kiosk_issue_token')
-        response = self.client.post(
+        response: Any = self.client.post(
             url,
             data={'service_id': self.service.id, 'is_priority': True},
             content_type='application/json'
@@ -170,7 +170,7 @@ class KioskAndInteractiveTestCase(TestCase):
             queue_date=timezone.now().date()
         )
         url = reverse('queues:api_arrival_checkin', kwargs={'pk': token.pk})
-        response = self.client.post(url)
+        response: Any = self.client.post(url)
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertTrue(data['success'])

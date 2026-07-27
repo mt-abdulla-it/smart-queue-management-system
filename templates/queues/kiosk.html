@@ -185,7 +185,7 @@
         <div class="row g-4">
             {% for s in services_list %}
             <div class="col-12 col-md-6 col-lg-4">
-                <div class="kiosk-card text-start h-100" onclick="issueKioskToken({{ s.id }}, '{{ s.name|escapejs }}', this)">
+                <div class="kiosk-card text-start h-100" data-service-id="{{ s.id }}" data-service-name="{{ s.name }}" onclick="onKioskCardClick(this)">
                     <div class="d-flex justify-content-between align-items-start">
                         <div class="kiosk-icon-box">
                             <i class="fa-solid {{ s.icon|default:'fa-ticket' }}"></i>
@@ -288,6 +288,12 @@
         });
 
         let autoCloseInterval;
+
+        function onKioskCardClick(cardElement) {
+            const serviceId = cardElement.getAttribute('data-service-id');
+            const serviceName = cardElement.getAttribute('data-service-name');
+            issueKioskToken(serviceId, serviceName, cardElement);
+        }
 
         function issueKioskToken(serviceId, serviceName, cardElement) {
             const isPriority = document.getElementById('priorityToggle').checked;
