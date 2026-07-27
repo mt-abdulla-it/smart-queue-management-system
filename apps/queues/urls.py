@@ -26,7 +26,12 @@ urlpatterns = [
     path('live/', views.LiveDisplayView.as_view(), name='live_display_alias'),
     path('admin-list/', views.AdminQueueListView.as_view(), name='admin_list'),
     
+    # Kiosk View
+    path('kiosk/', views.KioskView.as_view(), name='kiosk'),
+    
     # API endpoints
     path('api/waiting-list/', views.LiveWaitingListAPIView.as_view(), name='api_waiting_list'),
     path('api/token-status/<int:pk>/', views.TokenLiveStatusAPIView.as_view(), name='api_token_status'),
+    path('api/kiosk-issue-token/', views.KioskCreateTokenAPIView.as_view(), name='api_kiosk_issue_token'),
+    path('api/checkin/<int:pk>/', views.TokenArrivalCheckinAPIView.as_view(), name='api_arrival_checkin'),
 ]
