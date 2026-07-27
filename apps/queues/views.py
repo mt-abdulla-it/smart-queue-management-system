@@ -3,6 +3,7 @@ Queues Views.
 Handles queue booking, status checking, and staff queue management.
 """
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.http import HttpResponse, JsonResponse
@@ -388,4 +389,163 @@ class TokenLiveStatusAPIView(View):
             'service_name': token.service.name,
             'updated_at': token.updated_at.strftime('%H:%M:%S') if token.updated_at else None
         })
+
+
+class KioskView(TemplateView):
+    """Interactive Touchscreen Self-Service Kiosk View."""
+    template_name = 'queues/kiosk.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        today = timezone.now().date()
+        
+        departments = Department.objects.filter(is_active=True).prefetch_related('services')
+        services_data = []
+        
+        for dept in departments:
+            for service in dept.services.filter(is_active=True):
+                waiting_count = QueueToken.objects.filter(
+                    service=service,
+                    created_at__date=today,
+                    status='WAITING'
+                ).count()
+                
+                est_wait = waiting_count * getattr(service, 'avg_service_time_minutes', 10)
+                
+                services_data.append({
+                    'id': service.id,
+                    'name': service.name,
+                    'prefix': service.prefix,
+                    'department_name': dept.name,
+                    'icon': service.icon if hasattr(service, 'icon') else 'bi-ticket-perforated',
+                    'description': service.description,
+                    'waiting_count': waiting_count,
+                    'est_wait': est_wait,
+                })
+                
+        context['services_list'] = services_data
+        return context
+
+
+class KioskCreateTokenAPIView(View):
+    """AJAX Endpoint to issue a new queue token from the interactive Kiosk."""
+    
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        import json
+        try:
+            data = json.loads(request.body) if request.body else request.POST
+            service_id = data.get('service_id')
+            is_priority = data.get('is_priority', False)
+            
+            if not service_id:
+                return JsonResponse({'success': False, 'error': 'Service ID is required'}, status=400)
+                
+            service = get_object_or_404(Service, id=service_id)
+            today = timezone.now().date()
+            
+            # Determine or create user for kiosk ticket
+            if request.user.is_authenticated:
+                user = request.user
+            else:
+                User = get_user_model()
+                user, _ = User.objects.get_or_create(
+                    username='kiosk_guest',
+                    defaults={
+                        'first_name': 'Kiosk',
+                        'last_name': 'Walk-in',
+                        'email': 'kiosk@sqms.local',
+                        'role': 'USER'
+                    }
+                )
+            
+            # Next token number for today
+            last_token = QueueToken.objects.filter(
+                service=service,
+                created_at__date=today
+            ).order_by('-id').first()
+            
+            if last_token:
+                try:
+                    last_num = int(last_token.token_number.split('-')[-1])
+                    next_num = last_num + 1
+                except ValueError:
+                    next_num = 1
+            else:
+                next_num = 1
+                
+            token_number = f"{service.prefix}-{next_num:03d}"
+            
+            # Save token
+            token = QueueToken.objects.create(
+                user=user,
+                service=service,
+                branch=service.department.branch if service.department else None,
+                token_number=token_number,
+                status=QueueToken.Status.WAITING,
+                queue_date=today,
+                booking_type=QueueToken.BookingType.KIOSK,
+                is_priority=is_priority
+            )
+            
+            # QR code generation
+            qr_url = request.build_absolute_uri(reverse('queues:token_detail', kwargs={'pk': token.pk}))
+            qr_file = generate_qr_code(qr_url)
+            token.qr_code.save(f"token_{token.id}_qr.png", qr_file, save=True)
+            
+            # Log history
+            QueueHistory.objects.create(
+                token=token,
+                action_by=user,
+                action=QueueHistory.Action.CREATED,
+                notes="Token generated via Self-Service Kiosk."
+            )
+            
+            # Calculate current waiting position
+            waiting_ids = list(QueueToken.objects.filter(
+                service=service,
+                status='WAITING',
+                created_at__date=today
+            ).order_by('created_at').values_list('id', flat=True))
+            
+            try:
+                position = waiting_ids.index(token.id) + 1
+            except ValueError:
+                position = 1
+                
+            avg_time = getattr(service, 'avg_service_time_minutes', 10)
+            estimated_wait = position * avg_time
+            
+            return JsonResponse({
+                'success': True,
+                'token_id': token.id,
+                'token_number': token.token_number,
+                'service_name': service.name,
+                'department_name': service.department.name if service.department else 'General',
+                'branch_name': service.department.branch.name if service.department and service.department.branch else 'Main Hospital',
+                'qr_code_url': token.qr_code.url if token.qr_code else '',
+                'token_detail_url': reverse('queues:token_detail', kwargs={'pk': token.pk}),
+                'position': position,
+                'estimated_wait': estimated_wait,
+                'created_at': timezone.localtime(token.created_at).strftime('%I:%M %p, %b %d, %Y'),
+            })
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+
+class TokenArrivalCheckinAPIView(View):
+    """AJAX endpoint for patient to confirm physical arrival at venue."""
+    def post(self, request, pk, *args, **kwargs):
+        token = get_object_or_404(QueueToken, pk=pk)
+        token.notes = (token.notes + " | Patient checked in on-site.").strip(" |")
+        token.save()
+        
+        QueueHistory.objects.create(
+            token=token,
+            action_by=request.user if request.user.is_authenticated else token.user,
+            action=QueueHistory.Action.CALLED if token.status == 'CALLED' else QueueHistory.Action.CREATED,
+            notes="Patient confirmed arrival on mobile."
+        )
+        return JsonResponse({'success': True, 'message': 'Arrival checked in successfully!'})
+
 
