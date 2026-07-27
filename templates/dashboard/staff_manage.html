@@ -220,11 +220,17 @@
 <script>
     // Keyboard Hotkey Listener
     document.addEventListener('keydown', function(event) {
+        // Skip if user is typing inside an input/textarea
+        if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
+
         // Space bar calls next token
-        if (event.code === 'Space' && !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
+        if (event.code === 'Space') {
             event.preventDefault();
             const firstCallBtn = document.querySelector('.call-next-btn');
-            if (firstCallBtn) firstCallBtn.click();
+            if (firstCallBtn) {
+                firstCallBtn.classList.add('active');
+                firstCallBtn.click();
+            }
         }
         // Alt + C completes token
         if (event.altKey && event.key.toLowerCase() === 'c') {
@@ -237,6 +243,18 @@
             event.preventDefault();
             const holdForm = document.getElementById('holdForm');
             if (holdForm) holdForm.submit();
+        }
+        // Alt + R recalls token
+        if (event.altKey && event.key.toLowerCase() === 'r') {
+            event.preventDefault();
+            const recallBtn = document.querySelector('.recall-token-btn');
+            if (recallBtn) recallBtn.click();
+        }
+        // Alt + S skips token
+        if (event.altKey && event.key.toLowerCase() === 's') {
+            event.preventDefault();
+            const skipForm = document.querySelector('.skip-form');
+            if (skipForm) skipForm.submit();
         }
     });
 

@@ -308,12 +308,34 @@
         }, 3000);
     }
 
+    // Web Speech API Voice Announcement
+    function speakTokenCall(tokenNumber, serviceName, counterName) {
+        if (!('speechSynthesis' in window)) return;
+        window.speechSynthesis.cancel(); // Stop current speaking audio
+        
+        let tokenSpoken = tokenNumber.split('').join(' '); // Speaks digits clearly
+        let counterText = counterName ? `at ${counterName}` : '';
+        let text = `Attention please. Token ${tokenSpoken}, please proceed to ${serviceName} counter ${counterText}.`;
+        
+        let utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.88; // Slightly slow and clear
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+        
+        // Find best english voice
+        let voices = window.speechSynthesis.getVoices();
+        let englishVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Samantha')));
+        if (englishVoice) utterance.voice = englishVoice;
+
+        window.speechSynthesis.speak(utterance);
+    }
+
     // Trigger Pop-up Toast Announcement
-    function triggerCallToast(tokenNumber, serviceName) {
+    function triggerCallToast(tokenNumber, serviceName, counterName) {
         const toast = document.getElementById('callToast');
         const msg = document.getElementById('callToastMessage');
         if (toast && msg) {
-            msg.textContent = `NOW CALLING: Token #${tokenNumber} — ${serviceName}`;
+            msg.textContent = `NOW CALLING: Token #${tokenNumber} — ${serviceName} ${counterName ? '(' + counterName + ')' : ''}`;
             toast.classList.add('show');
             setTimeout(() => {
                 toast.classList.remove('show');
@@ -334,7 +356,7 @@
             const data = JSON.parse(e.data);
             
             if (data.type === 'queue_update') {
-                if (data.status === 'SERVING') {
+                if (data.status === 'SERVING' || data.status === 'CALLED') {
                     document.getElementById('servingToken').textContent = data.token_number;
                     document.getElementById('servingService').textContent = data.service;
                     
@@ -345,7 +367,8 @@
                     if (servingCard) servingCard.classList.add('called-active');
                     
                     playChimeSound();
-                    triggerCallToast(data.token_number, data.service);
+                    triggerCallToast(data.token_number, data.service, data.counter);
+                    speakTokenCall(data.token_number, data.service, data.counter);
 
                     if (!isMuted) {
                         const bell = document.getElementById('bellSound');
