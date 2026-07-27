@@ -122,7 +122,7 @@
                     </div>
 
                     {% if token.qr_code %}
-                    <div class="mb-4">
+                    <div class="mb-3">
                         <div class="ticket-qr-frame">
                             <img src="{{ token.qr_code.url }}" alt="Token QR Code" class="img-fluid rounded-2" style="max-width: 170px;">
                         </div>
@@ -130,6 +130,16 @@
                     </div>
                     {% endif %}
                     
+                    <!-- Interactive Arrival Check-In -->
+                    <div class="mb-4">
+                        <button id="arrivalCheckinBtn" class="btn btn-outline-success rounded-pill px-4 py-2 fw-bold shadow-sm hover-lift" onclick="performArrivalCheckin({{ token.id }})">
+                            <i class="fas fa-street-view me-2"></i>I Have Arrived at Facility (Check-In)
+                        </button>
+                        <div id="checkinSuccessMsg" class="alert alert-success d-none mt-2 rounded-4 text-center fw-bold py-2 mb-0">
+                            <i class="fas fa-check-circle me-1"></i>Arrival Confirmed! Staff counter notified.
+                        </div>
+                    </div>
+
                     <div class="d-flex justify-content-center gap-3">
                         <a href="{% url 'queues:download_pdf' token.pk %}" class="btn btn-primary rounded-pill px-4 hover-lift">
                             <i class="fas fa-file-pdf me-2"></i>Download Pass (PDF)
@@ -255,5 +265,33 @@ document.addEventListener('DOMContentLoaded', function() {
     updateLiveQueueStatus();
     setInterval(updateLiveQueueStatus, 5000);
 });
+
+function performArrivalCheckin(tokenId) {
+    const btn = document.getElementById('arrivalCheckinBtn');
+    const msg = document.getElementById('checkinSuccessMsg');
+    if (btn) btn.disabled = true;
+
+    fetch(`/queues/api/checkin/${tokenId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            if (btn) btn.classList.add('d-none');
+            if (msg) msg.classList.remove('d-none');
+        } else {
+            alert('Check-in failed. Please try again.');
+            if (btn) btn.disabled = false;
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        if (btn) btn.disabled = false;
+    });
+}
 </script>
 {% endblock %}
