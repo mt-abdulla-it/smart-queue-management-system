@@ -132,7 +132,7 @@
                     
                     <!-- Interactive Arrival Check-In -->
                     <div class="mb-4">
-                        <button id="arrivalCheckinBtn" class="btn btn-outline-success rounded-pill px-4 py-2 fw-bold shadow-sm hover-lift" onclick="performArrivalCheckin({{ token.id }})">
+                        <button id="arrivalCheckinBtn" data-token-id="{{ token.id }}" class="btn btn-outline-success rounded-pill px-4 py-2 fw-bold shadow-sm hover-lift" onclick="performArrivalCheckin(this)">
                             <i class="fas fa-street-view me-2"></i>I Have Arrived at Facility (Check-In)
                         </button>
                         <div id="checkinSuccessMsg" class="alert alert-success d-none mt-2 rounded-4 text-center fw-bold py-2 mb-0">
@@ -266,12 +266,13 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(updateLiveQueueStatus, 5000);
 });
 
-function performArrivalCheckin(tokenId) {
-    const btn = document.getElementById('arrivalCheckinBtn');
+function performArrivalCheckin(btnElement) {
+    const btn = btnElement || document.getElementById('arrivalCheckinBtn');
+    const targetTokenId = btn ? btn.getAttribute('data-token-id') : '{{ token.id }}';
     const msg = document.getElementById('checkinSuccessMsg');
     if (btn) btn.disabled = true;
 
-    fetch(`/queues/api/checkin/${tokenId}/`, {
+    fetch(`/queues/api/checkin/${targetTokenId}/`, {
         method: 'POST',
         headers: {
             'X-CSRFToken': '{{ csrf_token }}',
