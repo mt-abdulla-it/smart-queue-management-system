@@ -70,6 +70,12 @@
                     <span>Live Display</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link {% active_link_startswith '/queues/kiosk/' %}" href="{% url 'queues:kiosk' %}" target="_blank">
+                    <i class="fas fa-desktop"></i>
+                    <span>Self-Service Kiosk</span>
+                </a>
+            </li>
             {% endif %}
 
             {% if user.role == 'ADMIN' %}
@@ -99,6 +105,12 @@
                 <a class="nav-link {% active_link_startswith '/queues/display/' %}" href="{% url 'queues:live_display' %}">
                     <i class="fas fa-tv"></i>
                     <span>Live Display</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% active_link_startswith '/queues/kiosk/' %}" href="{% url 'queues:kiosk' %}" target="_blank">
+                    <i class="fas fa-desktop"></i>
+                    <span>Self-Service Kiosk</span>
                 </a>
             </li>
 

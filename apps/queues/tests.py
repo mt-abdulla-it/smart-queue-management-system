@@ -115,3 +115,67 @@ class TransferTokenTestCase(TestCase):
         self.assertIn("Laboratory / Blood Test", history.notes)
         self.assertIn("Referred for blood tests", history.notes)
 
+
+class KioskAndInteractiveTestCase(TestCase):
+    def setUp(self):
+        self.branch = Branch.objects.create(name="Central Hospital", code="CH")
+        self.department = Department.objects.create(name="Outpatient Dept", branch=self.branch, is_active=True)
+        self.service = Service.objects.create(
+            name="General Consultation",
+            department=self.department,
+            code="GEN",
+            prefix="GEN",
+            avg_service_time_minutes=10,
+            is_active=True
+        )
+        self.client = Client()
+
+    def test_kiosk_page_render(self):
+        response = self.client.get(reverse('queues:kiosk'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Smart Queue Self-Service Kiosk')
+        self.assertContains(response, 'General Consultation')
+
+    def test_kiosk_issue_token_api(self):
+        url = reverse('queues:api_kiosk_issue_token')
+        response = self.client.post(
+            url,
+            data={'service_id': self.service.id, 'is_priority': True},
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data['success'])
+        self.assertEqual(data['service_name'], 'General Consultation')
+        self.assertIn('GEN-', data['token_number'])
+
+        # Verify DB token object
+        token = QueueToken.objects.filter(token_number=data['token_number']).first()
+        self.assertIsNotNone(token)
+        self.assertTrue(token.is_priority)
+        self.assertEqual(token.booking_type, QueueToken.BookingType.KIOSK)
+
+    def test_arrival_checkin_api(self):
+        user = User.objects.create_user(
+            email='patientcheckin@example.com',
+            password='Password123!',
+            role='USER'
+        )
+        token = QueueToken.objects.create(
+            user=user,
+            service=self.service,
+            branch=self.branch,
+            token_number="GEN-005",
+            status="WAITING",
+            queue_date=timezone.now().date()
+        )
+        url = reverse('queues:api_arrival_checkin', kwargs={'pk': token.pk})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data['success'])
+
+        token.refresh_from_db()
+        self.assertIn("Patient checked in on-site", token.notes)
+
+
