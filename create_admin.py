@@ -12,7 +12,7 @@ email = 'admin@example.com'
 password = 'admin123'
 
 if not User.objects.filter(email=email).exists():
-    User.objects.create_superuser(email=email, password=password)
+    User.objects.create_superuser(email=email, password=password, first_name='Admin', last_name='System')
     print(f"✅ Success! Admin user created.")
     print(f"📧 Email: {email}")
     print(f"🔑 Password: {password}")
