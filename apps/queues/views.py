@@ -450,11 +450,10 @@ class KioskCreateTokenAPIView(View):
             else:
                 User = get_user_model()
                 user, _ = User.objects.get_or_create(
-                    username='kiosk_guest',
+                    email='kiosk@sqms.local',
                     defaults={
                         'first_name': 'Kiosk',
                         'last_name': 'Walk-in',
-                        'email': 'kiosk@sqms.local',
                         'role': 'USER'
                     }
                 )
@@ -476,11 +475,16 @@ class KioskCreateTokenAPIView(View):
                 
             token_number = f"{service.prefix}-{next_num:03d}"
             
+            branch = service.department.branch if (service.department and hasattr(service.department, 'branch')) else None
+            if not branch:
+                from apps.branches.models import Branch
+                branch = Branch.objects.filter(is_active=True).first()
+
             # Save token
             token = QueueToken.objects.create(
                 user=user,
                 service=service,
-                branch=service.department.branch if service.department else None,
+                branch=branch,
                 token_number=token_number,
                 status=QueueToken.Status.WAITING,
                 queue_date=today,
