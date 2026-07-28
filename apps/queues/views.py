@@ -187,7 +187,7 @@ class ChangeTokenStatusView(RoleRequiredMixin, View):
             'call': 'SERVING',
             'skip': 'SKIPPED',
             'complete': 'COMPLETED',
-            'hold': 'HOLD'
+            'hold': 'ON_HOLD'
         }
         
         new_status = status_map.get(action)
@@ -199,7 +199,7 @@ class ChangeTokenStatusView(RoleRequiredMixin, View):
                 'SERVING': QueueHistory.Action.SERVING,
                 'SKIPPED': QueueHistory.Action.SKIPPED,
                 'COMPLETED': QueueHistory.Action.COMPLETED,
-                'HOLD': QueueHistory.Action.ON_HOLD,
+                'ON_HOLD': QueueHistory.Action.ON_HOLD,
             }
             history_action = action_mapping.get(new_status, QueueHistory.Action.CREATED)
             

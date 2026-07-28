@@ -26,6 +26,7 @@ class QueueToken(TimeStampedModel):
         CANCELLED = 'CANCELLED', 'Cancelled'
         NO_SHOW = 'NO_SHOW', 'No Show'
         ON_HOLD = 'ON_HOLD', 'On Hold'
+        SKIPPED = 'SKIPPED', 'Skipped'
 
     class BookingType(models.TextChoices):
         ONLINE = 'ONLINE', 'Online Booking'
