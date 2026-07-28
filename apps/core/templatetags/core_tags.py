@@ -73,6 +73,7 @@ def status_badge(status):
         'CANCELLED': '<span class="badge bg-danger"><i class="fas fa-times-circle me-1"></i>Cancelled</span>',
         'NO_SHOW': '<span class="badge bg-secondary"><i class="fas fa-user-slash me-1"></i>No Show</span>',
         'ON_HOLD': '<span class="badge bg-dark"><i class="fas fa-pause-circle me-1"></i>On Hold</span>',
+        'SKIPPED': '<span class="badge bg-secondary"><i class="fas fa-forward me-1"></i>Skipped</span>',
     }
     return mark_safe(badges.get(status, f'<span class="badge bg-secondary">{status}</span>'))
 
