@@ -23,11 +23,12 @@ class UserAdmin(BaseUserAdmin):
         }),
     )
 
+    @admin.display(description="Full Name")
     def full_name_display(self, obj):
         name = obj.get_full_name()
         return name if name else "—"
-    full_name_display.short_description = "Full Name"
 
+    @admin.display(description="Avatar")
     def user_avatar(self, obj):
         initials = (obj.first_name[:1] + obj.last_name[:1]).upper() if (obj.first_name and obj.last_name) else obj.email[:2].upper()
         bg_colors = {'ADMIN': '#6366f1', 'STAFF': '#0ea5e9', 'USER': '#10b981'}
@@ -36,8 +37,8 @@ class UserAdmin(BaseUserAdmin):
             '<div style="width:36px;height:36px;border-radius:50%;background:{};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,0.15);">{}</div>',
             color, initials
         )
-    user_avatar.short_description = "Avatar"
 
+    @admin.display(description="Role")
     def role_badge(self, obj):
         role_styles = {
             'ADMIN': 'background:rgba(99,102,241,0.15);color:#818cf8;border:1px solid rgba(99,102,241,0.3);',
@@ -49,13 +50,12 @@ class UserAdmin(BaseUserAdmin):
             '<span style="padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;{};">{}</span>',
             style, obj.get_role_display()
         )
-    role_badge.short_description = "Role"
 
+    @admin.display(description="Status")
     def status_badge(self, obj):
         if obj.is_active:
             return format_html('<span style="padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.3);"><i class="fas fa-check-circle" style="margin-right:4px;"></i>Active</span>')
         return format_html('<span style="padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3);"><i class="fas fa-times-circle" style="margin-right:4px;"></i>Inactive</span>')
-    status_badge.short_description = "Status"
 
 
 @admin.register(StaffProfile)
