@@ -142,6 +142,11 @@
             </div>
         </div>
         <div class="d-flex align-items-center gap-3 text-end">
+            <select id="langSelect" class="form-select form-select-sm bg-dark text-light border-info rounded-pill px-3 py-2 fw-semibold" style="width: auto; cursor: pointer;">
+                <option value="en" selected>🇬🇧 English</option>
+                <option value="si">🇱🇰 සිංහල (Sinhala)</option>
+                <option value="ta">🇱🇰 தமிழ் (Tamil)</option>
+            </select>
             <button id="audioMuteBtn" class="btn btn-outline-info btn-sm rounded-pill px-3 py-2" title="Toggle audio chime">
                 <i class="fas fa-volume-up me-1" id="audioIcon"></i> Sound ON
             </button>
@@ -308,24 +313,48 @@
         }, 3000);
     }
 
-    // Web Speech API Voice Announcement
+    // Tri-lingual speech synthesis preference
+    let selectedLang = localStorage.getItem('sqms_display_lang') || 'en';
+    const langSelect = document.getElementById('langSelect');
+    if (langSelect) {
+        langSelect.value = selectedLang;
+        langSelect.addEventListener('change', (e) => {
+            selectedLang = e.target.value;
+            localStorage.setItem('sqms_display_lang', selectedLang);
+        });
+    }
+
+    // Web Speech API Voice Announcement (Tri-lingual: English, Sinhala, Tamil)
     function speakTokenCall(tokenNumber, serviceName, counterName) {
         if (!('speechSynthesis' in window)) return;
         window.speechSynthesis.cancel(); // Stop current speaking audio
         
         let tokenSpoken = tokenNumber.split('').join(' '); // Speaks digits clearly
-        let counterText = counterName ? `at ${counterName}` : '';
-        let text = `Attention please. Token ${tokenSpoken}, please proceed to ${serviceName} counter ${counterText}.`;
+        let text = '';
+        let targetLangCode = 'en-US';
+
+        if (selectedLang === 'si') {
+            targetLangCode = 'si-LK';
+            text = `අවධානය යොමු කරන්න. ටෝකන් අංකය ${tokenSpoken}, ${serviceName} කවුන්ටරය වෙත පැමිණෙන්න.`;
+        } else if (selectedLang === 'ta') {
+            targetLangCode = 'ta-LK';
+            text = `தயவுசெய்து கவனிக்கவும். டோக்கன் எண் ${tokenSpoken}, ${serviceName} கவுண்டருக்கு வாருங்கள்.`;
+        } else {
+            targetLangCode = 'en-US';
+            let counterText = counterName ? `at ${counterName}` : '';
+            text = `Attention please. Token ${tokenSpoken}, please proceed to ${serviceName} counter ${counterText}.`;
+        }
         
         let utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 0.88; // Slightly slow and clear
+        utterance.rate = 0.85; // Slightly slow and clear
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
+        utterance.lang = targetLangCode;
         
-        // Find best english voice
+        // Find best voice for language
         let voices = window.speechSynthesis.getVoices();
-        let englishVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Samantha')));
-        if (englishVoice) utterance.voice = englishVoice;
+        let matchedVoice = voices.find(v => v.lang.toLowerCase().startsWith(selectedLang));
+        if (matchedVoice) utterance.voice = matchedVoice;
 
         window.speechSynthesis.speak(utterance);
     }

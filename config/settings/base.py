@@ -352,6 +352,16 @@ TIME_ZONE = 'Asia/Colombo'  # Sri Lanka timezone
 USE_I18N = True
 USE_TZ = True
 
+LANGUAGES = [
+    ('en', 'English'),
+    ('si', 'Sinhala'),
+    ('ta', 'Tamil'),
+]
+
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
+
 # =============================================================================
 # SECURITY SETTINGS (Base — overridden in production.py)
 # =============================================================================

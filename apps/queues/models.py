@@ -54,8 +54,17 @@ class QueueToken(TimeStampedModel):
     estimated_wait_minutes = models.PositiveIntegerField('Estimated Wait (min)', default=0)
     qr_code = models.ImageField('QR Code', upload_to='qr_codes/', blank=True, null=True)
     notes = models.TextField('Notes', blank=True)
+    class TriageLevel(models.TextChoices):
+        EMERGENCY = 'EMERGENCY', 'Emergency Triage'
+        ELDERLY_DISABLED = 'ELDERLY_DISABLED', 'Elderly / Differently Abled'
+        PRIORITY = 'PRIORITY', 'Priority'
+        REGULAR = 'REGULAR', 'Regular'
+
     booking_type = models.CharField(max_length=10, choices=BookingType.choices,
                                      default=BookingType.ONLINE)
+    triage_level = models.CharField(max_length=20, choices=TriageLevel.choices,
+                                    default=TriageLevel.REGULAR)
+    priority_weight = models.PositiveIntegerField('Priority Weight', default=10)
     is_priority = models.BooleanField('Priority', default=False)
 
     class Meta:

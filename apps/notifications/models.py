@@ -18,14 +18,26 @@ class Notification(TimeStampedModel):
         SMS = 'SMS', 'SMS'
         PUSH = 'PUSH', 'Push Notification'
         IN_APP = 'IN_APP', 'In-App'
+        WHATSAPP = 'WHATSAPP', 'WhatsApp'
+        SMS_GATEWAY = 'SMS_GATEWAY', 'SMS Gateway'
+
+    class DeliveryStatus(models.TextChoices):
+        PENDING = 'PENDING', 'Pending'
+        SENT = 'SENT', 'Sent'
+        FAILED = 'FAILED', 'Failed'
+        DELIVERED = 'DELIVERED', 'Delivered'
 
     user: Any = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
                                  related_name='notifications')
     title = models.CharField('Title', max_length=200)
     message = models.TextField('Message')
-    notification_type = models.CharField(max_length=10, choices=NotificationType.choices,
+    notification_type = models.CharField(max_length=15, choices=NotificationType.choices,
                                           default=NotificationType.IN_APP)
     is_read = models.BooleanField('Read', default=False)
+    delivery_status = models.CharField(max_length=15, choices=DeliveryStatus.choices,
+                                        default=DeliveryStatus.PENDING)
+    gateway_response_id = models.CharField('Gateway Response ID', max_length=100, blank=True, null=True)
+    retry_count = models.PositiveIntegerField('Retry Count', default=0)
     sent_at = models.DateTimeField('Sent At', auto_now_add=True)
     read_at = models.DateTimeField('Read At', null=True, blank=True)
 

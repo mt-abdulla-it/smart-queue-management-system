@@ -11,6 +11,9 @@ from channels.layers import get_channel_layer
 
 from apps.queues.models import QueueHistory
 from .models import Notification
+from .gateways import NotificationGatewayRouter
+
+router = NotificationGatewayRouter()
 
 @receiver(post_save, sender=QueueHistory)
 def handle_queue_status_change(sender, instance, created, **kwargs):
@@ -42,6 +45,7 @@ def handle_queue_status_change(sender, instance, created, **kwargs):
         return
         
     user_email = token.user.email
+    user_phone = getattr(token.user, 'phone', None)
     subject = None
     message = None
 
@@ -84,3 +88,25 @@ def handle_queue_status_change(sender, instance, created, **kwargs):
             )
         except Exception as e:
             print(f"Failed to send notification email to {user_email}: {e}")
+
+        # Send Multi-Channel SMS & WhatsApp Gateway Notifications
+        if user_phone:
+            sms_res = router.dispatch_sms(user_phone, message, subject)
+            Notification.objects.create(
+                user=token.user,
+                title=subject,
+                message=message,
+                notification_type=Notification.NotificationType.SMS_GATEWAY,
+                delivery_status=Notification.DeliveryStatus.SENT if sms_res.get('success') else Notification.DeliveryStatus.FAILED,
+                gateway_response_id=sms_res.get('gateway_response_id')
+            )
+            
+            wa_res = router.dispatch_whatsapp(user_phone, message, subject)
+            Notification.objects.create(
+                user=token.user,
+                title=subject,
+                message=message,
+                notification_type=Notification.NotificationType.WHATSAPP,
+                delivery_status=Notification.DeliveryStatus.SENT if wa_res.get('success') else Notification.DeliveryStatus.FAILED,
+                gateway_response_id=wa_res.get('gateway_response_id')
+            )
