@@ -35,7 +35,12 @@ class PriorityQueueManager:
             base = cls.BASE_WEIGHTS[QueueToken.TriageLevel.PRIORITY]
 
         now = timezone.now()
-        minutes_waiting = max(0, int((now - token.booked_at).total_seconds() / 60))
+        booked_at = getattr(token, 'booked_at', None)
+        if isinstance(booked_at, datetime):
+            minutes_waiting = max(0, int((now - booked_at).total_seconds() / 60))
+        else:
+            minutes_waiting = 0
+
         starvation_bonus = (minutes_waiting // cls.STARVATION_INTERVAL_MINUTES) * cls.STARVATION_BONUS_WEIGHT
 
         return base + starvation_bonus
