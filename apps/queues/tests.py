@@ -179,3 +179,50 @@ class KioskAndInteractiveTestCase(TestCase):
         self.assertIn("Patient checked in on-site", token.notes)
 
 
+class PriorityQueueTriageTestCase(TestCase):
+    def setUp(self):
+        self.branch = Branch.objects.create(name="Central Hospital", code="CH")
+        self.department = Department.objects.create(name="Emergency / OPD", branch=self.branch, is_active=True)
+        self.service = Service.objects.create(
+            name="Emergency Care",
+            department=self.department,
+            code="EMG",
+            prefix="EMG",
+            avg_service_time_minutes=15,
+            is_active=True
+        )
+        self.user1 = User.objects.create_user(email='regular@example.com', password='Password123!', role='USER')
+        self.user2 = User.objects.create_user(email='emergency@example.com', password='Password123!', role='USER')
+
+    def test_priority_queue_reordering(self):
+        from apps.queues.triage import PriorityQueueManager
+
+        # Regular token created first
+        token_reg = QueueToken.objects.create(
+            user=self.user1,
+            service=self.service,
+            branch=self.branch,
+            token_number="EMG-001",
+            status=QueueToken.Status.WAITING,
+            triage_level=QueueToken.TriageLevel.REGULAR,
+            queue_date=timezone.now().date()
+        )
+
+        # Emergency triage token created second
+        token_emg = QueueToken.objects.create(
+            user=self.user2,
+            service=self.service,
+            branch=self.branch,
+            token_number="EMG-002",
+            status=QueueToken.Status.WAITING,
+            triage_level=QueueToken.TriageLevel.EMERGENCY,
+            queue_date=timezone.now().date()
+        )
+
+        ordered_tokens = PriorityQueueManager.reorder_branch_queue(self.branch.id, self.service.id)
+        self.assertEqual(ordered_tokens[0].token_number, 'EMG-002') # Emergency token moved to top
+        self.assertEqual(ordered_tokens[0].position, 1)
+        self.assertGreater(ordered_tokens[0].priority_weight, ordered_tokens[1].priority_weight)
+
+
+
