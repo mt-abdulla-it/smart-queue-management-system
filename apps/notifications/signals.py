@@ -34,7 +34,11 @@ def handle_queue_status_change(sender, instance, created, **kwargs):
                     'message': f'Token {token.token_number} action: {action}',
                     'token_number': token.token_number,
                     'status': token.status,
-                    'service': token.service.name
+                    'service': token.service.name,
+                    'counter_number': getattr(token, 'counter_number', 'Counter 1'),
+                    'branch_id': token.branch.id if token.branch else None,
+                    'branch_code': token.branch.code if token.branch else '',
+                    'action': action
                 }
             )
         except Exception as e:

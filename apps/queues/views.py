@@ -193,10 +193,25 @@ class ChangeTokenStatusView(RoleRequiredMixin, View):
         new_status = status_map.get(action)
         if new_status and new_status != old_status:
             token.status = new_status
+            
+            # Record counter number and staff member calling token
+            counter_from_post = request.POST.get('counter_number', '').strip()
+            if counter_from_post:
+                token.counter_number = counter_from_post
+            elif hasattr(request.user, 'staff_profile') and getattr(request.user.staff_profile, 'counter_number', None):
+                token.counter_number = request.user.staff_profile.counter_number
+                
+            token.called_by = request.user
+            if new_status == 'SERVING':
+                token.called_at = timezone.now()
+                token.serving_at = timezone.now()
+            elif new_status == 'COMPLETED':
+                token.completed_at = timezone.now()
+                
             token.save()
             
             action_mapping = {
-                'SERVING': QueueHistory.Action.SERVING,
+                'SERVING': QueueHistory.Action.CALLED if action == 'call' else QueueHistory.Action.SERVING,
                 'SKIPPED': QueueHistory.Action.SKIPPED,
                 'COMPLETED': QueueHistory.Action.COMPLETED,
                 'ON_HOLD': QueueHistory.Action.ON_HOLD,
@@ -207,7 +222,7 @@ class ChangeTokenStatusView(RoleRequiredMixin, View):
                 token=token,
                 action_by=request.user,
                 action=history_action,
-                notes=f"Status changed to {new_status} via staff panel."
+                notes=f"Token {token.token_number} status set to {new_status} at {token.counter_number}."
             )
             
         return redirect('queues:staff_manage')

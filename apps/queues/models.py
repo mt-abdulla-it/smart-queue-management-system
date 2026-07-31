@@ -66,6 +66,8 @@ class QueueToken(TimeStampedModel):
                                     default=TriageLevel.REGULAR)
     priority_weight = models.PositiveIntegerField('Priority Weight', default=10)
     is_priority = models.BooleanField('Priority', default=False)
+    counter_number = models.CharField('Counter Number', max_length=50, default='Counter 1', blank=True,
+                                      help_text='Desk or Counter number calling/serving this token')
 
     class Meta:
         verbose_name = 'Queue Token'

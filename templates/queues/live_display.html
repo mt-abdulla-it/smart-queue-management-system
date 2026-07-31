@@ -175,7 +175,10 @@
                     </div>
                     <p class="text-uppercase tracking-widest text-white-50 fw-bold mb-1">Token Number</p>
                     <h1 class="display-1 fw-black text-white mb-2 tracking-tight tv-token-giant" id="servingToken" style="font-size: 6rem;">--</h1>
-                    <h3 class="text-info fw-semibold" id="servingService">Waiting for next token...</h3>
+                    <h3 class="text-info fw-semibold mb-2" id="servingService">Waiting for next token...</h3>
+                    <div class="mt-2 text-warning fw-bold fs-2" id="servingCounterBadge">
+                        <i class="fas fa-desktop me-2"></i><span id="servingCounterText">Counter 1</span>
+                    </div>
                     <div class="mt-4">
                         <span class="badge bg-danger fs-4 px-5 py-3 rounded-pill blink-glow d-none" id="proceedBadge">
                             <i class="fas fa-arrow-circle-right me-2"></i>PLEASE PROCEED TO COUNTER
@@ -385,9 +388,12 @@
             const data = JSON.parse(e.data);
             
             if (data.type === 'queue_update') {
+                const counterVal = data.counter_number || data.counter || 'Counter 1';
                 if (data.status === 'SERVING' || data.status === 'CALLED') {
                     document.getElementById('servingToken').textContent = data.token_number;
                     document.getElementById('servingService').textContent = data.service;
+                    const cntElem = document.getElementById('servingCounterText');
+                    if (cntElem) cntElem.textContent = counterVal;
                     
                     const badge = document.getElementById('proceedBadge');
                     const servingCard = document.getElementById('servingCard');
@@ -396,8 +402,8 @@
                     if (servingCard) servingCard.classList.add('called-active');
                     
                     playChimeSound();
-                    triggerCallToast(data.token_number, data.service, data.counter);
-                    speakTokenCall(data.token_number, data.service, data.counter);
+                    triggerCallToast(data.token_number, data.service, counterVal);
+                    speakTokenCall(data.token_number, data.service, counterVal);
 
                     if (!isMuted) {
                         const bell = document.getElementById('bellSound');

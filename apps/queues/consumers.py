@@ -21,16 +21,14 @@ class QueueConsumer(AsyncWebsocketConsumer):
 
     # Receive message from room group
     async def queue_update(self, event):
-        message = event['message']
-        token_number = event.get('token_number')
-        status = event.get('status')
-        service = event.get('service')
-        
-        # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'type': 'queue_update',
-            'message': message,
-            'token_number': token_number,
-            'status': status,
-            'service': service
+            'message': event.get('message'),
+            'token_number': event.get('token_number'),
+            'status': event.get('status'),
+            'service': event.get('service'),
+            'counter_number': event.get('counter_number', 'Counter 1'),
+            'branch_id': event.get('branch_id'),
+            'branch_code': event.get('branch_code'),
+            'action': event.get('action')
         }))
