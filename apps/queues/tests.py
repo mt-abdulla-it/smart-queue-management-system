@@ -225,4 +225,51 @@ class PriorityQueueTriageTestCase(TestCase):
         self.assertGreater(ordered_tokens[0].priority_weight, ordered_tokens[1].priority_weight)
 
 
+class CounterAssignmentTestCase(TestCase):
+    def setUp(self):
+        self.staff_user = User.objects.create_user(
+            email='counterstaff@example.com',
+            password='Password123!',
+            role='STAFF',
+            first_name='Counter',
+            last_name='Staff'
+        )
+        self.branch = Branch.objects.create(name="Central Hospital", code="CH")
+        self.department = Department.objects.create(name="OPD", branch=self.branch)
+        self.service = Service.objects.create(
+            name="General Consultation",
+            department=self.department,
+            code="GEN",
+            prefix="GEN",
+            avg_service_time_minutes=10
+        )
+        self.token = QueueToken.objects.create(
+            user=self.staff_user,
+            service=self.service,
+            branch=self.branch,
+            token_number="GEN-010",
+            status=QueueToken.Status.WAITING,
+            queue_date=timezone.now().date()
+        )
+        self.client = Client()
+
+    def test_call_token_assigns_counter_number(self):
+        self.client.login(email='counterstaff@example.com', password='Password123!')
+        url = reverse('queues:change_status', kwargs={'pk': self.token.pk, 'action': 'call'})
+        response: Any = self.client.post(url, {'counter_number': 'Counter 3'})
+        self.assertEqual(response.status_code, 302)
+        
+        self.token.refresh_from_db()
+        self.assertEqual(self.token.status, QueueToken.Status.SERVING)
+        self.assertEqual(self.token.counter_number, 'Counter 3')
+        self.assertEqual(self.token.called_by, self.staff_user)
+
+    def test_live_display_view_loads(self):
+        url = reverse('queues:live_display')
+        response: Any = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Live TV Queue Display')
+
+
+
 
