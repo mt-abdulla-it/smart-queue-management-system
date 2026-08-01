@@ -311,6 +311,7 @@ class NotificationGatewayRouter:
 
     def __init__(self):
         # Pick SMS gateway dynamically
+        self.sms_gateway: BaseNotificationGateway
         if getattr(settings, 'NOTIFY_LK_API_KEY', '') and getattr(settings, 'NOTIFY_LK_USER_ID', ''):
             self.sms_gateway = NotifyLkSMSGateway()
         elif getattr(settings, 'TWILIO_ACCOUNT_SID', '') and getattr(settings, 'TWILIO_AUTH_TOKEN', ''):
@@ -319,6 +320,7 @@ class NotificationGatewayRouter:
             self.sms_gateway = SandboxSMSGateway()
 
         # Pick WhatsApp gateway dynamically
+        self.whatsapp_gateway: BaseNotificationGateway
         if getattr(settings, 'WHATSAPP_PHONE_NUMBER_ID', '') and getattr(settings, 'WHATSAPP_ACCESS_TOKEN', ''):
             self.whatsapp_gateway = WhatsAppBusinessGateway()
         elif getattr(settings, 'TWILIO_ACCOUNT_SID', '') and getattr(settings, 'TWILIO_AUTH_TOKEN', '') and getattr(settings, 'TWILIO_PHONE_NUMBER', ''):
