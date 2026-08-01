@@ -461,3 +461,18 @@ QUEUE_SETTINGS = {
     'ADVANCE_BOOKING_DAYS': 7,
     'NOTIFY_BEFORE_POSITIONS': 3,  # Notify user when 3 positions away
 }
+
+# =============================================================================
+# SMS & WHATSAPP GATEWAY SETTINGS
+# =============================================================================
+
+TWILIO_ACCOUNT_SID = env('TWILIO_ACCOUNT_SID', default='')
+TWILIO_AUTH_TOKEN = env('TWILIO_AUTH_TOKEN', default='')
+TWILIO_PHONE_NUMBER = env('TWILIO_PHONE_NUMBER', default='')
+
+NOTIFY_LK_API_KEY = env('NOTIFY_LK_API_KEY', default='')
+NOTIFY_LK_USER_ID = env('NOTIFY_LK_USER_ID', default='')
+NOTIFY_LK_SENDER_ID = env('NOTIFY_LK_SENDER_ID', default='SQMS')
+
+WHATSAPP_PHONE_NUMBER_ID = env('WHATSAPP_PHONE_NUMBER_ID', default='')
+WHATSAPP_ACCESS_TOKEN = env('WHATSAPP_ACCESS_TOKEN', default='')
