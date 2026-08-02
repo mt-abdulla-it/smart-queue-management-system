@@ -24,6 +24,7 @@
                         <div class="ms-auto text-muted small">Navigation</div>
                     </a>
                     
+                    {% if user.role == 'USER' %}
                     <!-- Book Token -->
                     <a href="{% url 'queues:book' %}" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center gap-3 command-item">
                         <div class="bg-success bg-opacity-10 text-success rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
@@ -48,7 +49,125 @@
                         <div class="ms-auto text-muted small">Navigation</div>
                     </a>
 
-                    <!-- Profile Settings -->
+                    <!-- Submit Feedback -->
+                    <a href="{% url 'feedback:submit' %}" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center gap-3 command-item">
+                        <div class="bg-secondary bg-opacity-10 text-secondary rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="fas fa-comment-dots"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">Submit Feedback</h6>
+                            <small class="text-muted">Send feedback about your experience</small>
+                        </div>
+                        <div class="ms-auto text-muted small">Action</div>
+                    </a>
+                    {% endif %}
+
+                    {% if user.role == 'STAFF' or user.role == 'ADMIN' %}
+                    <!-- Manage Queue -->
+                    <a href="{% url 'queues:staff_manage' %}" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center gap-3 command-item">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="fas fa-users-cog"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">Manage Queue</h6>
+                            <small class="text-muted">Call next, skip, hold, or complete queue tokens</small>
+                        </div>
+                        <div class="ms-auto text-muted small">Queue</div>
+                    </a>
+                    <!-- Today's Queue -->
+                    <a href="{% url 'queues:today' %}" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center gap-3 command-item">
+                        <div class="bg-secondary bg-opacity-10 text-secondary rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">Today's Queue</h6>
+                            <small class="text-muted">View all tokens issued today</small>
+                        </div>
+                        <div class="ms-auto text-muted small">Queue</div>
+                    </a>
+                    <!-- Live Display -->
+                    <a href="{% url 'queues:live_display' %}" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center gap-3 command-item">
+                        <div class="bg-warning bg-opacity-10 text-warning rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="fas fa-tv"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">Live TV Display</h6>
+                            <small class="text-muted">Launch the live customer/patient TV display</small>
+                        </div>
+                        <div class="ms-auto text-muted small">Display</div>
+                    </a>
+                    <!-- Self-Service Kiosk -->
+                    <a href="{% url 'queues:kiosk' %}" target="_blank" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center gap-3 command-item">
+                        <div class="bg-success bg-opacity-10 text-success rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="fas fa-desktop"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">Self-Service Kiosk</h6>
+                            <small class="text-muted">Open interactive ticket booking kiosk (New Tab)</small>
+                        </div>
+                        <div class="ms-auto text-muted small">Kiosk</div>
+                    </a>
+                    {% endif %}
+
+                    {% if user.role == 'ADMIN' %}
+                    <!-- User Management (Admin Dashboard / Django Admin) -->
+                    <a href="/admin/accounts/user/" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center gap-3 command-item">
+                        <div class="bg-danger bg-opacity-10 text-danger rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">Manage Users</h6>
+                            <small class="text-muted">View, activate, and manage user accounts</small>
+                        </div>
+                        <div class="ms-auto text-muted small">Admin</div>
+                    </a>
+                    <!-- Branch Management -->
+                    <a href="{% url 'branches:branch_list' %}" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center gap-3 command-item">
+                        <div class="bg-info bg-opacity-10 text-info rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">Manage Branches</h6>
+                            <small class="text-muted">Configure branches, departments, and services</small>
+                        </div>
+                        <div class="ms-auto text-muted small">Admin</div>
+                    </a>
+                    <!-- All Queues -->
+                    <a href="{% url 'queues:admin_list' %}" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center gap-3 command-item">
+                        <div class="bg-warning bg-opacity-10 text-warning rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="fas fa-stream"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">All Queues</h6>
+                            <small class="text-muted">Monitor and filter active token queues across branches</small>
+                        </div>
+                        <div class="ms-auto text-muted small">Admin</div>
+                    </a>
+                    <!-- Analytics & Reports -->
+                    <a href="{% url 'dashboard:admin' %}" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center gap-3 command-item">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">Reports & Analytics</h6>
+                            <small class="text-muted">Export PDF/Excel summaries and view system metrics</small>
+                        </div>
+                        <div class="ms-auto text-muted small">Admin</div>
+                    </a>
+                    <!-- View Feedback -->
+                    <a href="{% url 'feedback:admin_list' %}" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center gap-3 command-item">
+                        <div class="bg-success bg-opacity-10 text-success rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="fas fa-comment-dots"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">Feedback Reports</h6>
+                            <small class="text-muted">View patient/client feedback and ratings</small>
+                        </div>
+                        <div class="ms-auto text-muted small">Admin</div>
+                    </a>
+                    {% endif %}
+
+                    <!-- Common: Profile Settings -->
                     <a href="{% url 'accounts:profile' %}" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center gap-3 command-item">
                         <div class="bg-warning bg-opacity-10 text-warning rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
                             <i class="fas fa-user-cog"></i>
