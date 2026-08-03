@@ -146,6 +146,7 @@
                 <option value="en" selected>🇬🇧 English</option>
                 <option value="si">🇱🇰 සිංහල (Sinhala)</option>
                 <option value="ta">🇱🇰 தமிழ் (Tamil)</option>
+                <option value="all">🇱🇰 All 3 Languages (Seq)</option>
             </select>
             <button id="audioMuteBtn" class="btn btn-outline-info btn-sm rounded-pill px-3 py-2" title="Toggle audio chime">
                 <i class="fas fa-volume-up me-1" id="audioIcon"></i> Sound ON
@@ -333,33 +334,76 @@
         window.speechSynthesis.cancel(); // Stop current speaking audio
         
         let tokenSpoken = tokenNumber.split('').join(' '); // Speaks digits clearly
-        let text = '';
-        let targetLangCode = 'en-US';
 
-        if (selectedLang === 'si') {
-            targetLangCode = 'si-LK';
-            text = `අවධානය යොමු කරන්න. ටෝකන් අංකය ${tokenSpoken}, ${serviceName} කවුන්ටරය වෙත පැමිණෙන්න.`;
-        } else if (selectedLang === 'ta') {
-            targetLangCode = 'ta-LK';
-            text = `தயவுசெய்து கவனிக்கவும். டோக்கன் எண் ${tokenSpoken}, ${serviceName} கவுண்டருக்கு வாருங்கள்.`;
+        if (selectedLang === 'all') {
+            let announcements = [
+                {
+                    lang: 'si',
+                    code: 'si-LK',
+                    text: `අවධානය යොමු කරන්න. ටෝකන් අංකය ${tokenSpoken}, ${serviceName} කවුන්ටරය වෙත පැමිණෙන්න.`
+                },
+                {
+                    lang: 'ta',
+                    code: 'ta-LK',
+                    text: `தயவுசெய்து கவனிக்கவும். டோக்கன் எண் ${tokenSpoken}, ${serviceName} கவுண்டருக்கு வாருங்கள்.`
+                },
+                {
+                    lang: 'en',
+                    code: 'en-US',
+                    text: `Attention please. Token ${tokenSpoken}, please proceed to ${serviceName} counter ${counterName ? counterName : ''}.`
+                }
+            ];
+
+            let index = 0;
+            function playNext() {
+                if (index >= announcements.length) return;
+                let current = announcements[index];
+                let utterance = new SpeechSynthesisUtterance(current.text);
+                utterance.rate = 0.85;
+                utterance.pitch = 1.0;
+                utterance.volume = 1.0;
+                utterance.lang = current.code;
+
+                let voices = window.speechSynthesis.getVoices();
+                let matchedVoice = voices.find(v => v.lang.toLowerCase().startsWith(current.lang));
+                if (matchedVoice) utterance.voice = matchedVoice;
+
+                utterance.onend = function() {
+                    index++;
+                    playNext();
+                };
+                window.speechSynthesis.speak(utterance);
+            }
+            playNext();
         } else {
-            targetLangCode = 'en-US';
-            let counterText = counterName ? `at ${counterName}` : '';
-            text = `Attention please. Token ${tokenSpoken}, please proceed to ${serviceName} counter ${counterText}.`;
-        }
-        
-        let utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 0.85; // Slightly slow and clear
-        utterance.pitch = 1.0;
-        utterance.volume = 1.0;
-        utterance.lang = targetLangCode;
-        
-        // Find best voice for language
-        let voices = window.speechSynthesis.getVoices();
-        let matchedVoice = voices.find(v => v.lang.toLowerCase().startsWith(selectedLang));
-        if (matchedVoice) utterance.voice = matchedVoice;
+            let text = '';
+            let targetLangCode = 'en-US';
 
-        window.speechSynthesis.speak(utterance);
+            if (selectedLang === 'si') {
+                targetLangCode = 'si-LK';
+                text = `අවධානය යොමු කරන්න. ටෝකන් අංකය ${tokenSpoken}, ${serviceName} කවුන්ටරය වෙත පැමිණෙන්න.`;
+            } else if (selectedLang === 'ta') {
+                targetLangCode = 'ta-LK';
+                text = `தயவுசெய்து கவனிக்கவும். டோக்கன் எண் ${tokenSpoken}, ${serviceName} கவுண்டருக்கு வாருங்கள்.`;
+            } else {
+                targetLangCode = 'en-US';
+                let counterText = counterName ? `at ${counterName}` : '';
+                text = `Attention please. Token ${tokenSpoken}, please proceed to ${serviceName} counter ${counterText}.`;
+            }
+            
+            let utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 0.85; // Slightly slow and clear
+            utterance.pitch = 1.0;
+            utterance.volume = 1.0;
+            utterance.lang = targetLangCode;
+            
+            // Find best voice for language
+            let voices = window.speechSynthesis.getVoices();
+            let matchedVoice = voices.find(v => v.lang.toLowerCase().startsWith(selectedLang));
+            if (matchedVoice) utterance.voice = matchedVoice;
+
+            window.speechSynthesis.speak(utterance);
+        }
     }
 
     // Trigger Pop-up Toast Announcement
