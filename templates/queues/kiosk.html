@@ -142,16 +142,16 @@
                 <i class="fa-solid fa-hospital"></i>
             </div>
             <div>
-                <h2 class="mb-0 text-white kiosk-brand">Smart Queue Self-Service Kiosk</h2>
-                <small class="text-secondary">Touch a service below to take your ticket instantly</small>
+                <h2 class="mb-0 text-white kiosk-brand" id="kioskTitle">Smart Queue Self-Service Kiosk</h2>
+                <small class="text-secondary" id="kioskSubtitle">Touch a service below to take your ticket instantly</small>
             </div>
         </div>
         <div class="d-flex align-items-center gap-4">
             <!-- Language Selector -->
             <div class="btn-group" role="group">
-                <button class="btn btn-outline-light active px-3">English</button>
-                <button class="btn btn-outline-light px-3">සිංහල</button>
-                <button class="btn btn-outline-light px-3">தமிழ்</button>
+                <button id="btnLangEn" class="btn btn-outline-light active px-3" onclick="setKioskLanguage('en')">English</button>
+                <button id="btnLangSi" class="btn btn-outline-light px-3" onclick="setKioskLanguage('si')">සිංහල</button>
+                <button id="btnLangTa" class="btn btn-outline-light px-3" onclick="setKioskLanguage('ta')">தமிழ்</button>
             </div>
             <div class="text-end">
                 <h3 id="kioskClock" class="mb-0 text-info font-monospace">00:00:00 AM</h3>
@@ -170,17 +170,17 @@
             <div class="d-flex align-items-center gap-3">
                 <i class="fa-solid fa-wheelchair fs-2 text-warning"></i>
                 <div>
-                    <h5 class="mb-0 fw-bold text-white">Priority Ticket Assistance</h5>
-                    <small class="text-light opacity-75">Senior Citizens (60+), Expectant Mothers, Differently Abled</small>
+                    <h5 class="mb-0 fw-bold text-white" id="priorityTitle">Priority Ticket Assistance</h5>
+                    <small class="text-light opacity-75" id="prioritySubtitle">Senior Citizens (60+), Expectant Mothers, Differently Abled</small>
                 </div>
             </div>
             <div class="form-check form-switch fs-3">
                 <input class="form-check-input" type="checkbox" id="priorityToggle">
-                <label class="form-check-label fs-6 fw-bold text-warning ms-2" for="priorityToggle">Request Priority Token</label>
+                <label class="form-check-label fs-6 fw-bold text-warning ms-2" for="priorityToggle" id="priorityLabel">Request Priority Token</label>
             </div>
         </div>
 
-        <h3 class="fw-bold mb-4 text-light"><i class="fa-solid fa-layer-group text-cyan me-2"></i>Select Department / Service</h3>
+        <h3 class="fw-bold mb-4 text-light" id="servicesSectionHeader"><i class="fa-solid fa-layer-group text-cyan me-2"></i>Select Department / Service</h3>
 
         <div class="row g-4">
             {% for s in services_list %}
@@ -190,17 +190,17 @@
                         <div class="kiosk-icon-box">
                             <i class="fa-solid {{ s.icon|default:'fa-ticket' }}"></i>
                         </div>
-                        <span class="badge-est-time">
+                        <span class="badge-est-time" data-est-wait="{{ s.est_wait }}">
                             <i class="fa-regular fa-clock me-1"></i>~{{ s.est_wait }} mins wait
                         </span>
                     </div>
 
-                    <h3 class="text-white fw-bold mb-2">{{ s.name }}</h3>
-                    <p class="text-secondary small mb-3">{{ s.description|default:"Fast & efficient queue processing" }}</p>
+                    <h3 class="text-white fw-bold mb-2 service-name-el">{{ s.name }}</h3>
+                    <p class="text-secondary small mb-3 service-desc-el" data-default-desc="{{ s.description|default:"Fast & efficient queue processing" }}">{{ s.description|default:"Fast & efficient queue processing" }}</p>
 
                     <div class="d-flex justify-content-between align-items-center pt-3 border-top border-secondary border-opacity-25">
-                        <span class="text-muted small">Department: <strong>{{ s.department_name }}</strong></span>
-                        <span class="badge bg-primary rounded-pill px-3 py-2 fs-6">
+                        <span class="text-muted small department-label" data-dept-name="{{ s.department_name }}">Department: <strong>{{ s.department_name }}</strong></span>
+                        <span class="badge bg-primary rounded-pill px-3 py-2 fs-6 waiting-label" data-waiting-count="{{ s.waiting_count }}">
                             <i class="fa-solid fa-users me-1"></i>{{ s.waiting_count }} Waiting
                         </span>
                     </div>
@@ -209,7 +209,7 @@
             {% empty %}
             <div class="col-12 text-center py-5">
                 <i class="fa-solid fa-circle-info fs-1 text-muted mb-3"></i>
-                <h4 class="text-muted">No active services currently available.</h4>
+                <h4 class="text-muted" id="noServicesLabel">No active services currently available.</h4>
             </div>
             {% endfor %}
         </div>
@@ -220,7 +220,7 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content bg-transparent border-0">
                 <div class="ticket-paper">
-                    <div class="badge bg-success text-white px-3 py-2 rounded-pill mb-3">
+                    <div class="badge bg-success text-white px-3 py-2 rounded-pill mb-3" id="modalGeneratedBadge">
                         <i class="fa-solid fa-check-circle me-1"></i>TICKET GENERATED
                     </div>
                     <h5 class="text-muted text-uppercase fw-bold mb-0" id="ticketBranch">Smart Hospital Sri Lanka</h5>
@@ -233,16 +233,16 @@
                     </div>
 
                     <div class="row g-2 text-start bg-light p-3 rounded-3 mb-3 fs-6">
-                        <div class="col-6">Position in Queue: <strong id="ticketPosition" class="text-primary">#1</strong></div>
-                        <div class="col-6">Estimated Wait: <strong id="ticketWait" class="text-primary">~10 mins</strong></div>
+                        <div class="col-6"><span id="lblPosition">Position in Queue:</span> <strong id="ticketPosition" class="text-primary">#1</strong></div>
+                        <div class="col-6"><span id="lblWait">Estimated Wait:</span> <strong id="ticketWait" class="text-primary">~10 mins</strong></div>
                         <div class="col-12 border-top pt-1 mt-1 text-muted small" id="ticketDate">Issued: Today</div>
                     </div>
 
                     <div class="d-flex gap-2">
-                        <button class="btn btn-primary btn-kiosk-touch w-100" onclick="printTicketModal()">
+                        <button class="btn btn-primary btn-kiosk-touch w-100" id="btnPrintTicket" onclick="printTicketModal()">
                             <i class="fa-solid fa-print me-2"></i>PRINT TICKET
                         </button>
-                        <button class="btn btn-outline-dark btn-kiosk-touch" data-bs-dismiss="modal">
+                        <button class="btn btn-outline-dark btn-kiosk-touch" id="btnDone" data-bs-dismiss="modal">
                             DONE (<span id="autoCloseSecs">10</span>s)
                         </button>
                     </div>
@@ -255,14 +255,128 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Language configuration and translation dictionary
+        let currentLang = localStorage.getItem('sqms_kiosk_lang') || 'en';
+        
+        const dictionary = {
+            en: {
+                title: "Smart Queue Self-Service Kiosk",
+                subtitle: "Touch a service below to take your ticket instantly",
+                priorityTitle: "Priority Ticket Assistance",
+                prioritySubtitle: "Senior Citizens (60+), Expectant Mothers, Differently Abled",
+                priorityLabel: "Request Priority Token",
+                servicesHeader: "Select Department / Service",
+                noServices: "No active services currently available.",
+                ticketGenerated: "TICKET GENERATED",
+                position: "Position in Queue:",
+                wait: "Estimated Wait:",
+                issued: "Issued:",
+                printTicket: "PRINT TICKET",
+                done: "DONE",
+                deptPrefix: "Department: ",
+                waitingSuffix: " Waiting",
+                minWaitSuffix: " mins wait",
+                voicePrompt: "Ticket generated. Token number {token}. Please take your printed ticket."
+            },
+            si: {
+                title: "ස්මාර්ට් පෝලිම් ස්වයංක්‍රීය සේවා කියොස්කය",
+                subtitle: "ක්ෂණිකව ටෝකන් පතක් ලබා ගැනීමට පහත සේවාවක් ස්පර්ශ කරන්න",
+                priorityTitle: "ප්‍රමුඛතා ටෝකන් සහාය",
+                prioritySubtitle: "වැඩිහිටි පුරවැසියන් (60+), ගර්භනී මව්වරුන්, ආබාධිත පුද්ගලයින්",
+                priorityLabel: "ප්‍රමුඛතා ටෝකන් පතක් ඉල්ලන්න",
+                servicesHeader: "අංශය / සේවාව තෝරන්න",
+                noServices: "දැනට සක්‍රීය සේවාවන් නොමැත.",
+                ticketGenerated: "ටෝකන් පත නිකුත් කරන ලදී",
+                position: "පෝලිමේ ස්ථානය:",
+                wait: "පොරොත්තු කාලය:",
+                issued: "නිකුත් කළ වේලාව:",
+                printTicket: "ටෝකන් පත මුද්‍රණය කරන්න",
+                done: "අවසන්",
+                deptPrefix: "අංශය: ",
+                waitingSuffix: " දෙනෙක් පොරොත්තුවෙන්",
+                minWaitSuffix: " ක පොරොත්තු කාලය",
+                voicePrompt: "ටෝකන් පතක් නිකුත් කරන ලදී. ටෝකන් අංකය {token}. කරුණාකර ඔබගේ මුද්‍රිත ටෝකන් පත ලබාගන්න."
+            },
+            ta: {
+                title: "ஸ்மார்ட் வரிசை சுய சேவை கியோஸ்க்",
+                subtitle: "உடனடியாக டோக்கன் பெற கீழே உள்ள சேவையைத் தொடவும்",
+                priorityTitle: "முன்னுரிமை டோக்கன் உதவி",
+                prioritySubtitle: "மூத்த குடிமக்கள் (60+), கர்ப்பிணித் தாய்மார்கள், மாற்றுத்திறனாளிகள்",
+                priorityLabel: "முன்னுரிமை டோக்கன் கோரவும்",
+                servicesHeader: "துறை / சேவையைத் தேர்ந்தெடுக்கவும்",
+                noServices: "தற்போது செயலில் உள்ள சேவைகள் எதுவும் இல்லை.",
+                ticketGenerated: "டோக்கன் உருவாக்கப்பட்டது",
+                position: "வரிசையில் நிலை:",
+                wait: "காத்திருப்பு நேரம்:",
+                issued: "வழங்கப்பட்டது:",
+                printTicket: "அச்சிடுக",
+                done: "முடிந்தது",
+                deptPrefix: "துறை: ",
+                waitingSuffix: " பேர் காத்திருக்கிறார்கள்",
+                minWaitSuffix: " நிமிடங்கள் காத்திருப்பு",
+                voicePrompt: "டோக்கன் உருவாக்கப்பட்டது. டோக்கன் எண் {token}. தயவுசெய்து உங்கள் அச்சிடப்பட்ட டோக்கனை எடுத்துக்கொள்ளுங்கள்."
+            }
+        };
+
+        function setKioskLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('sqms_kiosk_lang', lang);
+
+            // Update UI buttons styling
+            document.getElementById('btnLangEn').classList.toggle('active', lang === 'en');
+            document.getElementById('btnLangSi').classList.toggle('active', lang === 'si');
+            document.getElementById('btnLangTa').classList.toggle('active', lang === 'ta');
+
+            // Apply translations to static text
+            const t = dictionary[lang];
+            document.getElementById('kioskTitle').innerText = t.title;
+            document.getElementById('kioskSubtitle').innerText = t.subtitle;
+            document.getElementById('priorityTitle').innerText = t.priorityTitle;
+            document.getElementById('prioritySubtitle').innerText = t.prioritySubtitle;
+            document.getElementById('priorityLabel').innerText = t.priorityLabel;
+            document.getElementById('servicesSectionHeader').innerHTML = `<i class="fa-solid fa-layer-group text-cyan me-2"></i>` + t.servicesHeader;
+            
+            const noSvc = document.getElementById('noServicesLabel');
+            if (noSvc) noSvc.innerText = t.noServices;
+
+            // Modal translations
+            document.getElementById('modalGeneratedBadge').innerHTML = `<i class="fa-solid fa-check-circle me-1"></i>` + t.ticketGenerated;
+            document.getElementById('lblPosition').innerText = t.position;
+            document.getElementById('lblWait').innerText = t.wait;
+            document.getElementById('btnPrintTicket').innerHTML = `<i class="fa-solid fa-print me-2"></i>` + t.printTicket;
+            document.getElementById('btnDone').childNodes[0].nodeValue = t.done + ' ';
+
+            // Dynamic items: cards
+            document.querySelectorAll('.badge-est-time').forEach(el => {
+                const mins = el.getAttribute('data-est-wait');
+                el.innerHTML = `<i class="fa-regular fa-clock me-1"></i>~${mins}${t.minWaitSuffix}`;
+            });
+
+            document.querySelectorAll('.department-label').forEach(el => {
+                const name = el.getAttribute('data-dept-name');
+                el.innerHTML = `${t.deptPrefix}<strong>${name}</strong>`;
+            });
+
+            document.querySelectorAll('.waiting-label').forEach(el => {
+                const count = el.getAttribute('data-waiting-count');
+                el.innerHTML = `<i class="fa-solid fa-users me-1"></i>${count}${t.waitingSuffix}`;
+            });
+
+            updateClock();
+        }
+
         // Live Clock
         function updateClock() {
             const now = new Date();
             document.getElementById('kioskClock').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            document.getElementById('kioskDate').innerText = now.toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+            
+            let locale = 'en-US';
+            if (currentLang === 'si') locale = 'si-LK';
+            if (currentLang === 'ta') locale = 'ta-LK';
+
+            document.getElementById('kioskDate').innerText = now.toLocaleDateString(locale, { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
         }
         setInterval(updateClock, 1000);
-        updateClock();
 
         // Fullscreen Toggle
         function toggleFullScreen() {
@@ -295,6 +409,32 @@
             issueKioskToken(serviceId, serviceName, cardElement);
         }
 
+        function speakKioskToken(tokenNumber) {
+            if (!('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+            
+            // Format token spoken version: e.g. "A 0 0 1"
+            let tokenSpoken = tokenNumber.split('').join(' ');
+            let promptTemplate = dictionary[currentLang].voicePrompt;
+            let text = promptTemplate.replace('{token}', tokenSpoken);
+            
+            let utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 0.85;
+            utterance.pitch = 1.0;
+            utterance.volume = 1.0;
+            
+            let targetLang = 'en-US';
+            if (currentLang === 'si') targetLang = 'si-LK';
+            if (currentLang === 'ta') targetLang = 'ta-LK';
+            utterance.lang = targetLang;
+
+            let voices = window.speechSynthesis.getVoices();
+            let matchedVoice = voices.find(v => v.lang.toLowerCase().startsWith(currentLang));
+            if (matchedVoice) utterance.voice = matchedVoice;
+
+            window.speechSynthesis.speak(utterance);
+        }
+
         function issueKioskToken(serviceId, serviceName, cardElement) {
             const isPriority = document.getElementById('priorityToggle').checked;
             
@@ -317,7 +457,10 @@
                     document.getElementById('ticketBranch').innerText = data.branch_name + " | " + data.department_name;
                     document.getElementById('ticketPosition').innerText = '#' + data.position;
                     document.getElementById('ticketWait').innerText = '~' + data.estimated_wait + ' mins';
-                    document.getElementById('ticketDate').innerText = 'Issued: ' + data.created_at;
+                    
+                    const t = dictionary[currentLang];
+                    document.getElementById('ticketDate').innerText = `${t.issued} ${data.created_at}`;
+                    
                     if(data.qr_code_url) {
                         document.getElementById('ticketQR').src = data.qr_code_url;
                     }
@@ -325,8 +468,11 @@
                     const modal = new bootstrap.Modal(document.getElementById('ticketModal'));
                     modal.show();
 
-                    // Play audio confirmation
+                    // Play audio confirmation and localized voice
                     playAudioBeep();
+                    setTimeout(() => {
+                        speakKioskToken(data.token_number);
+                    }, 400);
 
                     // Auto close countdown
                     let countdown = 10;
@@ -369,6 +515,10 @@
         function printTicketModal() {
             window.print();
         }
+
+        // Initialize Kiosk Language on Page Load
+        setKioskLanguage(currentLang);
     </script>
 </body>
 </html>
+
