@@ -248,6 +248,9 @@
                 audioIcon.className = 'fas fa-volume-mute me-1';
                 audioMuteBtn.className = 'btn btn-outline-secondary btn-sm rounded-pill px-3 py-2';
                 audioMuteBtn.childNodes[2].textContent = ' Sound OFF';
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                }
             } else {
                 audioIcon.className = 'fas fa-volume-up me-1';
                 audioMuteBtn.className = 'btn btn-outline-info btn-sm rounded-pill px-3 py-2';
