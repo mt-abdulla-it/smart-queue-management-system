@@ -335,6 +335,7 @@
     function speakTokenCall(tokenNumber, serviceName, counterName) {
         if (!('speechSynthesis' in window)) return;
         window.speechSynthesis.cancel(); // Stop current speaking audio
+        if (isMuted) return;
         
         let tokenSpoken = tokenNumber.split('').join(' '); // Speaks digits clearly
 
@@ -359,6 +360,7 @@
 
             let index = 0;
             function playNext() {
+                if (isMuted) return;
                 if (index >= announcements.length) return;
                 let current = announcements[index];
                 let utterance = new SpeechSynthesisUtterance(current.text);
@@ -372,6 +374,11 @@
                 if (matchedVoice) utterance.voice = matchedVoice;
 
                 utterance.onend = function() {
+                    index++;
+                    playNext();
+                };
+                utterance.onerror = function(e) {
+                    console.error("SpeechSynthesis error:", e);
                     index++;
                     playNext();
                 };
