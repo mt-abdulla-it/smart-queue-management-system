@@ -15,6 +15,7 @@ class PriorityQueueManager:
 
     BASE_WEIGHTS = {
         QueueToken.TriageLevel.EMERGENCY: 100,
+        QueueToken.TriageLevel.VIP: 80,
         QueueToken.TriageLevel.ELDERLY_DISABLED: 50,
         QueueToken.TriageLevel.PRIORITY: 30,
         QueueToken.TriageLevel.REGULAR: 10,
