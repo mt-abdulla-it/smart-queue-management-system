@@ -271,5 +271,46 @@ class CounterAssignmentTestCase(TestCase):
         self.assertContains(response, 'Live TV Queue Display')
 
 
+class QueueEnhancementsTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email='patient@example.com',
+            password='Password123!',
+            role='USER',
+            first_name='VIP',
+            last_name='Patient'
+        )
+        self.branch = Branch.objects.create(name="Central Hospital", code="CH")
+        self.department = Department.objects.create(name="OPD", branch=self.branch)
+        self.service = Service.objects.create(
+            name="General Consultation",
+            department=self.department,
+            code="GEN",
+            prefix="GEN",
+            avg_service_time_minutes=10
+        )
 
+    def test_vip_and_new_fields(self):
+        # Create a VIP token with cancellation reason and verification code
+        token = QueueToken.objects.create(
+            user=self.user,
+            service=self.service,
+            branch=self.branch,
+            token_number="GEN-777",
+            status="WAITING",
+            triage_level=QueueToken.TriageLevel.VIP,
+            cancellation_reason="No longer required",
+            verification_code="VIP999123",
+            queue_date=timezone.now().date()
+        )
 
+        # Retrieve and verify fields
+        token.refresh_from_db()
+        self.assertEqual(token.triage_level, QueueToken.TriageLevel.VIP)
+        self.assertEqual(token.cancellation_reason, "No longer required")
+        self.assertEqual(token.verification_code, "VIP999123")
+
+        # Verify priority weights logic
+        from apps.queues.triage import PriorityQueueManager
+        weight = PriorityQueueManager.calculate_effective_weight(token)
+        self.assertEqual(weight, 80)  # VIP base weight is 80
