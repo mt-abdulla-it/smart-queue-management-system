@@ -35,6 +35,7 @@ class QueueToken(TimeStampedModel):
 
     class TriageLevel(models.TextChoices):
         EMERGENCY = 'EMERGENCY', 'Emergency Triage'
+        VIP = 'VIP', 'VIP Premium'
         ELDERLY_DISABLED = 'ELDERLY_DISABLED', 'Elderly / Differently Abled'
         PRIORITY = 'PRIORITY', 'Priority'
         REGULAR = 'REGULAR', 'Regular'
@@ -68,6 +69,9 @@ class QueueToken(TimeStampedModel):
     is_priority = models.BooleanField('Priority', default=False)
     counter_number = models.CharField('Counter Number', max_length=50, default='Counter 1', blank=True,
                                       help_text='Desk or Counter number calling/serving this token')
+    cancellation_reason = models.TextField('Cancellation Reason', blank=True, null=True)
+    verification_code = models.CharField('Verification Code', max_length=10, blank=True, null=True,
+                                         help_text='Code for self-service kiosk check-in')
 
     class Meta:
         verbose_name = 'Queue Token'
