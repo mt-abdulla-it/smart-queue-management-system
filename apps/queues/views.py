@@ -247,6 +247,7 @@ class TransferTokenView(RoleRequiredMixin, View):
         
         # Update service and reset status to WAITING
         token.service = target_service
+        token.branch = target_service.department.branch
         token.status = 'WAITING'
         token.called_by = None
         token.save()
