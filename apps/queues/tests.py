@@ -115,6 +115,12 @@ class TransferTokenTestCase(TestCase):
         self.assertIn("Laboratory / Blood Test", history.notes)
         self.assertIn("Referred for blood tests", history.notes)
 
+        # Verify notification was created
+        from apps.notifications.models import Notification
+        notif = Notification.objects.filter(user=self.user, title__icontains="Transferred").first()
+        self.assertIsNotNone(notif)
+        self.assertIn("transferred to 'Laboratory / Blood Test' service", notif.message)
+
 
 class KioskAndInteractiveTestCase(TestCase):
     def setUp(self):
