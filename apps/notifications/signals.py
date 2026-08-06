@@ -71,6 +71,9 @@ def handle_queue_status_change(sender, instance, created, **kwargs):
     elif action == QueueHistory.Action.CANCELLED:
         subject = f"Token Cancelled: {token.token_number}"
         message = f"Hello {token.user.first_name},\n\nYour token {token.token_number} has been cancelled."
+    elif action == QueueHistory.Action.TRANSFERRED:
+        subject = f"Token Transferred: {token.token_number}"
+        message = f"Hello {token.user.first_name},\n\nYour token {token.token_number} has been transferred to '{token.service.name}' service. You are now in the queue for this service.\n\nThank you for using Smart Queue."
 
     if subject and message:
         # Create persistent In-App notification
