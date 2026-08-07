@@ -29,12 +29,16 @@
     <link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link href="{% static 'css/main.css' %}?v=2" rel="stylesheet">
-    <link href="{% static 'css/dark-mode.css' %}" rel="stylesheet">
+    <link href="{% static 'css/main.css' %}?v=3" rel="stylesheet">
+    <link href="{% static 'css/dark-mode.css' %}?v=2" rel="stylesheet">
+    <link href="{% static 'css/animations.css' %}?v=1" rel="stylesheet">
 
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    <!-- Skip to content (Accessibility) -->
+    <a href="#mainContent" class="visually-hidden-focusable position-fixed top-0 start-0 p-3 bg-primary text-white rounded-3 m-2" style="z-index:9999;">Skip to main content</a>
+
     {% if user.is_authenticated %}
         <!-- ========== Authenticated Layout (Sidebar + Content) ========== -->
         <div class="app-wrapper">
@@ -89,8 +93,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
 
     <!-- Custom JS -->
-    <script src="{% static 'js/main.js' %}?v=2"></script>
+    <script src="{% static 'js/main.js' %}?v=3"></script>
 
     {% block extra_js %}{% endblock %}
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
 </body>
 </html>
