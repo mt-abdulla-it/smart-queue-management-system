@@ -6,32 +6,33 @@
 {% block public_content %}
 <div class="auth-wrapper">
     <!-- Decorative Left Panel -->
-    <div class="auth-decorative d-none d-lg-flex">
+    <div class="auth-decorative d-none d-lg-flex position-relative">
+        <div class="hero-mesh opacity-20"></div>
         <!-- Floating shapes -->
-        <div class="auth-shape auth-shape-1"></div>
-        <div class="auth-shape auth-shape-2"></div>
-        <div class="auth-shape auth-shape-3"></div>
+        <div class="auth-shape auth-shape-1 anim-morph-blob"></div>
+        <div class="auth-shape auth-shape-2 anim-morph-blob" style="animation-delay: -4s;"></div>
+        <div class="auth-shape auth-shape-3 anim-morph-blob" style="animation-delay: -2s;"></div>
 
         <div class="auth-decorative-content">
-            <div class="brand-icon">
+            <div class="brand-icon shadow-lg mb-4 anim-breathe">
                 <i class="fas fa-hospital-user text-white"></i>
             </div>
-            <h2>Join Smart Queue</h2>
-            <p>Create your account to book queues online, skip the waiting line, and manage your appointments with ease.</p>
+            <h2 class="display-6 fw-black text-white mb-2">Join Smart Queue</h2>
+            <p class="text-white-50 mb-4">Create your account in 30 seconds to enjoy fast-track queue booking and live notifications.</p>
 
-            <!-- Mini stats -->
-            <div class="mt-4 d-flex justify-content-center gap-4 text-center" style="color: #94a3b8;">
-                <div>
-                    <h3 class="text-white mb-0" style="font-weight: 800;">500+</h3>
-                    <small>Active Users</small>
+            <!-- Mini Stats Row -->
+            <div class="mt-4 d-flex justify-content-center gap-4 text-center text-white">
+                <div class="glass-card p-3 rounded-4 border-0">
+                    <h3 class="fw-black mb-0 text-primary-light">1,200+</h3>
+                    <small class="text-white-50">Active Users</small>
                 </div>
-                <div>
-                    <h3 class="text-white mb-0" style="font-weight: 800;">50+</h3>
-                    <small>Branches</small>
+                <div class="glass-card p-3 rounded-4 border-0">
+                    <h3 class="fw-black mb-0 text-accent">15+</h3>
+                    <small class="text-white-50">Hospitals & Centers</small>
                 </div>
-                <div>
-                    <h3 class="text-white mb-0" style="font-weight: 800;">4.8★</h3>
-                    <small>Rating</small>
+                <div class="glass-card p-3 rounded-4 border-0">
+                    <h3 class="fw-black mb-0 text-warning">4.8★</h3>
+                    <small class="text-white-50">User Rating</small>
                 </div>
             </div>
         </div>
@@ -39,32 +40,90 @@
 
     <!-- Register Form Side -->
     <div class="auth-form-side">
-        <div class="auth-form-container" style="max-width: 520px;">
-            <div class="card shadow-sm border-0">
+        <div class="auth-form-container" style="max-width: 540px;">
+            <div class="card glass-card shadow-xl border-0 rounded-4 overflow-hidden">
                 <div class="card-body p-4 p-md-5">
                     <div class="text-center mb-4">
-                        <div class="brand-icon mx-auto mb-3 d-lg-none" style="width: 50px; height: 50px;">
+                        <div class="brand-icon mx-auto mb-3 d-lg-none" style="width: 54px; height: 54px;">
                             <i class="fas fa-hospital-user fs-4 text-white"></i>
                         </div>
-                        <h4 class="fw-bold">Create an Account</h4>
-                        <p class="text-muted">Join Smart Queue to skip the wait.</p>
+                        <h4 class="fw-extrabold mb-1">Create Your Account</h4>
+                        <p class="text-muted small">Enter your details below to register</p>
                     </div>
 
-                    <form method="post" novalidate>
+                    <form method="post" novalidate id="registerForm">
                         {% csrf_token %}
                         {{ form|crispy }}
+
+                        <!-- Password Strength Meter Bar -->
+                        <div class="mb-3 d-none" id="passMeterContainer">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small text-muted" style="font-size: 0.75rem;">Password Strength:</span>
+                                <span class="small fw-bold" id="passStrengthLabel" style="font-size: 0.75rem;">Weak</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-danger" id="passStrengthBar" role="progressbar" style="width: 25%"></div>
+                            </div>
+                        </div>
                         
-                        <button type="submit" class="btn btn-primary w-100 mt-4 mb-3">
-                            <i class="fas fa-user-plus me-2"></i>Register
+                        <button type="submit" class="btn btn-primary btn-magnetic w-100 rounded-3 py-3 fw-bold shadow-sm hover-lift mt-3 mb-3">
+                            <i class="fas fa-user-plus me-2"></i>Create Account
                         </button>
                     </form>
 
-                    <div class="text-center mt-4">
-                        <p class="text-muted mb-0">Already have an account? <a href="{% url 'accounts:login' %}" class="text-decoration-none fw-semibold">Sign in</a></p>
+                    <div class="text-center mt-4 pt-3 border-top">
+                        <p class="text-muted small mb-0">Already have an account? <a href="{% url 'accounts:login' %}" class="text-decoration-none fw-bold text-primary">Sign in</a></p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Real-time password strength evaluator
+    const passInput = document.querySelector('input[type="password"]');
+    const meterContainer = document.getElementById('passMeterContainer');
+    const strengthBar = document.getElementById('passStrengthBar');
+    const strengthLabel = document.getElementById('passStrengthLabel');
+
+    if (passInput && meterContainer) {
+        passInput.addEventListener('input', function() {
+            const val = passInput.value;
+            if (val.length > 0) {
+                meterContainer.classList.remove('d-none');
+            } else {
+                meterContainer.classList.add('d-none');
+                return;
+            }
+
+            let score = 0;
+            if (val.length >= 6) score += 25;
+            if (val.length >= 10) score += 25;
+            if (/[A-Z]/.test(val)) score += 25;
+            if (/[0-9!@#$%^&*]/.test(val)) score += 25;
+
+            strengthBar.style.width = score + '%';
+            if (score <= 25) {
+                strengthBar.className = 'progress-bar bg-danger';
+                strengthLabel.innerText = 'Weak';
+                strengthLabel.className = 'small fw-bold text-danger';
+            } else if (score <= 50) {
+                strengthBar.className = 'progress-bar bg-warning';
+                strengthLabel.innerText = 'Medium';
+                strengthLabel.className = 'small fw-bold text-warning';
+            } else if (score <= 75) {
+                strengthBar.className = 'progress-bar bg-info';
+                strengthLabel.innerText = 'Good';
+                strengthLabel.className = 'small fw-bold text-info';
+            } else {
+                strengthBar.className = 'progress-bar bg-success';
+                strengthLabel.innerText = 'Strong';
+                strengthLabel.className = 'small fw-bold text-success';
+            }
+        });
+    }
+</script>
 {% endblock %}
