@@ -827,7 +827,7 @@ a:hover {
 
 .btn-primary:hover {
     background: linear-gradient(135deg, var(--primary-dark), #4338ca);
-    transform: translateY(-2px);
+    transform: translateY(-3px) scale(1.02);
     box-shadow: 0 10px 30px rgba(var(--primary-rgb), 0.35);
 }
 
