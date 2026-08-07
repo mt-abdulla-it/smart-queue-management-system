@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}Token {{ token.token_number }} — {{ site_name }}{% endblock %}
-{% block page_header %}Token Ticket Pass{% endblock %}
+{% block page_header %}Digital Boarding Pass{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
@@ -11,14 +11,14 @@
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div class="live-sync-badge">
                     <span class="live-pulse-dot"></span>
-                    <span id="live-sync-text">Live Sync Active (Refreshes 5s)</span>
+                    <span id="live-sync-text">Live Sync Active (5s)</span>
                 </div>
                 <small class="text-muted" id="last-sync-time"><i class="fas fa-sync-alt fa-spin me-1"></i> Syncing...</small>
             </div>
 
-            <!-- Digital Ticket Pass Card -->
-            <div class="boarding-ticket shadow-xl position-relative">
-                <div class="ticket-header-gradient text-center">
+            <!-- Boarding Ticket Pass 2.0 -->
+            <div class="boarding-ticket shadow-2xl position-relative anim-card-flip">
+                <div class="ticket-header-gradient text-center p-4">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-1 text-uppercase fw-bold" style="letter-spacing: 1px;">
                             <i class="fas fa-hospital me-1"></i> {{ token.service.department.branch.name }}
@@ -31,7 +31,7 @@
                 </div>
                 
                 <div class="p-4 p-md-5 text-center">
-                    <div class="ticket-token-badge mb-2">{{ token.token_number }}</div>
+                    <div class="ticket-token-badge mb-2 display-3 fw-black text-primary">{{ token.token_number }}</div>
                     
                     <div class="mb-3" id="status-badge-container">
                         {% if token.status == 'WAITING' %}
@@ -123,10 +123,10 @@
 
                     {% if token.qr_code %}
                     <div class="mb-3">
-                        <div class="ticket-qr-frame">
+                        <div class="ticket-qr-frame shadow-md hover-lift">
                             <img src="{{ token.qr_code.url }}" alt="Token QR Code" class="img-fluid rounded-2" style="max-width: 170px;">
                         </div>
-                        <p class="text-muted small mt-2"><i class="fas fa-qrcode me-1"></i>Scan token QR for real-time mobile tracking</p>
+                        <p class="text-muted small mt-2"><i class="fas fa-qrcode me-1"></i>Scan ticket QR code for mobile check-in</p>
                     </div>
                     {% endif %}
                     
@@ -141,8 +141,8 @@
                     </div>
 
                     <div class="d-flex justify-content-center gap-3">
-                        <a href="{% url 'queues:download_pdf' token.pk %}" class="btn btn-primary rounded-pill px-4 hover-lift">
-                            <i class="fas fa-file-pdf me-2"></i>Download Pass (PDF)
+                        <a href="{% url 'queues:download_pdf' token.pk %}" class="btn btn-primary rounded-pill px-4 hover-lift shadow-sm">
+                            <i class="fas fa-file-pdf me-2"></i>Download Boarding Pass (PDF)
                         </a>
                         <a href="{% url 'queues:my_tokens' %}" class="btn btn-outline-secondary rounded-pill px-4">
                             <i class="fas fa-list me-1"></i> My Tokens
@@ -158,7 +158,6 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const tokenId = parseInt("{{ token.id }}", 10);
     const statusApiUrl = "{% url 'queues:api_token_status' token.id %}";
     let previousStatus = "{{ token.status }}";
 
@@ -173,12 +172,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                 document.getElementById('last-sync-time').innerHTML = `<i class="fas fa-check-circle text-success me-1"></i> Synced ${timeStr}`;
 
-                // Update Position and Wait Metrics
                 document.getElementById('live-position').textContent = data.status === 'WAITING' ? data.position : '—';
                 document.getElementById('live-ahead').textContent = data.status === 'WAITING' ? data.total_ahead : '0';
                 document.getElementById('live-wait-val').textContent = data.status === 'WAITING' ? data.estimated_wait : '0';
 
-                // Update Progress Bar
                 const progressBar = document.getElementById('live-progress-bar');
                 const progressLabel = document.getElementById('progress-percent-label');
                 progressBar.style.width = data.progress_percent + '%';
@@ -190,27 +187,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     progressBar.classList.remove('serving-progress');
                 }
 
-                // Stage Label Highlights
-                const stageIssued = document.getElementById('stage-issued');
-                const stageWaiting = document.getElementById('stage-waiting');
-                const stageNext = document.getElementById('stage-next');
-                const stageServing = document.getElementById('stage-serving');
-
-                [stageIssued, stageWaiting, stageNext, stageServing].forEach(el => el && el.classList.remove('active-stage'));
-
-                if (data.status === 'WAITING') {
-                    if (data.position === 1) {
-                        stageNext && stageNext.classList.add('active-stage');
-                    } else {
-                        stageWaiting && stageWaiting.classList.add('active-stage');
-                    }
-                } else if (data.status === 'SERVING' || data.status === 'COMPLETED') {
-                    stageServing && stageServing.classList.add('active-stage');
-                } else {
-                    stageIssued && stageIssued.classList.add('active-stage');
-                }
-
-                // Update Status Badge and Banner
                 const statusContainer = document.getElementById('status-badge-container');
                 const servingBanner = document.getElementById('serving-alert-banner');
 
@@ -226,9 +202,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             <i class="fas fa-bullhorn me-2"></i>PLEASE PROCEED TO COUNTER
                         </span>`;
                     servingBanner.classList.remove('d-none');
-
-                    if (previousStatus !== 'SERVING') {
-                        if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
+                    if (previousStatus !== 'SERVING' && 'vibrate' in navigator) {
+                        navigator.vibrate([200, 100, 200]);
                     }
                 } else if (data.status === 'COMPLETED') {
                     statusContainer.innerHTML = `
@@ -238,30 +213,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     servingBanner.classList.add('d-none');
                 }
 
-                // Timeline updates
-                const stepWaiting = document.getElementById('timeline-step-waiting');
-                const stepServing = document.getElementById('timeline-step-serving');
-                const stepCompleted = document.getElementById('timeline-step-completed');
-                const line2 = document.getElementById('timeline-line-2');
-                const line3 = document.getElementById('timeline-line-3');
-
-                if (stepWaiting) stepWaiting.className = 'timeline-step ' + (data.status === 'WAITING' ? 'active' : (data.status === 'SERVING' || data.status === 'COMPLETED' ? 'completed' : ''));
-                if (stepServing) stepServing.className = 'timeline-step ' + (data.status === 'SERVING' ? 'serving' : (data.status === 'COMPLETED' ? 'completed' : ''));
-                if (stepCompleted) stepCompleted.className = 'timeline-step ' + (data.status === 'COMPLETED' ? 'completed' : '');
-
-                if (line2) line2.className = 'timeline-line ' + (data.status === 'SERVING' || data.status === 'COMPLETED' ? 'completed' : '');
-                if (line3) line3.className = 'timeline-line ' + (data.status === 'COMPLETED' ? 'completed' : '');
-
                 previousStatus = data.status;
             })
-            .catch(err => {
-                console.error('Live sync error:', err);
-                const syncElem = document.getElementById('last-sync-time');
-                if (syncElem) syncElem.innerHTML = `<span class="text-danger"><i class="fas fa-exclamation-triangle me-1"></i> Sync Error</span>`;
-            });
+            .catch(err => console.error('Live sync error:', err));
     }
 
-    // Initial fetch & setup 5s interval
     updateLiveQueueStatus();
     setInterval(updateLiveQueueStatus, 5000);
 });

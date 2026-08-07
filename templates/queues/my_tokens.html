@@ -1,24 +1,37 @@
 {% extends 'base.html' %}
 
 {% block title %}My Tokens — {{ site_name }}{% endblock %}
-{% block page_header %}My Queue Tokens{% endblock %}
+{% block page_header %}My Digital Passes{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
-    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4 anim-slide-down">
         <div>
-            <h4 class="fw-bold mb-1">Your Active & Past Tokens</h4>
-            <p class="text-secondary mb-0 small">Real-time status tracking for your booked queues across all branches.</p>
+            <h4 class="fw-extrabold mb-1">My Digital Boarding Passes</h4>
+            <p class="text-secondary mb-0 small">Real-time status tracking for your active and past queue tokens across all medical branches.</p>
         </div>
-        <a href="{% url 'queues:book' %}" class="btn btn-primary rounded-pill px-4 shadow-sm hover-lift">
-            <i class="fas fa-plus me-2"></i>Book New Token
+        <a href="{% url 'queues:book' %}" class="btn btn-primary rounded-pill px-4 shadow-sm hover-lift btn-magnetic">
+            <i class="fas fa-plus me-2"></i>Book New Ticket
         </a>
     </div>
 
-    <div class="row g-4">
+    <!-- Status Filter Pill Tabs -->
+    <ul class="nav nav-pills mb-4 gap-2" id="tokenFilterTabs">
+        <li class="nav-item">
+            <button class="nav-link active rounded-pill px-3 py-2 fw-semibold" data-filter="all">All Tokens ({{ tokens|length }})</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link rounded-pill px-3 py-2 fw-semibold" data-filter="waiting">Active / Waiting</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link rounded-pill px-3 py-2 fw-semibold" data-filter="completed">Completed</button>
+        </li>
+    </ul>
+
+    <div class="row g-4" id="tokenCardsGrid">
         {% for token in tokens %}
-        <div class="col-md-6 col-xl-4">
-            <div class="card h-100 border-0 shadow-md rounded-4 hover-lift overflow-hidden position-relative border-start border-4 {% if token.status == 'WAITING' %}border-warning{% elif token.status == 'SERVING' %}border-info{% elif token.status == 'COMPLETED' %}border-success{% else %}border-secondary{% endif %}">
+        <div class="col-md-6 col-xl-4 token-card-wrapper" data-status="{{ token.status|lower }}">
+            <div class="card h-100 glass-card border-0 shadow-md rounded-4 hover-lift overflow-hidden position-relative border-start border-4 {% if token.status == 'WAITING' %}border-warning{% elif token.status == 'SERVING' %}border-info{% elif token.status == 'COMPLETED' %}border-success{% else %}border-secondary{% endif %}">
                 <div class="card-body p-4">
                     <div class="d-flex justify-content-between align-items-start mb-3">
                         <div>
@@ -44,7 +57,7 @@
                         </div>
                     </div>
                     
-                    <div class="bg-body-tertiary p-3 rounded-3 mb-3">
+                    <div class="bg-body-tertiary p-3 rounded-3 mb-3 border">
                         <div class="d-flex align-items-center mb-2">
                             <i class="fas fa-building text-primary me-2" style="width: 16px;"></i>
                             <span class="fw-semibold">{{ token.service.department.branch.name }}</span>
@@ -64,22 +77,22 @@
                     </div>
                 </div>
                 <div class="card-footer bg-transparent border-top p-3">
-                    <a href="{% url 'queues:token_detail' token.pk %}" class="btn btn-outline-primary rounded-pill w-100">
-                        View Live Pass & Ticket <i class="fas fa-arrow-right ms-1"></i>
+                    <a href="{% url 'queues:token_detail' token.pk %}" class="btn btn-outline-primary rounded-pill w-100 fw-bold">
+                        View Live Boarding Pass <i class="fas fa-arrow-right ms-1"></i>
                     </a>
                 </div>
             </div>
         </div>
         {% empty %}
         <div class="col-12">
-            <div class="card border-0 shadow-md rounded-4 p-5 text-center">
+            <div class="card glass-card border-0 shadow-md rounded-4 p-5 text-center">
                 <div class="empty-state py-4">
                     <div class="empty-state-icon text-primary bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px; font-size: 2rem;">
-                        <i class="fas fa-ticket"></i>
+                        <i class="fas fa-ticket-alt"></i>
                     </div>
                     <h4 class="fw-bold">No active tokens found</h4>
                     <p class="text-secondary max-width-500 mx-auto mb-4">You haven't booked any queue tokens yet. Select your hospital branch and service to get started.</p>
-                    <a href="{% url 'queues:book' %}" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm hover-lift">
+                    <a href="{% url 'queues:book' %}" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm hover-lift btn-magnetic">
                         <i class="fas fa-plus me-2"></i>Book Your First Queue Token
                     </a>
                 </div>
@@ -90,3 +103,28 @@
 </div>
 {% endblock %}
 
+{% block extra_js %}
+<script>
+    // Token Filter Tabs
+    document.querySelectorAll('#tokenFilterTabs button').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('#tokenFilterTabs button').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            const filter = this.getAttribute('data-filter');
+            document.querySelectorAll('.token-card-wrapper').forEach(card => {
+                const status = card.getAttribute('data-status');
+                if (filter === 'all') {
+                    card.style.display = 'block';
+                } else if (filter === 'waiting' && (status === 'waiting' || status === 'serving')) {
+                    card.style.display = 'block';
+                } else if (filter === 'completed' && status === 'completed') {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
