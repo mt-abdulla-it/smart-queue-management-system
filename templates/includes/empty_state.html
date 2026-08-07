@@ -1,0 +1,15 @@
+<!-- ========== Reusable Empty State Component ========== -->
+<div class="empty-state py-5 px-3 text-center">
+    <div class="empty-state-icon text-primary bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3 anim-breathe" style="width: 80px; height: 80px; font-size: 2.2rem;">
+        <i class="fas {% if empty_icon %}{{ empty_icon }}{% else %}fa-inbox{% endif %}"></i>
+    </div>
+    <h4 class="fw-bold mb-2">{% if empty_title %}{{ empty_title }}{% else %}No Data Found{% endif %}</h4>
+    <p class="text-muted max-width-500 mx-auto mb-4 small" style="max-width: 420px;">
+        {% if empty_message %}{{ empty_message }}{% else %}There are no items to display at this time. Check back later or create a new entry.{% endif %}
+    </p>
+    {% if action_url and action_label %}
+    <a href="{{ action_url }}" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm hover-lift btn-magnetic">
+        <i class="fas {% if action_icon %}{{ action_icon }}{% else %}fa-plus{% endif %} me-2"></i>{{ action_label }}
+    </a>
+    {% endif %}
+</div>
