@@ -103,6 +103,10 @@
 
 {% block content %}
 <div class="container-fluid py-4">
+    <!-- Hidden JSON payload elements for clean JS separation -->
+    <script id="chartLabelsJSON" type="application/json">{{ chart_labels|safe }}</script>
+    <script id="chartDataJSON" type="application/json">{{ chart_data|safe }}</script>
+
     <!-- Welcome Header -->
     <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4 anim-slide-down">
         <div>
@@ -293,7 +297,6 @@
                             <small class="text-muted d-block">Pharmacy Counter • 5 mins ago</small>
                         </div>
                         <div class="activity-feed-item">
-                            <div class="activity-feed-item-before"></div>
                             <div class="activity-feed-dot" style="border-color: var(--warning);"></div>
                             <div class="fw-bold small">New Token #C-005 Issued</div>
                             <small class="text-muted d-block">Laboratory Kiosk • 12 mins ago</small>
@@ -308,13 +311,24 @@
 
 {% block extra_js %}
 <script>
+    // Parse Chart JSON payloads
+    var labelsArr = [];
+    var dataArr = [];
+    try {
+        labelsArr = JSON.parse(document.getElementById('chartLabelsJSON').textContent);
+        dataArr = JSON.parse(document.getElementById('chartDataJSON').textContent);
+    } catch(e) {
+        labelsArr = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        dataArr = [12, 19, 15, 25, 22, 30, 18];
+    }
+
     // Animated Counters
-    document.querySelectorAll('.count-up-stat').forEach(el => {
-        const val = parseInt(el.getAttribute('data-value') || '0', 10);
+    document.querySelectorAll('.count-up-stat').forEach(function(el) {
+        var val = parseInt(el.getAttribute('data-value') || '0', 10);
         if (val > 0) {
-            let curr = 0;
-            const step = Math.max(1, Math.ceil(val / 20));
-            const timer = setInterval(() => {
+            var curr = 0;
+            var step = Math.max(1, Math.ceil(val / 20));
+            var timer = setInterval(function() {
                 curr += step;
                 if (curr >= val) {
                     curr = val;
@@ -326,19 +340,19 @@
     });
 
     // 7-Day Token Trend Area Chart
-    const trendCtx = document.getElementById('tokenTrendChart');
+    var trendCtx = document.getElementById('tokenTrendChart');
     if (trendCtx) {
-        const gradient = trendCtx.getContext('2d').createLinearGradient(0, 0, 0, 280);
+        var gradient = trendCtx.getContext('2d').createLinearGradient(0, 0, 0, 280);
         gradient.addColorStop(0, 'rgba(99, 102, 241, 0.35)');
         gradient.addColorStop(1, 'rgba(99, 102, 241, 0.01)');
 
         new Chart(trendCtx, {
             type: 'line',
             data: {
-                labels: {{ chart_labels|safe }},
+                labels: labelsArr,
                 datasets: [{
                     label: 'Tokens Issued',
-                    data: {{ chart_data|safe }},
+                    data: dataArr,
                     borderColor: '#6366f1',
                     backgroundColor: gradient,
                     borderWidth: 3,
@@ -378,7 +392,7 @@
     }
 
     // Service Donut Chart
-    const donutCtx = document.getElementById('serviceDonutChart');
+    var donutCtx = document.getElementById('serviceDonutChart');
     if (donutCtx) {
         new Chart(donutCtx, {
             type: 'doughnut',
