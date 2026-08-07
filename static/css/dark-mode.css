@@ -14,10 +14,24 @@
     --text-secondary: #94a3b8;
     --text-muted: #64748b;
     --border-color: #334155;
+
+    /* Enhanced Shadows for dark mode */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.15);
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
     --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.4);
     --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.5);
+    --shadow-2xl: 0 25px 80px rgba(0, 0, 0, 0.6);
+
+    /* Dark mode glass tokens (brighter borders) */
+    --glass-bg: rgba(30, 41, 59, 0.75);
+    --glass-bg-strong: rgba(30, 41, 59, 0.9);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-blur: 20px;
+    --glass-saturation: 120%;
+
+    /* Focus ring visibility in dark mode */
+    --focus-ring-color: rgba(129, 140, 248, 0.5);
 }
 
 [data-bs-theme="dark"] body {

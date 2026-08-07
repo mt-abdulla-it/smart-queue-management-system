@@ -1,30 +1,57 @@
 /* =============================================================================
-   Smart Queue Management System — Main Stylesheet
+   Smart Queue Management System — Main Stylesheet v2.0
    A premium, modern design system with CSS custom properties,
    smooth animations, glassmorphism effects, and responsive layout.
    ============================================================================= */
 
-/* ---------- CSS Custom Properties (Design Tokens) ---------- */
+/* ---------- CSS Custom Properties (Design Tokens 2.0) ---------- */
 :root {
-    /* Primary Colors */
+    /* Primary Colors (with extended palette) */
+    --primary-50: #eef2ff;
+    --primary-100: #e0e7ff;
+    --primary-200: #c7d2fe;
+    --primary-300: #a5b4fc;
+    --primary-400: #818cf8;
     --primary: #6366f1;
     --primary-dark: #4f46e5;
+    --primary-700: #4338ca;
+    --primary-800: #3730a3;
+    --primary-900: #312e81;
     --primary-light: #818cf8;
     --primary-rgb: 99, 102, 241;
 
     /* Accent Colors */
+    --accent-50: #ecfeff;
+    --accent-100: #cffafe;
+    --accent-200: #a5f3fc;
     --accent: #06b6d4;
     --accent-dark: #0891b2;
+    --accent-700: #0e7490;
     --accent-rgb: 6, 182, 212;
 
     /* Status Colors */
+    --success-50: #ecfdf5;
+    --success-100: #d1fae5;
     --success: #10b981;
+    --success-dark: #059669;
     --success-rgb: 16, 185, 129;
+
+    --warning-50: #fffbeb;
+    --warning-100: #fef3c7;
     --warning: #f59e0b;
+    --warning-dark: #d97706;
     --warning-rgb: 245, 158, 11;
+
+    --danger-50: #fef2f2;
+    --danger-100: #fee2e2;
     --danger: #ef4444;
+    --danger-dark: #dc2626;
     --danger-rgb: 239, 68, 68;
+
+    --info-50: #eff6ff;
+    --info-100: #dbeafe;
     --info: #3b82f6;
+    --info-dark: #2563eb;
     --info-rgb: 59, 130, 246;
 
     /* Neutrals */
@@ -37,32 +64,81 @@
     --text-muted: #94a3b8;
     --border-color: #e2e8f0;
 
+    /* Fluid Typography Scale (clamp for responsive scaling) */
+    --text-xs: clamp(0.694rem, 0.05vw + 0.68rem, 0.72rem);
+    --text-sm: clamp(0.8rem, 0.08vw + 0.78rem, 0.875rem);
+    --text-base: clamp(0.875rem, 0.12vw + 0.85rem, 1rem);
+    --text-lg: clamp(1rem, 0.2vw + 0.95rem, 1.125rem);
+    --text-xl: clamp(1.125rem, 0.3vw + 1.05rem, 1.313rem);
+    --text-2xl: clamp(1.35rem, 0.5vw + 1.2rem, 1.625rem);
+    --text-3xl: clamp(1.6rem, 0.8vw + 1.4rem, 2.1rem);
+    --text-4xl: clamp(2rem, 1.2vw + 1.7rem, 2.8rem);
+    --text-hero: clamp(2.5rem, 2vw + 2rem, 4.5rem);
+
+    /* 4px-based Spacing Scale */
+    --space-0: 0;
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-7: 28px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
+    --space-14: 56px;
+    --space-16: 64px;
+
     /* Sidebar */
     --sidebar-width: 270px;
-    --sidebar-collapsed-width: 0px;
+    --sidebar-collapsed-width: 72px;
 
     /* Navbar */
     --navbar-height: 65px;
 
-    /* Shadows */
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-    --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.12);
-    --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.15);
+    /* Shadows (6-tier scale) */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+    --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
+    --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.15), 0 8px 20px rgba(0, 0, 0, 0.08);
+    --shadow-2xl: 0 25px 80px rgba(0, 0, 0, 0.2), 0 10px 30px rgba(0, 0, 0, 0.1);
     --shadow-primary: 0 8px 24px rgba(var(--primary-rgb), 0.25);
 
+    /* Color-tinted Shadow Variants */
+    --shadow-primary-sm: 0 4px 14px rgba(var(--primary-rgb), 0.15);
+    --shadow-success-sm: 0 4px 14px rgba(var(--success-rgb), 0.15);
+    --shadow-warning-sm: 0 4px 14px rgba(var(--warning-rgb), 0.15);
+    --shadow-danger-sm: 0 4px 14px rgba(var(--danger-rgb), 0.15);
+    --shadow-info-sm: 0 4px 14px rgba(var(--info-rgb), 0.15);
+
     /* Border Radius */
+    --radius-xs: 6px;
     --radius-sm: 10px;
     --radius-md: 14px;
     --radius-lg: 16px;
     --radius-xl: 24px;
+    --radius-2xl: 32px;
     --radius-full: 9999px;
 
-    /* Transitions */
-    --transition-fast: 150ms ease;
-    --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    /* Motion Design Tokens */
+    --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+    --duration-fast: 150ms;
+    --duration-normal: 300ms;
+    --duration-slow: 500ms;
+    --duration-slower: 700ms;
+
+    --transition-fast: var(--duration-fast) var(--ease-out);
+    --transition-normal: var(--duration-normal) var(--ease-out);
+    --transition-slow: var(--duration-slow) var(--ease-out);
+    --transition-spring: var(--duration-slow) var(--ease-spring);
 
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
@@ -72,12 +148,26 @@
     --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     --gradient-dark-card: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
     --gradient-live-display: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+    --gradient-mesh: linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, rgba(6, 182, 212, 0.02) 50%, rgba(16, 185, 129, 0.03) 100%);
 
     /* Neon & Glow Shadows */
     --shadow-glow-primary: 0 0 25px rgba(99, 102, 241, 0.4);
     --shadow-glow-accent: 0 0 25px rgba(6, 182, 212, 0.4);
     --shadow-glow-success: 0 0 25px rgba(16, 185, 129, 0.4);
     --shadow-glow-danger: 0 0 25px rgba(239, 68, 68, 0.4);
+    --shadow-glow-warning: 0 0 25px rgba(245, 158, 11, 0.4);
+
+    /* Enhanced Glassmorphism */
+    --glass-bg: rgba(255, 255, 255, 0.65);
+    --glass-bg-strong: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.8);
+    --glass-blur: 24px;
+    --glass-saturation: 150%;
+
+    /* Focus Ring (Accessibility) */
+    --focus-ring-color: rgba(var(--primary-rgb), 0.4);
+    --focus-ring-width: 3px;
+    --focus-ring-offset: 2px;
 }
 
 /* ---------- Keyframe Animations & Utilities ---------- */
@@ -138,18 +228,34 @@
 }
 
 .glass-card {
-    background: rgba(255, 255, 255, 0.65);
-    backdrop-filter: blur(24px) saturate(150%);
-    -webkit-backdrop-filter: blur(24px) saturate(150%);
-    border: 1px solid rgba(255, 255, 255, 0.8);
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+    border: 1px solid var(--glass-border);
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
     transition: all var(--transition-normal);
+    position: relative;
+}
+
+.glass-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--gradient-mesh);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--transition-normal);
 }
 
 .glass-card:hover {
     box-shadow: var(--shadow-glow-primary);
     transform: translateY(-2px);
     border-color: rgba(var(--primary-rgb), 0.3);
+}
+
+.glass-card:hover::after {
+    opacity: 1;
 }
 
 [data-bs-theme="dark"] .glass-card {
@@ -3206,9 +3312,20 @@ a:hover {
 
 /* ---------- Accessibility & Skeleton Loader ---------- */
 :focus-visible {
-    outline: 3px solid var(--primary-light) !important;
-    outline-offset: 2px !important;
+    outline: var(--focus-ring-width) solid var(--focus-ring-color) !important;
+    outline-offset: var(--focus-ring-offset) !important;
+    border-radius: var(--radius-xs);
 }
+
+/* Color-aware focus rings for different button variants */
+.btn-primary:focus-visible,
+.btn-success:focus-visible { --focus-ring-color: rgba(var(--primary-rgb), 0.5); }
+.btn-danger:focus-visible,
+.btn-outline-danger:focus-visible { --focus-ring-color: rgba(var(--danger-rgb), 0.5); }
+.btn-warning:focus-visible,
+.btn-outline-warning:focus-visible { --focus-ring-color: rgba(var(--warning-rgb), 0.5); }
+.btn-info:focus-visible,
+.btn-outline-info:focus-visible { --focus-ring-color: rgba(var(--info-rgb), 0.5); }
 
 .skeleton-pulse {
     background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
@@ -3227,11 +3344,16 @@ a:hover {
    ============================================================================= */
 
 /* Staggered Animations */
-.stagger-1 { animation: slideUpFade 0.4s ease-out 0.1s forwards; opacity: 0; }
-.stagger-2 { animation: slideUpFade 0.4s ease-out 0.2s forwards; opacity: 0; }
-.stagger-3 { animation: slideUpFade 0.4s ease-out 0.3s forwards; opacity: 0; }
-.stagger-4 { animation: slideUpFade 0.4s ease-out 0.4s forwards; opacity: 0; }
-.stagger-5 { animation: slideUpFade 0.4s ease-out 0.5s forwards; opacity: 0; }
+.stagger-1 { animation: slideUpFade 0.45s var(--ease-out) 0.05s forwards; opacity: 0; }
+.stagger-2 { animation: slideUpFade 0.45s var(--ease-out) 0.1s forwards; opacity: 0; }
+.stagger-3 { animation: slideUpFade 0.45s var(--ease-out) 0.15s forwards; opacity: 0; }
+.stagger-4 { animation: slideUpFade 0.45s var(--ease-out) 0.2s forwards; opacity: 0; }
+.stagger-5 { animation: slideUpFade 0.45s var(--ease-out) 0.25s forwards; opacity: 0; }
+.stagger-6 { animation: slideUpFade 0.45s var(--ease-out) 0.3s forwards; opacity: 0; }
+.stagger-7 { animation: slideUpFade 0.45s var(--ease-out) 0.35s forwards; opacity: 0; }
+.stagger-8 { animation: slideUpFade 0.45s var(--ease-out) 0.4s forwards; opacity: 0; }
+.stagger-9 { animation: slideUpFade 0.45s var(--ease-out) 0.45s forwards; opacity: 0; }
+.stagger-10 { animation: slideUpFade 0.45s var(--ease-out) 0.5s forwards; opacity: 0; }
 
 /* Interactive Card Selection */
 .interactive-card {
