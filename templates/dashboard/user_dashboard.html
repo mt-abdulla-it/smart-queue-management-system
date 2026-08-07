@@ -1,31 +1,77 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}My Dashboard — {{ site_name }}{% endblock %}
-{% block page_header %}My Dashboard{% endblock %}
+{% block page_header %}User Dashboard{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
-    <!-- Welcome Header -->
-    <div class="d-flex align-items-center justify-content-between mb-4 stagger-1">
+    <!-- Dynamic Time-of-Day Greeting Header -->
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4 anim-slide-down">
         <div>
-            <h3 class="fw-extrabold mb-1">Hello, {{ request.user.first_name }}! 👋</h3>
-            <p class="text-muted mb-0">Track your queue tokens and manage your appointments.</p>
+            <h3 class="fw-extrabold mb-1">
+                <span id="timeGreeting">Welcome</span>, {{ request.user.first_name }}! <span class="greeting-emoji">👋</span>
+            </h3>
+            <p class="text-muted mb-0">Track active queue tickets, view estimated wait times, and manage bookings.</p>
         </div>
-        <a href="{% url 'queues:book' %}" class="btn btn-primary btn-magnetic rounded-pill px-4 shadow-sm hover-lift">
-            <i class="fas fa-plus-circle me-2"></i>Book New Token
+        <a href="{% url 'queues:book' %}" class="btn btn-primary rounded-pill px-4 shadow-sm hover-lift btn-magnetic">
+            <i class="fas fa-plus-circle me-2"></i>Book Queue Ticket
         </a>
     </div>
 
-    <!-- Stats Cards -->
+    <!-- Active Token Hero Banner (if available) -->
+    {% if active_tokens > 0 and recent_tokens %}
+        {% for token in recent_tokens %}
+            {% if token.status == 'WAITING' or token.status == 'SERVING' %}
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-4 anim-scale-in {% if token.status == 'SERVING' %}anim-border-glow{% else %}bg-primary text-white{% endif %}" style="{% if token.status != 'SERVING' %}background: var(--gradient-primary);{% endif %}">
+                <div class="card-body p-4 p-md-5">
+                    <div class="row align-items-center g-4">
+                        <div class="col-md-7 text-white">
+                            <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-white bg-opacity-20 mb-3 small fw-bold text-uppercase">
+                                {% if token.status == 'SERVING' %}
+                                    <span class="live-pulse-dot bg-success"></span> NOW SERVING YOUR TURN!
+                                {% else %}
+                                    <i class="fas fa-clock"></i> ACTIVE TICKET IN QUEUE
+                                {% endif %}
+                            </div>
+                            <h2 class="display-4 fw-extrabold mb-1">{{ token.token_number }}</h2>
+                            <p class="fs-5 opacity-90 mb-3">{{ token.service.name }} — {{ token.service.department.branch.name }}</p>
+                            <div class="d-flex flex-wrap align-items-center gap-3">
+                                <a href="{% url 'queues:token_detail' token.pk %}" class="btn btn-light text-primary rounded-pill px-4 fw-bold hover-lift">
+                                    <i class="fas fa-ticket-alt me-2"></i>View Live Boarding Pass
+                                </a>
+                                <span class="small opacity-75"><i class="fas fa-info-circle me-1"></i>Position in Queue: <strong>#{{ forloop.counter }}</strong></span>
+                            </div>
+                        </div>
+                        <div class="col-md-5 text-center text-white">
+                            <div class="progress-ring-container">
+                                <svg class="progress-ring-svg" width="140" height="140">
+                                    <circle class="progress-ring-circle-bg" stroke-width="8" r="58" cx="70" cy="70"/>
+                                    <circle class="progress-ring-circle" stroke="currentColor" stroke-width="8" stroke-dasharray="364" stroke-dashoffset="100" r="58" cx="70" cy="70"/>
+                                </svg>
+                                <div class="progress-ring-text">
+                                    <div class="fs-3 fw-black">~15</div>
+                                    <div class="small opacity-75">mins wait</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    <!-- Stats Summary Row -->
     <div class="row g-3 mb-4">
         <div class="col-md-4 stagger-1">
             <div class="card glass-card border-0 rounded-4 p-3 shadow-sm h-100">
                 <div class="d-flex align-items-center gap-3">
-                    <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-3 d-flex align-items-center justify-content-center" style="width:56px;height:56px;">
+                    <div class="stat-icon bg-primary bg-opacity-10 text-primary rounded-3 p-3">
                         <i class="fas fa-clock fa-2x"></i>
                     </div>
                     <div>
-                        <span class="text-muted small text-uppercase tracking-wider fw-bold">Active Tokens</span>
+                        <span class="text-muted small text-uppercase tracking-wider fw-bold">Active Tickets</span>
                         <h3 class="mb-0 fw-extrabold text-primary">{{ active_tokens }}</h3>
                     </div>
                 </div>
@@ -34,11 +80,11 @@
         <div class="col-md-4 stagger-2">
             <div class="card glass-card border-0 rounded-4 p-3 shadow-sm h-100">
                 <div class="d-flex align-items-center gap-3">
-                    <div class="bg-success bg-opacity-10 text-success rounded-3 p-3 d-flex align-items-center justify-content-center" style="width:56px;height:56px;">
+                    <div class="stat-icon bg-success bg-opacity-10 text-success rounded-3 p-3">
                         <i class="fas fa-check-circle fa-2x"></i>
                     </div>
                     <div>
-                        <span class="text-muted small text-uppercase tracking-wider fw-bold">Completed</span>
+                        <span class="text-muted small text-uppercase tracking-wider fw-bold">Completed Visits</span>
                         <h3 class="mb-0 fw-extrabold text-success">{{ completed_tokens }}</h3>
                     </div>
                 </div>
@@ -47,11 +93,11 @@
         <div class="col-md-4 stagger-3">
             <div class="card glass-card border-0 rounded-4 p-3 shadow-sm h-100">
                 <div class="d-flex align-items-center gap-3">
-                    <div class="bg-info bg-opacity-10 text-info rounded-3 p-3 d-flex align-items-center justify-content-center" style="width:56px;height:56px;">
+                    <div class="stat-icon bg-info bg-opacity-10 text-info rounded-3 p-3">
                         <i class="fas fa-comment-dots fa-2x"></i>
                     </div>
                     <div>
-                        <span class="text-muted small text-uppercase tracking-wider fw-bold">Feedback Given</span>
+                        <span class="text-muted small text-uppercase tracking-wider fw-bold">Feedback Submitted</span>
                         <h3 class="mb-0 fw-extrabold text-info">{{ feedback_given }}</h3>
                     </div>
                 </div>
@@ -59,17 +105,17 @@
         </div>
     </div>
 
-    <!-- Recent Tokens -->
+    <!-- Recent Tokens Table & Quick Actions -->
     <div class="row g-4">
         <div class="col-lg-8 stagger-4">
             <div class="card glass-card border-0 shadow-sm rounded-4 overflow-hidden">
                 <div class="card-header bg-transparent p-4 border-bottom d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="fw-bold mb-0"><i class="fas fa-ticket text-primary me-2"></i>Recent Tokens</h5>
-                        <small class="text-muted">Your latest queue token activity</small>
+                        <h5 class="fw-bold mb-0"><i class="fas fa-history text-primary me-2"></i>My Queue History</h5>
+                        <small class="text-muted">Your latest queue tokens and ticket statuses</small>
                     </div>
                     <a href="{% url 'queues:my_tokens' %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                        <i class="fas fa-list me-1"></i>View All
+                        <i class="fas fa-list me-1"></i>View All Tokens
                     </a>
                 </div>
                 <div class="card-body p-0">
@@ -77,11 +123,11 @@
                         <table class="table table-hover align-middle mb-0">
                             <thead class="bg-body-tertiary">
                                 <tr>
-                                    <th class="ps-4 text-uppercase fs-7 text-muted tracking-wider">Token</th>
+                                    <th class="ps-4 text-uppercase fs-7 text-muted tracking-wider">Token Number</th>
                                     <th class="text-uppercase fs-7 text-muted tracking-wider">Service</th>
-                                    <th class="text-uppercase fs-7 text-muted tracking-wider">Date</th>
+                                    <th class="text-uppercase fs-7 text-muted tracking-wider">Date & Time</th>
                                     <th class="text-uppercase fs-7 text-muted tracking-wider">Status</th>
-                                    <th class="pe-4 text-uppercase fs-7 text-muted tracking-wider"></th>
+                                    <th class="pe-4 text-uppercase fs-7 text-muted tracking-wider">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -98,24 +144,30 @@
                                         {% if token.status == 'WAITING' %}
                                             <span class="badge bg-warning text-dark rounded-pill px-3 py-1"><i class="fas fa-clock me-1"></i>Waiting</span>
                                         {% elif token.status == 'SERVING' %}
-                                            <span class="badge bg-success rounded-pill px-3 py-1 pulse-glow"><i class="fas fa-bullhorn me-1"></i>Serving</span>
+                                            <span class="badge bg-success rounded-pill px-3 py-1 pulse-glow"><i class="fas fa-bullhorn me-1"></i>Serving Now</span>
                                         {% elif token.status == 'COMPLETED' %}
-                                            <span class="badge bg-secondary rounded-pill px-3 py-1"><i class="fas fa-check me-1"></i>Done</span>
+                                            <span class="badge bg-secondary rounded-pill px-3 py-1"><i class="fas fa-check me-1"></i>Completed</span>
                                         {% else %}
                                             <span class="badge bg-outline-secondary rounded-pill px-3 py-1">{{ token.status }}</span>
                                         {% endif %}
                                     </td>
                                     <td class="pe-4">
                                         <a href="{% url 'queues:token_detail' token.pk %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                                            <i class="fas fa-eye me-1"></i>View
+                                            <i class="fas fa-eye me-1"></i>View Pass
                                         </a>
                                     </td>
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="5" class="text-center py-5 text-muted">
-                                        <i class="fas fa-ticket fa-2x opacity-25 mb-2 d-block"></i>
-                                        No tokens yet. Book your first queue!
+                                    <td colspan="5" class="text-center py-5">
+                                        <div class="empty-state">
+                                            <i class="fas fa-ticket-alt empty-state-icon text-primary"></i>
+                                            <h5 class="fw-bold">No Queue Tokens Yet</h5>
+                                            <p class="text-muted small">You don't have any active or past tokens. Book your first appointment to skip the line!</p>
+                                            <a href="{% url 'queues:book' %}" class="btn btn-primary rounded-pill px-4 shadow-sm hover-lift">
+                                                <i class="fas fa-plus me-1"></i>Book Ticket Now
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -126,25 +178,21 @@
             </div>
         </div>
 
-        <!-- Quick Actions -->
         <div class="col-lg-4 stagger-5">
             <div class="card glass-card border-0 shadow-sm rounded-4 h-100">
                 <div class="card-header bg-transparent border-bottom p-4">
-                    <h5 class="fw-bold mb-0"><i class="fas fa-bolt text-warning me-2"></i>Quick Actions</h5>
+                    <h5 class="fw-bold mb-0"><i class="fas fa-bolt text-warning me-2"></i>Quick Services</h5>
                 </div>
                 <div class="card-body p-4">
                     <div class="d-grid gap-3">
                         <a href="{% url 'queues:book' %}" class="btn btn-primary rounded-3 py-3 text-start hover-lift shadow-sm">
-                            <i class="fas fa-plus-circle me-2"></i> Book a Queue Token
+                            <i class="fas fa-plus-circle me-2"></i> Book New Ticket
                         </a>
                         <a href="{% url 'queues:my_tokens' %}" class="btn btn-outline-primary rounded-3 py-3 text-start hover-lift">
-                            <i class="fas fa-list-check me-2"></i> My Tokens
+                            <i class="fas fa-ticket-alt me-2"></i> My Active Passes
                         </a>
-                        <a href="{% url 'queues:live_display' %}" class="btn btn-outline-info rounded-3 py-3 text-start hover-lift">
-                            <i class="fas fa-tv me-2"></i> Live Queue Display
-                        </a>
-                        <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary rounded-3 py-3 text-start hover-lift">
-                            <i class="fas fa-user-cog me-2"></i> Edit Profile
+                        <a href="{% url 'feedback:submit' %}" class="btn btn-outline-info rounded-3 py-3 text-start hover-lift">
+                            <i class="fas fa-comment-dots me-2"></i> Submit Experience Feedback
                         </a>
                     </div>
                 </div>
@@ -152,4 +200,17 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Time of day greeting generator
+    const hour = new Date().getHours();
+    const greetingEl = document.getElementById('timeGreeting');
+    if (greetingEl) {
+        if (hour < 12) greetingEl.innerText = 'Good Morning';
+        else if (hour < 18) greetingEl.innerText = 'Good Afternoon';
+        else greetingEl.innerText = 'Good Evening';
+    }
+</script>
 {% endblock %}

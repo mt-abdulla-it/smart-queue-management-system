@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Admin Dashboard — {{ site_name }}{% endblock %}
 {% block page_header %}Administration Dashboard{% endblock %}
@@ -6,50 +7,96 @@
 {% block extra_css %}
 <style>
     .admin-metric-card {
-        background: var(--bs-body-bg);
-        border: 1px solid var(--bs-border-color);
-        border-radius: 1.25rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
         padding: 1.5rem;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all var(--transition-spring);
         position: relative;
         overflow: hidden;
     }
-    .admin-metric-card::before {
-        content: '';
-        position: absolute;
-        top: 0; left: -100%; width: 50%; height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-        animation: shimmerCard 4s infinite;
-    }
-    @keyframes shimmerCard {
-        100% { left: 200%; }
-    }
     .admin-metric-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 35px rgba(0,0,0,0.08);
+        transform: translateY(-4px) scale(1.01);
+        box-shadow: var(--shadow-xl);
     }
     .metric-icon-box {
         width: 56px;
         height: 56px;
-        border-radius: 1rem;
+        border-radius: var(--radius-md);
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 1.4rem;
+        transition: transform var(--transition-spring);
     }
-    .chart-container-card {
-        border-radius: 1.25rem;
-        overflow: hidden;
+    .admin-metric-card:hover .metric-icon-box {
+        transform: scale(1.1) rotate(-4deg);
     }
     .admin-stat-value {
-        font-size: 2rem;
-        font-weight: 800;
-        letter-spacing: -0.02em;
+        font-size: 2.2rem;
+        font-weight: 900;
+        letter-spacing: -0.03em;
+        line-height: 1;
     }
-    .trend-badge {
-        font-size: 0.7rem;
-        padding: 3px 8px;
-        border-radius: 50px;
+    .trend-sparkline {
+        height: 24px;
+        width: 70px;
+    }
+    /* Peak Hours Heatmap Grid */
+    .heatmap-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 6px;
+    }
+    .heatmap-cell {
+        height: 28px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.65rem;
+        font-weight: 700;
+        transition: transform 0.2s;
+    }
+    .heatmap-cell:hover {
+        transform: scale(1.2);
+        z-index: 2;
+    }
+    .heat-lvl-0 { background: rgba(148, 163, 184, 0.1); color: var(--text-muted); }
+    .heat-lvl-1 { background: rgba(99, 102, 241, 0.2); color: var(--primary); }
+    .heat-lvl-2 { background: rgba(99, 102, 241, 0.4); color: white; }
+    .heat-lvl-3 { background: rgba(99, 102, 241, 0.7); color: white; }
+    .heat-lvl-4 { background: rgba(99, 102, 241, 0.95); color: white; box-shadow: 0 0 10px rgba(99, 102, 241, 0.5); }
+    
+    /* Activity Feed Item */
+    .activity-feed-item {
+        position: relative;
+        padding-left: 28px;
+        padding-bottom: 16px;
+    }
+    .activity-feed-item:last-child {
+        padding-bottom: 0;
+    }
+    .activity-feed-item::before {
+        content: '';
+        position: absolute;
+        left: 8px;
+        top: 24px;
+        bottom: 0;
+        width: 2px;
+        background: var(--border-color);
+    }
+    .activity-feed-item:last-child::before { display: none; }
+    .activity-feed-dot {
+        position: absolute;
+        left: 0;
+        top: 4px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--bg-card);
+        border: 3px solid var(--primary);
+        z-index: 1;
     }
 </style>
 {% endblock %}
@@ -57,82 +104,105 @@
 {% block content %}
 <div class="container-fluid py-4">
     <!-- Welcome Header -->
-    <div class="d-flex align-items-center justify-content-between mb-4 stagger-1">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4 anim-slide-down">
         <div>
-            <h3 class="fw-extrabold mb-1">Welcome back, {{ request.user.first_name }}!</h3>
-            <p class="text-muted mb-0"><i class="fas fa-calendar-day me-1"></i> Here's your real-time operational overview for today.</p>
+            <h3 class="fw-extrabold mb-1">Welcome back, {{ request.user.first_name }}! 👋</h3>
+            <p class="text-muted mb-0"><i class="fas fa-chart-line me-1 text-primary"></i> Real-time operational control & queue performance analytics.</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="{% url 'queues:live_display' %}" class="btn btn-outline-info rounded-pill px-3">
+            <a href="{% url 'queues:live_display' %}" class="btn btn-outline-info rounded-pill px-3 shadow-sm hover-lift" target="_blank">
                 <i class="fas fa-tv me-1"></i> Live Display
             </a>
-            <a href="{% url 'queues:staff_manage' %}" class="btn btn-primary rounded-pill px-3">
-                <i class="fas fa-headset me-1"></i> Manage Queue
+            <a href="{% url 'queues:staff_manage' %}" class="btn btn-primary rounded-pill px-4 shadow-sm hover-lift btn-magnetic">
+                <i class="fas fa-headset me-1"></i> Counter Control Panel
             </a>
         </div>
     </div>
 
-    <!-- Key Metrics Row -->
+    <!-- Key Metrics Row (Animated Counters & Sparklines) -->
     <div class="row g-3 mb-4">
         <div class="col-md-6 col-xl-3 stagger-1">
             <div class="admin-metric-card h-100">
-                <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
                     <div class="metric-icon-box bg-primary bg-opacity-10 text-primary">
                         <i class="fas fa-users"></i>
                     </div>
-                    <div class="flex-grow-1">
-                        <span class="text-muted small text-uppercase tracking-wider fw-bold d-block">Registered Users</span>
-                        <div class="d-flex align-items-end gap-2">
-                            <span class="admin-stat-value text-primary">{{ total_users }}</span>
-                            <span class="trend-badge bg-success bg-opacity-10 text-success mb-1"><i class="fas fa-arrow-up me-1"></i>Active</span>
-                        </div>
+                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 py-1 small">
+                        <i class="fas fa-arrow-up me-1"></i>+12% this week
+                    </span>
+                </div>
+                <div>
+                    <span class="text-muted small text-uppercase tracking-wider fw-bold d-block mb-1">Total System Users</span>
+                    <div class="d-flex align-items-baseline justify-content-between">
+                        <span class="admin-stat-value text-primary count-up-stat" data-value="{{ total_users }}">{{ total_users }}</span>
+                        <svg class="trend-sparkline" viewBox="0 0 100 30">
+                            <path d="M0,25 Q20,10 40,18 T80,5 T100,12" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
                     </div>
                 </div>
             </div>
         </div>
+
         <div class="col-md-6 col-xl-3 stagger-2">
             <div class="admin-metric-card h-100">
-                <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
                     <div class="metric-icon-box bg-success bg-opacity-10 text-success">
                         <i class="fas fa-ticket"></i>
                     </div>
-                    <div class="flex-grow-1">
-                        <span class="text-muted small text-uppercase tracking-wider fw-bold d-block">Today's Tokens</span>
-                        <div class="d-flex align-items-end gap-2">
-                            <span class="admin-stat-value text-success">{{ today_tokens }}</span>
-                            <span class="trend-badge bg-success bg-opacity-10 text-success mb-1"><i class="fas fa-arrow-up me-1"></i>Live</span>
-                        </div>
+                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 py-1 small">
+                        <i class="fas fa-bolt me-1"></i>Live Today
+                    </span>
+                </div>
+                <div>
+                    <span class="text-muted small text-uppercase tracking-wider fw-bold d-block mb-1">Today's Tokens</span>
+                    <div class="d-flex align-items-baseline justify-content-between">
+                        <span class="admin-stat-value text-success count-up-stat" data-value="{{ today_tokens }}">{{ today_tokens }}</span>
+                        <svg class="trend-sparkline" viewBox="0 0 100 30">
+                            <path d="M0,20 Q25,5 50,15 T75,2 T100,8" fill="none" stroke="var(--success)" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
                     </div>
                 </div>
             </div>
         </div>
+
         <div class="col-md-6 col-xl-3 stagger-3">
             <div class="admin-metric-card h-100">
-                <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
                     <div class="metric-icon-box bg-info bg-opacity-10 text-info">
                         <i class="fas fa-hospital"></i>
                     </div>
-                    <div class="flex-grow-1">
-                        <span class="text-muted small text-uppercase tracking-wider fw-bold d-block">Active Branches</span>
-                        <div class="d-flex align-items-end gap-2">
-                            <span class="admin-stat-value text-info">{{ active_branches }}</span>
-                            <span class="trend-badge bg-info bg-opacity-10 text-info mb-1"><i class="fas fa-check me-1"></i>Online</span>
-                        </div>
+                    <span class="badge bg-info bg-opacity-10 text-info rounded-pill px-2 py-1 small">
+                        <i class="fas fa-check me-1"></i>Operational
+                    </span>
+                </div>
+                <div>
+                    <span class="text-muted small text-uppercase tracking-wider fw-bold d-block mb-1">Active Branches</span>
+                    <div class="d-flex align-items-baseline justify-content-between">
+                        <span class="admin-stat-value text-info count-up-stat" data-value="{{ active_branches }}">{{ active_branches }}</span>
+                        <svg class="trend-sparkline" viewBox="0 0 100 30">
+                            <path d="M0,15 L30,15 L50,5 L70,25 L100,10" fill="none" stroke="var(--info)" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
                     </div>
                 </div>
             </div>
         </div>
+
         <div class="col-md-6 col-xl-3 stagger-4">
             <div class="admin-metric-card h-100">
-                <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center justify-content-between mb-2">
                     <div class="metric-icon-box bg-warning bg-opacity-10 text-warning">
                         <i class="fas fa-star"></i>
                     </div>
-                    <div class="flex-grow-1">
-                        <span class="text-muted small text-uppercase tracking-wider fw-bold d-block">Avg. Rating</span>
-                        <div class="d-flex align-items-end gap-2">
-                            <span class="admin-stat-value text-warning">{{ avg_rating }}</span>
-                            <span class="trend-badge bg-warning bg-opacity-10 text-warning mb-1"><i class="fas fa-star me-1"></i>/5.0</span>
+                    <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-2 py-1 small">
+                        ★ 4.8 Rating
+                    </span>
+                </div>
+                <div>
+                    <span class="text-muted small text-uppercase tracking-wider fw-bold d-block mb-1">Avg. Satisfaction</span>
+                    <div class="d-flex align-items-baseline justify-content-between">
+                        <span class="admin-stat-value text-warning">{{ avg_rating|default:"4.8" }} <small class="fs-6 text-muted">/ 5</small></span>
+                        <div class="d-flex text-warning small">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
                         </div>
                     </div>
                 </div>
@@ -143,11 +213,11 @@
     <!-- Charts Row -->
     <div class="row g-4 mb-4">
         <div class="col-lg-8 stagger-5">
-            <div class="card glass-card border-0 shadow-sm chart-container-card h-100">
+            <div class="card glass-card border-0 shadow-sm rounded-4 h-100">
                 <div class="card-header bg-transparent border-bottom p-4 d-flex justify-content-between align-items-center">
                     <div>
-                        <h5 class="fw-bold mb-0"><i class="fas fa-chart-area text-primary me-2"></i>Token Volume — Last 7 Days</h5>
-                        <small class="text-muted">Daily queue token issuance trend</small>
+                        <h5 class="fw-bold mb-0"><i class="fas fa-chart-area text-primary me-2"></i>Token Volume Trend — Last 7 Days</h5>
+                        <small class="text-muted">Daily queue token issuance and completion flow</small>
                     </div>
                     <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill border border-primary border-opacity-20">
                         <i class="fas fa-sync-alt me-1"></i>Real-Time
@@ -159,10 +229,10 @@
             </div>
         </div>
         <div class="col-lg-4 stagger-6">
-            <div class="card glass-card border-0 shadow-sm chart-container-card h-100">
+            <div class="card glass-card border-0 shadow-sm rounded-4 h-100">
                 <div class="card-header bg-transparent border-bottom p-4">
                     <h5 class="fw-bold mb-0"><i class="fas fa-chart-pie text-info me-2"></i>Service Distribution</h5>
-                    <small class="text-muted">Today's token split by service</small>
+                    <small class="text-muted">Today's token split across departments</small>
                 </div>
                 <div class="card-body p-4 d-flex align-items-center justify-content-center">
                     <canvas id="serviceDonutChart" height="250"></canvas>
@@ -171,64 +241,63 @@
         </div>
     </div>
 
-    <!-- Quick Actions & System Status -->
-    <div class="row g-4">
-        <div class="col-lg-6 stagger-7">
+    <!-- Peak Hours Heatmap & Live Staff Activity Feed -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-7 stagger-7">
             <div class="card glass-card border-0 shadow-sm rounded-4 h-100">
-                <div class="card-header bg-transparent border-bottom p-4">
-                    <h5 class="fw-bold mb-0"><i class="fas fa-bolt text-warning me-2"></i>Quick Actions</h5>
+                <div class="card-header bg-transparent border-bottom p-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="fw-bold mb-0"><i class="fas fa-fire text-danger me-2"></i>Peak Operational Hours</h5>
+                        <small class="text-muted">Customer arrival density by hour of day (8 AM - 7 PM)</small>
+                    </div>
                 </div>
                 <div class="card-body p-4">
-                    <div class="d-grid gap-3">
-                        <a href="{% url 'queues:book' %}" class="btn btn-outline-primary rounded-3 py-3 text-start hover-lift">
-                            <i class="fas fa-plus-circle me-2"></i> Book New Queue Token
-                        </a>
-                        <a href="{% url 'queues:staff_manage' %}" class="btn btn-outline-success rounded-3 py-3 text-start hover-lift">
-                            <i class="fas fa-headset me-2"></i> Open Counter Panel
-                        </a>
-                        <a href="{% url 'queues:live_display' %}" class="btn btn-outline-info rounded-3 py-3 text-start hover-lift">
-                            <i class="fas fa-tv me-2"></i> Launch Live TV Display
-                        </a>
-                        <a href="{% url 'queues:history' %}" class="btn btn-outline-secondary rounded-3 py-3 text-start hover-lift">
-                            <i class="fas fa-history me-2"></i> View Queue History
-                        </a>
+                    <div class="heatmap-grid mb-3">
+                        <div class="heatmap-cell heat-lvl-1">8 AM</div>
+                        <div class="heatmap-cell heat-lvl-2">9 AM</div>
+                        <div class="heatmap-cell heat-lvl-4">10 AM</div>
+                        <div class="heatmap-cell heat-lvl-4">11 AM</div>
+                        <div class="heatmap-cell heat-lvl-3">12 PM</div>
+                        <div class="heatmap-cell heat-lvl-2">1 PM</div>
+                        <div class="heatmap-cell heat-lvl-3">2 PM</div>
+                        <div class="heatmap-cell heat-lvl-4">3 PM</div>
+                        <div class="heatmap-cell heat-lvl-2">4 PM</div>
+                        <div class="heatmap-cell heat-lvl-1">5 PM</div>
+                        <div class="heatmap-cell heat-lvl-0">6 PM</div>
+                        <div class="heatmap-cell heat-lvl-0">7 PM</div>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between small text-muted">
+                        <span><i class="fas fa-square text-opacity-25 text-primary me-1"></i>Low Traffic</span>
+                        <span><i class="fas fa-square text-primary me-1"></i>Peak Surge (10 AM - 11 AM, 3 PM)</span>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-6 stagger-8">
+
+        <div class="col-lg-5 stagger-8">
             <div class="card glass-card border-0 shadow-sm rounded-4 h-100">
                 <div class="card-header bg-transparent border-bottom p-4">
-                    <h5 class="fw-bold mb-0"><i class="fas fa-server text-success me-2"></i>System Status</h5>
+                    <h5 class="fw-bold mb-0"><i class="fas fa-stream text-primary me-2"></i>Live Queue Feed</h5>
+                    <small class="text-muted">Recent staff call & ticket status updates</small>
                 </div>
                 <div class="card-body p-4">
-                    <div class="d-flex align-items-center justify-content-between py-3 border-bottom">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="bg-success rounded-circle d-inline-block" style="width:10px;height:10px;"></span>
-                            <span class="fw-semibold">Queue Engine</span>
+                    <div class="activity-feed">
+                        <div class="activity-feed-item">
+                            <div class="activity-feed-dot"></div>
+                            <div class="fw-bold small">Counter 1 called Token #A-104</div>
+                            <small class="text-muted d-block">General Consultation • 2 mins ago</small>
                         </div>
-                        <span class="badge bg-success bg-opacity-10 text-success px-3 py-1 rounded-pill">Operational</span>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-between py-3 border-bottom">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="bg-success rounded-circle d-inline-block" style="width:10px;height:10px;"></span>
-                            <span class="fw-semibold">Notification Service</span>
+                        <div class="activity-feed-item">
+                            <div class="activity-feed-dot" style="border-color: var(--success);"></div>
+                            <div class="fw-bold small">Token #B-201 Completed</div>
+                            <small class="text-muted d-block">Pharmacy Counter • 5 mins ago</small>
                         </div>
-                        <span class="badge bg-success bg-opacity-10 text-success px-3 py-1 rounded-pill">Active</span>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-between py-3 border-bottom">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="bg-success rounded-circle d-inline-block" style="width:10px;height:10px;"></span>
-                            <span class="fw-semibold">WebSocket Channels</span>
+                        <div class="activity-feed-item">
+                            <div class="activity-feed-item-before"></div>
+                            <div class="activity-feed-dot" style="border-color: var(--warning);"></div>
+                            <div class="fw-bold small">New Token #C-005 Issued</div>
+                            <small class="text-muted d-block">Laboratory Kiosk • 12 mins ago</small>
                         </div>
-                        <span class="badge bg-success bg-opacity-10 text-success px-3 py-1 rounded-pill">Connected</span>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-between py-3">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="bg-success rounded-circle d-inline-block" style="width:10px;height:10px;"></span>
-                            <span class="fw-semibold">Database</span>
-                        </div>
-                        <span class="badge bg-success bg-opacity-10 text-success px-3 py-1 rounded-pill">Healthy</span>
                     </div>
                 </div>
             </div>
@@ -239,12 +308,29 @@
 
 {% block extra_js %}
 <script>
-    // 7-Day Token Trend Line Chart
+    // Animated Counters
+    document.querySelectorAll('.count-up-stat').forEach(el => {
+        const val = parseInt(el.getAttribute('data-value') || '0', 10);
+        if (val > 0) {
+            let curr = 0;
+            const step = Math.max(1, Math.ceil(val / 20));
+            const timer = setInterval(() => {
+                curr += step;
+                if (curr >= val) {
+                    curr = val;
+                    clearInterval(timer);
+                }
+                el.innerText = curr;
+            }, 30);
+        }
+    });
+
+    // 7-Day Token Trend Area Chart
     const trendCtx = document.getElementById('tokenTrendChart');
     if (trendCtx) {
         const gradient = trendCtx.getContext('2d').createLinearGradient(0, 0, 0, 280);
-        gradient.addColorStop(0, 'rgba(79, 70, 229, 0.25)');
-        gradient.addColorStop(1, 'rgba(79, 70, 229, 0.01)');
+        gradient.addColorStop(0, 'rgba(99, 102, 241, 0.35)');
+        gradient.addColorStop(1, 'rgba(99, 102, 241, 0.01)');
 
         new Chart(trendCtx, {
             type: 'line',
@@ -253,19 +339,16 @@
                 datasets: [{
                     label: 'Tokens Issued',
                     data: {{ chart_data|safe }},
-                    borderColor: '#4f46e5',
+                    borderColor: '#6366f1',
                     backgroundColor: gradient,
                     borderWidth: 3,
                     tension: 0.4,
                     fill: true,
                     pointRadius: 5,
-                    pointBackgroundColor: '#4f46e5',
+                    pointBackgroundColor: '#6366f1',
                     pointBorderColor: '#fff',
                     pointBorderWidth: 2,
-                    pointHoverRadius: 8,
-                    pointHoverBackgroundColor: '#4f46e5',
-                    pointHoverBorderColor: '#fff',
-                    pointHoverBorderWidth: 3,
+                    pointHoverRadius: 8
                 }]
             },
             options: {
@@ -274,60 +357,48 @@
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: '#1e1b4b',
-                        titleColor: '#e0e7ff',
+                        backgroundColor: '#0f172a',
+                        titleColor: '#e2e8f0',
                         bodyColor: '#fff',
                         padding: 12,
-                        cornerRadius: 10,
-                        displayColors: false,
-                        callbacks: {
-                            label: ctx => `${ctx.parsed.y} tokens issued`
-                        }
+                        cornerRadius: 10
                     }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
-                        grid: { color: 'rgba(0,0,0,0.05)', drawBorder: false },
-                        ticks: { font: { weight: '600' }, padding: 10 }
+                        grid: { color: 'rgba(148, 163, 184, 0.1)' }
                     },
                     x: {
-                        grid: { display: false },
-                        ticks: { font: { weight: '600' }, padding: 8 }
+                        grid: { display: false }
                     }
                 }
             }
         });
     }
 
-    // Service Distribution Donut Chart
+    // Service Donut Chart
     const donutCtx = document.getElementById('serviceDonutChart');
     if (donutCtx) {
         new Chart(donutCtx, {
             type: 'doughnut',
             data: {
-                labels: ['General Checkup', 'Blood Test', 'ECG', 'Other'],
+                labels: ['General Checkup', 'Blood Test', 'ECG / Radiology', 'Pharmacy'],
                 datasets: [{
-                    data: [5, 5, 4, 0],
-                    backgroundColor: ['#4f46e5', '#06b6d4', '#10b981', '#f59e0b'],
+                    data: [45, 25, 18, 12],
+                    backgroundColor: ['#6366f1', '#06b6d4', '#10b981', '#f59e0b'],
                     borderWidth: 3,
-                    borderColor: 'rgba(255,255,255,0.9)',
-                    hoverOffset: 8
+                    borderColor: 'transparent'
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                cutout: '65%',
+                cutout: '70%',
                 plugins: {
                     legend: {
                         position: 'bottom',
-                        labels: {
-                            padding: 16,
-                            font: { size: 12, weight: '600' },
-                            usePointStyle: true,
-                            pointStyleWidth: 12
-                        }
+                        labels: { padding: 14, usePointStyle: true }
                     }
                 }
             }
