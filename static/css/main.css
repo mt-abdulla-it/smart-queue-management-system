@@ -3392,3 +3392,14 @@ a:hover {
     100% { box-shadow: 0 0 25px rgba(16, 185, 129, 0.5); }
 }
 
+/* ---------- Custom premium spacing helpers ---------- */
+.layout-gap-y {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.layout-padding-x {
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
