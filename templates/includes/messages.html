@@ -1,27 +1,31 @@
 <!-- ========== Flash Messages (Toast Notification System) ========== -->
 {% if messages %}
+{% load core_tags %}
+<div id="djangoMessages" style="display:none;"
+     data-messages='[{% for message in messages %}{"text":"{{ message|escapejs }}","type":"{% if message.tags == "error" or message.tags == "danger" %}error{% elif message.tags == "success" %}success{% elif message.tags == "warning" %}warning{% else %}info{% endif %}"}{% if not forloop.last %},{% endif %}{% endfor %}]'>
+</div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const toastContainer = document.getElementById('toastContainer');
-    if (!toastContainer) return;
+    var container = document.getElementById('toastContainer');
+    var dataEl = document.getElementById('djangoMessages');
+    if (!container || !dataEl) return;
 
-    const messages = [
-        {% for message in messages %}
-        {
-            text: "{{ message|escapejs }}",
-            type: "{% if message.tags == 'error' or message.tags == 'danger' %}error{% elif message.tags == 'success' %}success{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}"
-        }{% if not forloop.last %},{% endif %}
-        {% endfor %}
-    ];
+    var messages = [];
+    try {
+        messages = JSON.parse(dataEl.getAttribute('data-messages'));
+    } catch(e) {
+        return;
+    }
+    dataEl.remove();
 
-    const iconMap = {
+    var iconMap = {
         success: 'fa-check-circle',
         error: 'fa-exclamation-circle',
         warning: 'fa-exclamation-triangle',
         info: 'fa-info-circle'
     };
 
-    const titleMap = {
+    var titleMap = {
         success: 'Success',
         error: 'Error',
         warning: 'Warning',
@@ -30,31 +34,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
     messages.forEach(function(msg, index) {
         setTimeout(function() {
-            const toast = document.createElement('div');
+            var toast = document.createElement('div');
             toast.className = 'toast-notification toast-' + msg.type;
-            toast.innerHTML = `
-                <div class="toast-icon">
-                    <i class="fas ${iconMap[msg.type]}"></i>
-                </div>
-                <div class="toast-body">
-                    <div class="toast-title">${titleMap[msg.type]}</div>
-                    <div class="toast-message">${msg.text}</div>
-                </div>
-                <button class="toast-close" onclick="this.parentElement.classList.add('toast-dismissing'); setTimeout(() => this.parentElement.remove(), 300);">
-                    <i class="fas fa-times"></i>
-                </button>
-                <div class="toast-timer"></div>
-            `;
-            toastContainer.appendChild(toast);
+            toast.innerHTML =
+                '<div class="toast-icon"><i class="fas ' + iconMap[msg.type] + '"></i></div>' +
+                '<div class="toast-body">' +
+                    '<div class="toast-title">' + titleMap[msg.type] + '</div>' +
+                    '<div class="toast-message">' + msg.text + '</div>' +
+                '</div>' +
+                '<button class="toast-close" aria-label="Close notification"><i class="fas fa-times"></i></button>' +
+                '<div class="toast-timer"></div>';
 
-            // Auto-dismiss after 5 seconds
+            toast.querySelector('.toast-close').addEventListener('click', function() {
+                toast.classList.add('toast-dismissing');
+                setTimeout(function() { toast.remove(); }, 300);
+            });
+
+            container.appendChild(toast);
+
             setTimeout(function() {
                 if (toast.parentElement) {
                     toast.classList.add('toast-dismissing');
                     setTimeout(function() { toast.remove(); }, 300);
                 }
             }, 5000);
-        }, index * 150); // Stagger each toast
+        }, index * 150);
     });
 });
 </script>
