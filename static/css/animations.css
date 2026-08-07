@@ -1,0 +1,582 @@
+/* =============================================================================
+   Smart Queue Management System — Animations Library
+   Comprehensive micro-animation collection for premium UI/UX.
+   All animations respect prefers-reduced-motion.
+   ============================================================================= */
+
+/* ---------- Respect Reduced Motion Preference ---------- */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* =============================================================================
+   ENTRANCE ANIMATIONS
+   ============================================================================= */
+
+/* Slide Up with Fade */
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Slide Down with Fade */
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-24px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Slide In from Right */
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* Slide In from Left */
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* Scale In (Pop) */
+@keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.85); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* Blur In */
+@keyframes blurIn {
+    from { opacity: 0; filter: blur(12px); transform: scale(0.95); }
+    to { opacity: 1; filter: blur(0); transform: scale(1); }
+}
+
+/* Bounce In */
+@keyframes bounceEnter {
+    0% { opacity: 0; transform: scale(0.3); }
+    50% { opacity: 1; transform: scale(1.05); }
+    70% { transform: scale(0.97); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* Fade In Down (for dropdowns, toasts) */
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* =============================================================================
+   EXIT ANIMATIONS
+   ============================================================================= */
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes slideOutUp {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-20px); }
+}
+
+@keyframes slideOutRight {
+    from { opacity: 1; transform: translateX(0); }
+    to { opacity: 0; transform: translateX(30px); }
+}
+
+@keyframes scaleOut {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.85); }
+}
+
+/* =============================================================================
+   DECORATIVE / AMBIENT ANIMATIONS
+   ============================================================================= */
+
+/* Morphing Blob (organic shapes for backgrounds) */
+@keyframes morphBlob {
+    0%, 100% {
+        border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+        transform: rotate(0deg);
+    }
+    25% {
+        border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+    }
+    50% {
+        border-radius: 50% 60% 30% 70% / 40% 50% 70% 60%;
+        transform: rotate(180deg);
+    }
+    75% {
+        border-radius: 60% 30% 50% 40% / 70% 40% 60% 30%;
+    }
+}
+
+/* Gradient Border Glow — for "Now Serving" cards */
+@keyframes borderGlow {
+    0%, 100% {
+        border-color: rgba(99, 102, 241, 0.5);
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.2), inset 0 0 20px rgba(99, 102, 241, 0.05);
+    }
+    33% {
+        border-color: rgba(6, 182, 212, 0.6);
+        box-shadow: 0 0 30px rgba(6, 182, 212, 0.3), inset 0 0 20px rgba(6, 182, 212, 0.05);
+    }
+    66% {
+        border-color: rgba(16, 185, 129, 0.5);
+        box-shadow: 0 0 25px rgba(16, 185, 129, 0.25), inset 0 0 20px rgba(16, 185, 129, 0.05);
+    }
+}
+
+/* Shimmer Wave (refined loading shimmer) */
+@keyframes shimmerWave {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* Rotating Gradient Ring */
+@keyframes rotateGradient {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Typewriter cursor blink */
+@keyframes cursorBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* Card Flip */
+@keyframes cardFlipIn {
+    from { opacity: 0; transform: perspective(600px) rotateY(-90deg); }
+    to { opacity: 1; transform: perspective(600px) rotateY(0deg); }
+}
+
+/* Number Count Up visual pulse */
+@keyframes countPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+}
+
+/* Confetti burst */
+@keyframes confettiDrop {
+    0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+    100% { opacity: 0; transform: translateY(120px) rotate(720deg); }
+}
+
+/* Shake (error feedback) */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+    20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+/* Gentle Breathing / Ambient Pulse */
+@keyframes breathe {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.03); }
+}
+
+/* Toast slide in from top-right */
+@keyframes toastSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%) translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) translateY(0);
+    }
+}
+
+@keyframes toastSlideOut {
+    from {
+        opacity: 1;
+        transform: translateX(0) translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%) translateY(-10px);
+    }
+}
+
+/* Toast auto-dismiss timer bar */
+@keyframes toastTimer {
+    from { width: 100%; }
+    to { width: 0%; }
+}
+
+/* Ripple expand */
+@keyframes rippleExpand {
+    from {
+        transform: scale(0);
+        opacity: 0.6;
+    }
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Magnetic hover wobble */
+@keyframes magneticWobble {
+    0%, 100% { transform: translateY(0); }
+    25% { transform: translateY(-2px) rotate(-0.5deg); }
+    75% { transform: translateY(-1px) rotate(0.5deg); }
+}
+
+/* Progress ring rotation */
+@keyframes progressRingSpin {
+    from { stroke-dashoffset: 283; }
+    to { stroke-dashoffset: 0; }
+}
+
+/* Skeleton wave */
+@keyframes skeletonWave {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* Status dot pulse (for live indicators) */
+@keyframes statusPulse {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+    70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* =============================================================================
+   UTILITY CLASSES
+   ============================================================================= */
+
+/* Entrance Animations */
+.anim-slide-up {
+    animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    opacity: 0;
+}
+
+.anim-slide-down {
+    animation: slideDown 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    opacity: 0;
+}
+
+.anim-slide-right {
+    animation: slideInRight 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    opacity: 0;
+}
+
+.anim-slide-left {
+    animation: slideInLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    opacity: 0;
+}
+
+.anim-scale-in {
+    animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    opacity: 0;
+}
+
+.anim-blur-in {
+    animation: blurIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    opacity: 0;
+}
+
+.anim-bounce-in {
+    animation: bounceEnter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    opacity: 0;
+}
+
+.anim-card-flip {
+    animation: cardFlipIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    opacity: 0;
+}
+
+/* Exit Animations */
+.anim-fade-out {
+    animation: fadeOut 0.3s ease forwards;
+}
+
+.anim-slide-out-up {
+    animation: slideOutUp 0.3s ease forwards;
+}
+
+.anim-slide-out-right {
+    animation: slideOutRight 0.3s ease forwards;
+}
+
+/* Ambient / Continuous */
+.anim-border-glow {
+    animation: borderGlow 4s ease-in-out infinite;
+}
+
+.anim-morph-blob {
+    animation: morphBlob 12s ease-in-out infinite;
+}
+
+.anim-breathe {
+    animation: breathe 4s ease-in-out infinite;
+}
+
+.anim-shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+.anim-count-pulse {
+    animation: countPulse 0.4s ease-in-out;
+}
+
+.anim-magnetic {
+    animation: magneticWobble 2s ease-in-out infinite;
+}
+
+/* Stagger Delay Utilities (extends base stagger system) */
+.anim-delay-1 { animation-delay: 0.05s; }
+.anim-delay-2 { animation-delay: 0.1s; }
+.anim-delay-3 { animation-delay: 0.15s; }
+.anim-delay-4 { animation-delay: 0.2s; }
+.anim-delay-5 { animation-delay: 0.25s; }
+.anim-delay-6 { animation-delay: 0.3s; }
+.anim-delay-7 { animation-delay: 0.35s; }
+.anim-delay-8 { animation-delay: 0.4s; }
+.anim-delay-9 { animation-delay: 0.45s; }
+.anim-delay-10 { animation-delay: 0.5s; }
+
+/* =============================================================================
+   TOAST NOTIFICATION SYSTEM
+   ============================================================================= */
+
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+    max-width: 400px;
+    width: 100%;
+}
+
+.toast-notification {
+    pointer-events: auto;
+    background: rgba(30, 41, 59, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 16px 20px;
+    color: #f8fafc;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    animation: toastSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    position: relative;
+    overflow: hidden;
+}
+
+[data-bs-theme="light"] .toast-notification {
+    background: rgba(255, 255, 255, 0.95);
+    color: #1e293b;
+    border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+.toast-notification.toast-dismissing {
+    animation: toastSlideOut 0.3s ease forwards;
+}
+
+.toast-notification .toast-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.toast-notification.toast-success .toast-icon {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.toast-notification.toast-error .toast-icon {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+.toast-notification.toast-warning .toast-icon {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+}
+
+.toast-notification.toast-info .toast-icon {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+}
+
+.toast-notification .toast-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.toast-notification .toast-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin-bottom: 2px;
+    line-height: 1.3;
+}
+
+.toast-notification .toast-message {
+    font-size: 0.8rem;
+    opacity: 0.75;
+    line-height: 1.4;
+}
+
+.toast-notification .toast-close {
+    background: none;
+    border: none;
+    color: inherit;
+    opacity: 0.4;
+    cursor: pointer;
+    padding: 4px;
+    font-size: 0.85rem;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+}
+
+.toast-notification .toast-close:hover {
+    opacity: 1;
+}
+
+.toast-notification .toast-timer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    border-radius: 0 0 16px 16px;
+    animation: toastTimer 5s linear forwards;
+}
+
+.toast-success .toast-timer { background: #10b981; }
+.toast-error .toast-timer { background: #ef4444; }
+.toast-warning .toast-timer { background: #f59e0b; }
+.toast-info .toast-timer { background: #3b82f6; }
+
+/* =============================================================================
+   SKELETON LOADING SYSTEM
+   ============================================================================= */
+
+.skeleton-card {
+    background: var(--bg-card, #ffffff);
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid var(--border-color, #e2e8f0);
+}
+
+.skeleton-line {
+    height: 12px;
+    border-radius: 6px;
+    background: linear-gradient(
+        90deg,
+        rgba(148, 163, 184, 0.1) 25%,
+        rgba(148, 163, 184, 0.2) 37%,
+        rgba(148, 163, 184, 0.1) 63%
+    );
+    background-size: 400% 100%;
+    animation: skeletonWave 1.8s ease-in-out infinite;
+}
+
+.skeleton-line.w-75 { width: 75%; }
+.skeleton-line.w-50 { width: 50%; }
+.skeleton-line.w-25 { width: 25%; }
+.skeleton-line.w-100 { width: 100%; }
+
+.skeleton-circle {
+    border-radius: 50%;
+    background: linear-gradient(
+        90deg,
+        rgba(148, 163, 184, 0.1) 25%,
+        rgba(148, 163, 184, 0.2) 37%,
+        rgba(148, 163, 184, 0.1) 63%
+    );
+    background-size: 400% 100%;
+    animation: skeletonWave 1.8s ease-in-out infinite;
+}
+
+.skeleton-rect {
+    border-radius: 10px;
+    background: linear-gradient(
+        90deg,
+        rgba(148, 163, 184, 0.1) 25%,
+        rgba(148, 163, 184, 0.2) 37%,
+        rgba(148, 163, 184, 0.1) 63%
+    );
+    background-size: 400% 100%;
+    animation: skeletonWave 1.8s ease-in-out infinite;
+}
+
+/* =============================================================================
+   CONFETTI SYSTEM (for booking success)
+   ============================================================================= */
+
+.confetti-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+}
+
+.confetti-piece {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: -10px;
+    animation: confettiDrop 1.5s ease-in forwards;
+    opacity: 0.9;
+}
+
+.confetti-piece:nth-child(odd) { border-radius: 50%; }
+.confetti-piece:nth-child(even) { border-radius: 2px; }
+
+/* =============================================================================
+   PROGRESS RING SVG ANIMATION
+   ============================================================================= */
+
+.progress-ring-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress-ring-svg {
+    transform: rotate(-90deg);
+}
+
+.progress-ring-circle-bg {
+    fill: none;
+    stroke: rgba(148, 163, 184, 0.15);
+}
+
+.progress-ring-circle {
+    fill: none;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progress-ring-text {
+    position: absolute;
+    text-align: center;
+    font-weight: 800;
+    line-height: 1;
+}
