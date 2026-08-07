@@ -1,17 +1,19 @@
-<!-- ========== Pagination Controls ========== -->
+<!-- ========== Pagination Controls (v2.0 Pill Style) ========== -->
 {% if page_obj.has_other_pages %}
-<nav aria-label="Page navigation" class="mt-4">
-    <ul class="pagination justify-content-center">
-        <!-- Previous -->
+<nav aria-label="Page navigation" class="mt-4 mb-2">
+    <ul class="pagination justify-content-center gap-1">
+        <!-- Previous Page -->
         {% if page_obj.has_previous %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
-                    <i class="fas fa-chevron-left"></i>
+                <a class="page-link rounded-circle d-flex align-items-center justify-content-center border-0 shadow-sm" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous" style="width: 38px; height: 38px;">
+                    <i class="fas fa-chevron-left small"></i>
                 </a>
             </li>
         {% else %}
-            <li class="page-item disabled">
-                <span class="page-link"><i class="fas fa-chevron-left"></i></span>
+            <li class="page-item disabled opacity-50">
+                <span class="page-link rounded-circle d-flex align-items-center justify-content-center border-0" style="width: 38px; height: 38px;">
+                    <i class="fas fa-chevron-left small"></i>
+                </span>
             </li>
         {% endif %}
 
@@ -19,38 +21,40 @@
         {% for num in page_obj.paginator.page_range %}
             {% if page_obj.number == num %}
                 <li class="page-item active">
-                    <span class="page-link">{{ num }}</span>
+                    <span class="page-link rounded-circle d-flex align-items-center justify-content-center border-0 shadow-md bg-gradient-primary text-white fw-bold" style="width: 38px; height: 38px;">{{ num }}</span>
                 </li>
             {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    <a class="page-link rounded-circle d-flex align-items-center justify-content-center border-0 shadow-sm fw-semibold" href="?page={{ num }}" style="width: 38px; height: 38px;">{{ num }}</a>
                 </li>
             {% elif num == 1 or num == page_obj.paginator.num_pages %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    <a class="page-link rounded-circle d-flex align-items-center justify-content-center border-0 shadow-sm fw-semibold" href="?page={{ num }}" style="width: 38px; height: 38px;">{{ num }}</a>
                 </li>
             {% elif num == page_obj.number|add:'-3' or num == page_obj.number|add:'3' %}
-                <li class="page-item disabled">
-                    <span class="page-link">...</span>
+                <li class="page-item disabled opacity-50">
+                    <span class="page-link rounded-circle d-flex align-items-center justify-content-center border-0" style="width: 38px; height: 38px;">...</span>
                 </li>
             {% endif %}
         {% endfor %}
 
-        <!-- Next -->
+        <!-- Next Page -->
         {% if page_obj.has_next %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
-                    <i class="fas fa-chevron-right"></i>
+                <a class="page-link rounded-circle d-flex align-items-center justify-content-center border-0 shadow-sm" href="?page={{ page_obj.next_page_number }}" aria-label="Next" style="width: 38px; height: 38px;">
+                    <i class="fas fa-chevron-right small"></i>
                 </a>
             </li>
         {% else %}
-            <li class="page-item disabled">
-                <span class="page-link"><i class="fas fa-chevron-right"></i></span>
+            <li class="page-item disabled opacity-50">
+                <span class="page-link rounded-circle d-flex align-items-center justify-content-center border-0" style="width: 38px; height: 38px;">
+                    <i class="fas fa-chevron-right small"></i>
+                </span>
             </li>
         {% endif %}
     </ul>
-    <p class="text-center text-muted small">
-        Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} results
+    <p class="text-center text-muted small mt-2 mb-0" style="font-size: 0.8rem;">
+        Showing <span class="fw-bold text-body">{{ page_obj.start_index }}</span> to <span class="fw-bold text-body">{{ page_obj.end_index }}</span> of <span class="fw-bold text-body">{{ page_obj.paginator.count }}</span> entries
     </p>
 </nav>
 {% endif %}
