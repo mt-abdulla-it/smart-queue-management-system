@@ -2,37 +2,62 @@
 {% load crispy_forms_tags %}
 
 {% block title %}My Profile — {{ site_name }}{% endblock %}
-{% block page_header %}My Profile{% endblock %}
+{% block page_header %}My Profile Settings{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center pb-0">
-                    <h5 class="fw-bold mb-0">Profile Information</h5>
+        <div class="col-lg-9 col-xl-8">
+            <!-- Profile Hero Header Card -->
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-4">
+                <div class="p-4 p-md-5 text-center text-white position-relative" style="background: var(--gradient-primary);">
+                    <div class="position-relative d-inline-block mb-3">
+                        {% if user.profile_image %}
+                            <img src="{{ user.profile_image.url }}" alt="{{ user.get_full_name }}" class="rounded-circle shadow-lg border border-4 border-white" style="width: 120px; height: 120px; object-fit: cover;">
+                        {% else %}
+                            <div class="avatar-initials rounded-circle mx-auto shadow-lg border border-4 border-white" style="width: 120px; height: 120px; font-size: 2.5rem; background: var(--gradient-accent);">
+                                {{ user.first_name.0 }}{{ user.last_name.0 }}
+                            </div>
+                        {% endif %}
+                        <span class="position-absolute bottom-0 end-0 bg-success border border-2 border-white rounded-circle p-2" title="Active Account"></span>
+                    </div>
+                    <h3 class="fw-extrabold mb-1">{{ user.get_full_name }}</h3>
+                    <p class="opacity-75 mb-3">{{ user.email }}</p>
+                    <span class="badge bg-white text-primary rounded-pill px-3 py-2 fw-bold text-uppercase shadow-sm">
+                        <i class="fas fa-user-shield me-1"></i> {{ user.get_role_display }}
+                    </span>
+                </div>
+
+                <!-- Account Quick Stats Bar -->
+                <div class="row g-0 border-top bg-body-tertiary text-center">
+                    <div class="col-4 py-3 border-end">
+                        <span class="text-muted small d-block">Role</span>
+                        <strong class="text-primary">{{ user.get_role_display }}</strong>
+                    </div>
+                    <div class="col-4 py-3 border-end">
+                        <span class="text-muted small d-block">Member Since</span>
+                        <strong>{{ user.date_joined|date:"M Y" }}</strong>
+                    </div>
+                    <div class="col-4 py-3">
+                        <span class="text-muted small d-block">Status</span>
+                        <strong class="text-success"><i class="fas fa-check-circle me-1"></i>Active</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Form Edit Card -->
+            <div class="card glass-card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-transparent border-bottom p-4">
+                    <h5 class="fw-bold mb-0"><i class="fas fa-user-cog text-primary me-2"></i>Edit Account Details</h5>
                 </div>
                 <div class="card-body p-4">
                     <form method="post" enctype="multipart/form-data" novalidate>
                         {% csrf_token %}
-                        <div class="row mb-4">
-                            <div class="col-md-3 text-center mb-3 mb-md-0">
-                                {% if user.profile_image %}
-                                    <img src="{{ user.profile_image.url }}" alt="Profile Image" class="img-fluid rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
-                                {% else %}
-                                    <div class="avatar-initials rounded-circle mx-auto mb-3" style="width: 120px; height: 120px; font-size: 2.5rem;">
-                                        {{ user.first_name.0 }}{{ user.last_name.0 }}
-                                    </div>
-                                {% endif %}
-                                <div class="badge bg-primary w-100">{{ user.get_role_display }}</div>
-                            </div>
-                            <div class="col-md-9">
-                                {{ form|crispy }}
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-end border-top pt-3">
-                            <button type="submit" class="btn btn-primary px-4">
-                                <i class="fas fa-save me-2"></i>Save Changes
+                        {{ form|crispy }}
+                        
+                        <div class="d-flex justify-content-end border-top pt-4 mt-3">
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm hover-lift btn-magnetic">
+                                <i class="fas fa-save me-2"></i>Save Profile Changes
                             </button>
                         </div>
                     </form>
