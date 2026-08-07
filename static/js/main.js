@@ -23,15 +23,38 @@
 document.addEventListener('DOMContentLoaded', function () {
     const sidebar = document.getElementById('sidebar');
     const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
-    const mainContent = document.getElementById('mainContent');
 
+    // Restore desktop sidebar collapsed state from localStorage
+    if (sidebar && window.innerWidth > 991) {
+        const isCollapsed = localStorage.getItem('sqms-sidebar-collapsed') === 'true';
+        if (isCollapsed) {
+            sidebar.classList.add('collapsed');
+        }
+    }
+
+    // Mobile menu toggle button
     if (sidebarToggle && sidebar) {
         sidebarToggle.addEventListener('click', function () {
-            sidebar.classList.toggle('show');
-            if (sidebarOverlay) {
-                sidebarOverlay.classList.toggle('show');
+            if (window.innerWidth <= 991) {
+                sidebar.classList.toggle('show');
+                if (sidebarOverlay) {
+                    sidebarOverlay.classList.toggle('show');
+                }
+            } else {
+                sidebar.classList.toggle('collapsed');
+                localStorage.setItem('sqms-sidebar-collapsed', sidebar.classList.contains('collapsed'));
             }
+        });
+    }
+
+    // Desktop collapse toggle button (in brand header)
+    if (sidebarCollapseBtn && sidebar) {
+        sidebarCollapseBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            sidebar.classList.toggle('collapsed');
+            localStorage.setItem('sqms-sidebar-collapsed', sidebar.classList.contains('collapsed'));
         });
     }
 
@@ -43,11 +66,23 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Close sidebar on window resize to desktop
+    // Close mobile sidebar on window resize to desktop
     window.addEventListener('resize', function () {
         if (window.innerWidth > 991) {
             if (sidebar) sidebar.classList.remove('show');
             if (sidebarOverlay) sidebarOverlay.classList.remove('show');
+        }
+    });
+
+    // Keyboard shortcut (Ctrl + K) for Command Palette
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            const cmdModal = document.getElementById('commandPaletteModal');
+            if (cmdModal && typeof bootstrap !== 'undefined') {
+                const bsModal = bootstrap.Modal.getInstance(cmdModal) || new bootstrap.Modal(cmdModal);
+                bsModal.toggle();
+            }
         }
     });
 });
