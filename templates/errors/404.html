@@ -1,14 +1,28 @@
 {% extends 'base.html' %}
-{% block title %}404 — Page Not Found{% endblock %}
+{% load static %}
+
+{% block title %}404 — Lost in Queue? | {{ site_name }}{% endblock %}
+
 {% block public_content %}
-<div class="d-flex align-items-center justify-content-center min-vh-100">
-    <div class="text-center">
-        <h1 class="display-1 fw-bold text-primary">404</h1>
-        <h3 class="mb-3">Page Not Found</h3>
-        <p class="text-muted mb-4">The page you're looking for doesn't exist or has been moved.</p>
-        <a href="/" class="btn btn-primary btn-lg">
-            <i class="fas fa-home me-2"></i>Go Home
-        </a>
+<div class="d-flex align-items-center justify-content-center min-vh-100 p-4" style="background: var(--bg-body);">
+    <div class="card glass-card border-0 shadow-2xl rounded-4 text-center p-4 p-md-5 anim-scale-in" style="max-width: 520px; width: 100%;">
+        <div class="mb-3">
+            <div class="rounded-circle p-4 bg-primary bg-opacity-10 text-primary d-inline-flex align-items-center justify-content-center anim-breathe mb-2" style="width: 100px; height: 100px;">
+                <i class="fas fa-compass fa-3x"></i>
+            </div>
+        </div>
+        <h1 class="display-1 fw-black text-primary mb-0" style="letter-spacing: -2px;">404</h1>
+        <h3 class="fw-bold mb-2">Lost in the Queue?</h3>
+        <p class="text-muted small mb-4">The page or ticket route you're looking for doesn't exist, was moved, or has expired.</p>
+        
+        <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
+            <a href="/" class="btn btn-primary rounded-pill px-4 py-2 fw-bold hover-lift shadow-sm btn-magnetic">
+                <i class="fas fa-home me-2"></i>Go to Homepage
+            </a>
+            <a href="{% url 'queues:book' %}" class="btn btn-outline-primary rounded-pill px-4 py-2 fw-bold hover-lift">
+                <i class="fas fa-ticket-alt me-2"></i>Book Queue Token
+            </a>
+        </div>
     </div>
 </div>
 {% endblock %}

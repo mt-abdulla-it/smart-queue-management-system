@@ -1,47 +1,65 @@
 {% extends 'base.html' %}
 
 {% block title %}User Feedback — {{ site_name }}{% endblock %}
-{% block page_header %}User Feedback{% endblock %}
+{% block page_header %}Customer Sentiment & Feedback Analysis{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h5 class="fw-bold mb-0">Recent Feedback</h5>
+    <div class="d-flex justify-content-between align-items-center mb-4 anim-slide-down">
+        <div>
+            <h4 class="fw-extrabold mb-1">User Feedback & Rating Analytics</h4>
+            <p class="text-muted mb-0 small">Review patient satisfaction ratings and qualitative service comments.</p>
+        </div>
     </div>
 
-    <div class="card border-0 shadow-sm">
+    <!-- Sentiment Cards Table -->
+    <div class="card glass-card border-0 shadow-lg rounded-4 overflow-hidden">
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
+                    <thead class="bg-body-tertiary">
                         <tr>
-                            <th class="ps-4">Date</th>
-                            <th>User</th>
-                            <th>Branch</th>
-                            <th>Rating</th>
-                            <th class="pe-4">Comments</th>
+                            <th class="ps-4 text-uppercase fs-7 text-muted tracking-wider">Date</th>
+                            <th class="text-uppercase fs-7 text-muted tracking-wider">User</th>
+                            <th class="text-uppercase fs-7 text-muted tracking-wider">Branch Facility</th>
+                            <th class="text-uppercase fs-7 text-muted tracking-wider">Rating & Sentiment</th>
+                            <th class="pe-4 text-uppercase fs-7 text-muted tracking-wider">Comments</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for item in feedbacks %}
-                        <tr>
-                            <td class="ps-4 text-muted">{{ item.created_at|date:"M d, Y" }}</td>
-                            <td class="fw-semibold">{{ item.user.get_full_name|default:"Anonymous" }}</td>
-                            <td>{{ item.branch.name }}</td>
+                        <tr class="{% if item.rating >= 4 %}table-success bg-opacity-10{% elif item.rating == 3 %}table-warning bg-opacity-10{% else %}table-danger bg-opacity-10{% endif %}">
+                            <td class="ps-4 text-muted small">{{ item.created_at|date:"M d, Y" }}</td>
+                            <td class="fw-bold">{{ item.user.get_full_name|default:"Anonymous Citizen" }}</td>
+                            <td><span class="badge bg-body-tertiary border text-body">{{ item.branch.name }}</span></td>
                             <td>
-                                {% for i in "12345"|make_list %}
-                                    {% if forloop.counter <= item.rating %}
-                                        <i class="fas fa-star text-warning"></i>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="text-warning fs-6">
+                                        {% for i in "12345"|make_list %}
+                                            {% if forloop.counter <= item.rating %}
+                                                <i class="fas fa-star text-warning"></i>
+                                            {% else %}
+                                                <i class="far fa-star text-muted opacity-30"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    {% if item.rating >= 4 %}
+                                        <span class="badge bg-success rounded-pill small"><i class="fas fa-smile me-1"></i>Positive</span>
+                                    {% elif item.rating == 3 %}
+                                        <span class="badge bg-warning text-dark rounded-pill small"><i class="fas fa-meh me-1"></i>Neutral</span>
                                     {% else %}
-                                        <i class="far fa-star text-muted opacity-50"></i>
+                                        <span class="badge bg-danger rounded-pill small"><i class="fas fa-frown me-1"></i>Negative</span>
                                     {% endif %}
-                                {% endfor %}
+                                </div>
                             </td>
-                            <td class="pe-4">{{ item.comments|truncatechars:50|default:"<span class='text-muted italic'>No comments</span>"|safe }}</td>
+                            <td class="pe-4">{{ item.comments|truncatechars:70|default:"<span class='text-muted fst-italic small'>No additional comments provided</span>"|safe }}</td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="5" class="text-center py-5 text-muted">No feedback received yet.</td>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="fas fa-comment-slash fa-2x opacity-25 mb-2 d-block"></i>
+                                No user feedback submitted yet.
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
