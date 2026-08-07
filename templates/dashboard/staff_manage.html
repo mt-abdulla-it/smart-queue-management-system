@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Queue Management — {{ site_name }}{% endblock %}
-{% block page_header %}Counter Queue Control Panel{% endblock %}
+{% block page_header %}Counter Control Center{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
@@ -39,7 +40,7 @@
                     </div>
                     <div>
                         <span class="text-muted small text-uppercase tracking-wider fw-bold">Waiting Queue</span>
-                        <h3 class="mb-0 fw-extrabold text-warning">{{ waiting_tokens.count }} People</h3>
+                        <h3 class="mb-0 fw-extrabold text-warning">{{ waiting_tokens.count }} Customers</h3>
                     </div>
                 </div>
             </div>
@@ -51,7 +52,7 @@
                         <i class="fas fa-desktop fa-2x"></i>
                     </div>
                     <div class="flex-grow-1">
-                        <span class="text-muted small text-uppercase tracking-wider fw-bold">Active Counter</span>
+                        <span class="text-muted small text-uppercase tracking-wider fw-bold">Active Counter Desk</span>
                         <select id="staffCounterSelect" class="form-select form-select-sm border-success rounded-3 fw-bold text-success mt-1 shadow-sm">
                             <option value="Counter 1">Counter 1</option>
                             <option value="Counter 2">Counter 2</option>
@@ -71,22 +72,29 @@
     </div>
 
     <div class="row g-4">
-        <!-- Now Serving -->
+        <!-- Now Serving Hero Card -->
         <div class="col-lg-5 col-xl-4 stagger-4">
-            <div class="counter-hero-card h-100 d-flex flex-column justify-content-between">
+            <div class="counter-hero-card h-100 d-flex flex-column justify-content-between anim-border-glow">
                 <div>
                     <div class="d-flex align-items-center justify-content-between mb-3">
                         <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-1 fw-bold text-uppercase">
-                            <i class="fas fa-bullhorn me-1"></i> Active Serving Token
+                            <i class="fas fa-bullhorn me-1"></i> Active Serving Ticket
                         </span>
-                        <span class="badge bg-success text-white rounded-pill px-3 py-1 fw-bold">Live</span>
+                        <span class="badge bg-success text-white rounded-pill px-3 py-1 fw-bold">
+                            <span class="live-pulse-dot bg-white me-1"></span>Live
+                        </span>
                     </div>
-                    
+
                     {% for token in serving_tokens %}
                     <div class="text-center py-3">
-                        <div class="counter-serving-number mb-2">{{ token.token_number }}</div>
-                        <h5 class="text-white-50 mb-4">{{ token.service.name }}</h5>
+                        <div class="counter-serving-number mb-2 anim-scale-in">{{ token.token_number }}</div>
+                        <h5 class="text-white-50 mb-2">{{ token.service.name }}</h5>
                         
+                        <!-- Serving Duration Counter -->
+                        <div class="badge bg-white bg-opacity-10 text-white rounded-pill px-3 py-2 mb-4">
+                            <i class="fas fa-stopwatch text-warning me-1"></i>Serving Time: <span id="servingTimer">00:00</span>
+                        </div>
+
                         <div class="d-grid gap-2">
                             <form method="post" action="{% url 'queues:change_status' token.pk 'complete' %}" id="completeForm">
                                 {% csrf_token %}
@@ -107,24 +115,24 @@
                     </div>
                     {% empty %}
                     <div class="text-center py-5">
-                        <div class="bg-white bg-opacity-10 rounded-circle p-4 d-inline-block mb-3">
+                        <div class="bg-white bg-opacity-10 rounded-circle p-4 d-inline-block mb-3 anim-breathe">
                             <i class="fas fa-coffee fa-3x text-white-50"></i>
                         </div>
                         <h5 class="fw-semibold text-white">No token currently active</h5>
-                        <p class="small text-white-50 mb-0">Press <span class="counter-hotkey-badge">Space</span> or click "Call Next" in the list below to serve your next customer.</p>
+                        <p class="small text-white-50 mb-0">Press <span class="counter-hotkey-badge">Space</span> or click "Call Next" in the list to call your next customer.</p>
                     </div>
                     {% endfor %}
                 </div>
             </div>
         </div>
 
-        <!-- Waiting List -->
+        <!-- Waiting List Table -->
         <div class="col-lg-7 col-xl-8 stagger-5">
             <div class="card glass-card border-0 shadow-lg rounded-4 overflow-hidden h-100">
                 <div class="card-header bg-transparent p-4 border-bottom d-flex justify-content-between align-items-center">
                     <div>
                         <h5 class="fw-bold mb-0"><i class="fas fa-users text-warning me-2"></i>Customer Queue List</h5>
-                        <small class="text-muted">Real-time ordered token list</small>
+                        <small class="text-muted">Real-time priority ordered customer list</small>
                     </div>
                     <span class="badge bg-warning bg-opacity-20 text-warning px-3 py-2 rounded-pill fw-bold border border-warning border-opacity-30">
                         {{ waiting_tokens.count }} Waiting
@@ -143,11 +151,14 @@
                             </thead>
                             <tbody>
                                 {% for token in waiting_tokens %}
-                                <tr class="hover-action-row">
+                                <tr class="hover-action-row {% if token.is_priority %}table-warning bg-warning bg-opacity-10{% endif %}">
                                     <td class="ps-4">
                                         <span class="badge bg-primary bg-opacity-10 text-primary fs-5 fw-bold px-3 py-2 rounded-3 border border-primary border-opacity-20">
                                             {{ token.token_number }}
                                         </span>
+                                        {% if token.is_priority %}
+                                            <span class="badge bg-warning text-dark ms-1" title="Priority Patient"><i class="fas fa-star me-1"></i>Priority</span>
+                                        {% endif %}
                                     </td>
                                     <td><span class="fw-semibold text-body">{{ token.service.name }}</span></td>
                                     <td>
@@ -177,7 +188,7 @@
                                 <tr>
                                     <td colspan="4" class="text-center py-5 text-muted">
                                         <i class="fas fa-check-circle fa-2x text-success mb-2 opacity-50"></i>
-                                        <p class="mb-0 fw-medium">All queues are clear! No customers currently waiting.</p>
+                                        <p class="mb-0 fw-medium">All queues clear! No customers currently waiting.</p>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -200,26 +211,20 @@
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="post" id="transferForm" action="">
+            <form id="transferForm" method="post" action="">
                 {% csrf_token %}
                 <div class="modal-body p-4">
+                    <p class="text-muted small mb-3">Re-assign this customer token to another service department or counter desk.</p>
                     <div class="mb-3">
-                        <label for="id_target_service" class="form-label fw-bold small text-muted text-uppercase">Destination Service</label>
-                        <select name="target_service" id="id_target_service" class="form-select rounded-3 py-2" required>
-                            <option value="">-- Select Destination Service --</option>
-                            {% for service in services %}
-                            <option value="{{ service.id }}">{{ service.name }} ({{ service.department.name }})</option>
-                            {% endfor %}
+                        <label for="targetServiceSelect" class="form-label fw-bold">Target Service</label>
+                        <select class="form-select rounded-3" id="targetServiceSelect" name="target_service_id" required>
+                            <option value="" disabled selected>Select destination service...</option>
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label for="id_notes" class="form-label fw-bold small text-muted text-uppercase">Reason / Notes (Optional)</label>
-                        <textarea name="notes" id="id_notes" class="form-control rounded-3" rows="2" placeholder="e.g., Referred for laboratory diagnosis"></textarea>
-                    </div>
                 </div>
-                <div class="modal-footer border-0 p-3 pt-0">
-                    <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-warning rounded-3 px-4 fw-bold"><i class="fas fa-paper-plane me-1"></i> Confirm Transfer</button>
+                <div class="modal-footer border-0 bg-body-tertiary">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning text-dark fw-bold rounded-pill px-4">Transfer Ticket</button>
                 </div>
             </form>
         </div>
@@ -229,87 +234,51 @@
 
 {% block extra_js %}
 <script>
-    // Counter Selection Persistence & Auto-attach to forms
-    const counterSelect = document.getElementById('staffCounterSelect');
-    if (counterSelect) {
-        const savedCounter = localStorage.getItem('sqms_staff_counter');
-        if (savedCounter) counterSelect.value = savedCounter;
-
-        counterSelect.addEventListener('change', function() {
-            localStorage.setItem('sqms_staff_counter', this.value);
-        });
+    // Live Serving Timer
+    let seconds = 0;
+    const timerEl = document.getElementById('servingTimer');
+    if (timerEl) {
+        setInterval(() => {
+            seconds++;
+            const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+            const s = String(seconds % 60).padStart(2, '0');
+            timerEl.innerText = `${m}:${s}`;
+        }, 1000);
     }
 
-    document.querySelectorAll('form.call-next-form, #completeForm, #holdForm').forEach(form => {
-        form.addEventListener('submit', function() {
-            const currentCounter = counterSelect ? counterSelect.value : 'Counter 1';
-            let hiddenInput = this.querySelector('input[name="counter_number"]');
-            if (!hiddenInput) {
-                hiddenInput = document.createElement('input');
-                hiddenInput.type = 'hidden';
-                hiddenInput.name = 'counter_number';
-                this.appendChild(hiddenInput);
-            }
-            hiddenInput.value = currentCounter;
-        });
-    });
-
     // Keyboard Hotkey Listener
-    document.addEventListener('keydown', function(event) {
-        // Skip if user is typing inside an input/textarea
-        if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
-
-        // Space bar calls next token
-        if (event.code === 'Space') {
-            event.preventDefault();
+    document.addEventListener('keydown', function(e) {
+        // Space to call next
+        if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT') {
+            e.preventDefault();
             const firstCallBtn = document.querySelector('.call-next-btn');
-            if (firstCallBtn) {
-                firstCallBtn.classList.add('active');
-                firstCallBtn.click();
-            }
+            if (firstCallBtn) firstCallBtn.click();
         }
-        // Alt + C completes token
-        if (event.altKey && event.key.toLowerCase() === 'c') {
-            event.preventDefault();
+        // Alt + C to complete
+        if (e.altKey && (e.key === 'c' || e.key === 'C')) {
+            e.preventDefault();
             const completeForm = document.getElementById('completeForm');
             if (completeForm) completeForm.submit();
         }
-        // Alt + H puts token on hold
-        if (event.altKey && event.key.toLowerCase() === 'h') {
-            event.preventDefault();
+        // Alt + H to hold
+        if (e.altKey && (e.key === 'h' || e.key === 'H')) {
+            e.preventDefault();
             const holdForm = document.getElementById('holdForm');
             if (holdForm) holdForm.submit();
         }
-        // Alt + R recalls token
-        if (event.altKey && event.key.toLowerCase() === 'r') {
-            event.preventDefault();
-            const recallBtn = document.querySelector('.recall-token-btn');
-            if (recallBtn) recallBtn.click();
-        }
-        // Alt + S skips token
-        if (event.altKey && event.key.toLowerCase() === 's') {
-            event.preventDefault();
-            const skipForm = document.querySelector('.skip-form');
-            if (skipForm) skipForm.submit();
-        }
     });
 
-    // Transfer Modal dynamic action URL setup
+    // Transfer Modal Event Populate
     const transferModal = document.getElementById('transferModal');
     if (transferModal) {
-        transferModal.addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget;
-            if (button) {
-                const tokenId = button.getAttribute('data-token-id');
-                const tokenNumber = button.getAttribute('data-token-number');
-                
-                document.getElementById('transferTokenNumberDisplay').textContent = tokenNumber;
-                document.getElementById('transferForm').action = `/queues/token/${tokenId}/transfer/`;
-            }
+        transferModal.addEventListener('show.bs.modal', function(e) {
+            const btn = e.relatedTarget;
+            const tokenId = btn.getAttribute('data-token-id');
+            const tokenNum = btn.getAttribute('data-token-number');
+            document.getElementById('transferTokenNumberDisplay').innerText = tokenNum || '';
+            const form = document.getElementById('transferForm');
+            if (form) form.action = `/queues/tokens/${tokenId}/transfer/`;
         });
     }
 </script>
 {% endblock %}
-
-
-
