@@ -293,7 +293,34 @@ body {
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background-color var(--duration-normal) var(--ease-out),
+                border-color var(--duration-normal) var(--ease-out),
+                color var(--duration-normal) var(--ease-out);
 }
+
+/* Smooth Global Theme & Surface Transitions */
+.card, .glass-card, .top-navbar, .sidebar, .modal-content, .dropdown-menu {
+    transition: background-color var(--duration-normal) var(--ease-out),
+                border-color var(--duration-normal) var(--ease-out),
+                color var(--duration-normal) var(--ease-out),
+                box-shadow var(--duration-normal) var(--ease-out),
+                transform var(--duration-normal) var(--ease-out);
+}
+
+/* Form Control Focus Micro-Interactions */
+.form-control, .form-select {
+    transition: background-color var(--duration-normal) var(--ease-out),
+                border-color var(--duration-normal) var(--ease-out),
+                color var(--duration-normal) var(--ease-out),
+                box-shadow var(--duration-normal) var(--ease-out),
+                transform var(--duration-fast) var(--ease-out);
+}
+
+.form-control:focus, .form-select:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(var(--primary-rgb), 0.15), 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+}
+
 
 h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
