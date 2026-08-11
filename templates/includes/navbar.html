@@ -37,6 +37,19 @@
             <span class="small text-muted fw-medium ms-1" style="font-size: 0.72rem;">Live</span>
         </div>
 
+        <!-- Language Selector (i18n) -->
+        <div class="dropdown me-1">
+            <button class="btn btn-sm btn-outline-secondary dropdown-toggle rounded-pill px-2 py-1 small d-flex align-items-center gap-1 border-opacity-25" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Change Language">
+                <i class="fas fa-globe text-primary"></i>
+                <span class="small fw-semibold">EN</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" aria-labelledby="languageDropdown" style="font-size: 0.85rem;">
+                <li><a class="dropdown-item fw-semibold active" href="?lang=en">🇬🇧 English</a></li>
+                <li><a class="dropdown-item fw-semibold" href="?lang=si">🇱🇰 සිංහල (Sinhala)</a></li>
+                <li><a class="dropdown-item fw-semibold" href="?lang=ta">🇱🇰 தமிழ் (Tamil)</a></li>
+            </ul>
+        </div>
+
         <!-- Dark Mode Toggle -->
         <button class="btn btn-link nav-icon position-relative p-2" id="darkModeToggle" title="Toggle dark mode" aria-label="Toggle light or dark theme">
             <i class="fas fa-moon fs-5" id="darkModeIcon"></i>
