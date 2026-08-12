@@ -4,12 +4,16 @@ Handles Excel and PDF report generation for Queue Tokens.
 """
 from typing import Any
 import io
+import json
 import openpyxl
 from datetime import datetime
 
+from django.db.models import Count
 from django.http import HttpResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.utils import timezone
 from django.views import View
+from django.views.generic import TemplateView
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
