@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Analytics & Reporting — {{ site_name }}{% endblock %}
+{% block page_header %}Analytics & Performance Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Top Action & Export Bar -->
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+        <div>
+            <h4 class="fw-bold mb-1"><i class="fas fa-chart-line text-primary me-2"></i>Queue System Metrics</h4>
+            <p class="text-muted small mb-0">Live statistics and traffic trends across all active counters & services.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a href="{% url 'reports:export_excel' %}" class="btn btn-outline-success rounded-pill px-3 shadow-sm">
+                <i class="fas fa-file-excel me-1"></i> Export Excel
+            </a>
+            <a href="{% url 'reports:export_pdf' %}" class="btn btn-outline-danger rounded-pill px-3 shadow-sm">
+                <i class="fas fa-file-pdf me-1"></i> Export PDF Report
+            </a>
+        </div>
+    </div>
+
+    <!-- Executive KPI Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 stagger-1">
+            <div class="card glass-card border-0 rounded-4 p-3 shadow-sm h-100">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="stat-icon bg-primary bg-opacity-10 text-primary rounded-3 p-3">
+                        <i class="fas fa-ticket-alt fa-2x"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted small text-uppercase tracking-wider fw-bold">Total Tokens</span>
+                        <h3 class="mb-0 fw-extrabold text-primary">{{ total_tokens }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 stagger-2">
+            <div class="card glass-card border-0 rounded-4 p-3 shadow-sm h-100">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="stat-icon bg-info bg-opacity-10 text-info rounded-3 p-3">
+                        <i class="fas fa-calendar-day fa-2x"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted small text-uppercase tracking-wider fw-bold">Issued Today</span>
+                        <h3 class="mb-0 fw-extrabold text-info">{{ today_tokens }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 stagger-3">
+            <div class="card glass-card border-0 rounded-4 p-3 shadow-sm h-100">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="stat-icon bg-success bg-opacity-10 text-success rounded-3 p-3">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted small text-uppercase tracking-wider fw-bold">Completed</span>
+                        <h3 class="mb-0 fw-extrabold text-success">{{ completed_tokens }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 stagger-4">
+            <div class="card glass-card border-0 rounded-4 p-3 shadow-sm h-100">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="stat-icon bg-warning bg-opacity-10 text-warning rounded-3 p-3">
+                        <i class="fas fa-percentage fa-2x"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted small text-uppercase tracking-wider fw-bold">Completion Rate</span>
+                        <h3 class="mb-0 fw-extrabold text-warning">{{ completion_rate }}%</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row g-4 mb-4">
+        <!-- Peak Queueing Hours Chart -->
+        <div class="col-lg-8">
+            <div class="card glass-card border-0 rounded-4 p-4 shadow-sm h-100">
+                <h5 class="fw-bold mb-3"><i class="fas fa-clock text-info me-2"></i>Peak Queueing Hours (Today)</h5>
+                <div style="height: 300px;">
+                    <canvas id="hourlyChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Token Status Breakdown Chart -->
+        <div class="col-lg-4">
+            <div class="card glass-card border-0 rounded-4 p-4 shadow-sm h-100">
+                <h5 class="fw-bold mb-3"><i class="fas fa-chart-pie text-primary me-2"></i>Token Status Distribution</h5>
+                <div style="height: 300px;" class="d-flex align-items-center justify-content-center">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Services Load Bar -->
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="card glass-card border-0 rounded-4 p-4 shadow-sm">
+                <h5 class="fw-bold mb-3"><i class="fas fa-concierge-bell text-success me-2"></i>Top Services Volume Breakdown</h5>
+                <div style="height: 250px;">
+                    <canvas id="serviceChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const statusData = JSON.parse('{{ status_json|escapejs }}');
+    const hourlyData = JSON.parse('{{ hourly_json|escapejs }}');
+    const serviceLabels = JSON.parse('{{ service_labels_json|escapejs }}');
+    const serviceValues = JSON.parse('{{ service_values_json|escapejs }}');
+
+    // 1. Hourly Traffic Chart
+    const hourlyCtx = document.getElementById('hourlyChart').getContext('2d');
+    new Chart(hourlyCtx, {
+        type: 'line',
+        data: {
+            labels: Array.from({length: 24}, (_, i) => `${i}:00`),
+            datasets: [{
+                label: 'Tokens Issued',
+                data: hourlyData,
+                borderColor: '#0284c7',
+                backgroundColor: 'rgba(2, 132, 199, 0.15)',
+                fill: true,
+                tension: 0.4,
+                borderWidth: 3,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1 } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // 2. Token Status Doughnut Chart
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    const statusLabels = Object.keys(statusData);
+    const statusValues = Object.values(statusData);
+    new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: statusLabels,
+            datasets: [{
+                data: statusValues,
+                backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+
+    // 3. Top Services Horizontal Bar
+    const serviceCtx = document.getElementById('serviceChart').getContext('2d');
+    new Chart(serviceCtx, {
+        type: 'bar',
+        data: {
+            labels: serviceLabels.length ? serviceLabels : ['No Service Data'],
+            datasets: [{
+                label: 'Total Tickets',
+                data: serviceValues.length ? serviceValues : [0],
+                backgroundColor: '#10b981',
+                borderRadius: 8
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { beginAtZero: true, ticks: { stepSize: 1 } },
+                y: { grid: { display: false } }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
