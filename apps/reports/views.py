@@ -97,3 +97,46 @@ class ExportPDFView(RoleRequiredMixin, View):
         response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="SQMS_Report_{datetime.now().strftime("%Y%m%d")}.pdf"'
         return response
+
+
+class AnalyticsDashboardView(RoleRequiredMixin, TemplateView):
+    allowed_roles = ['ADMIN', 'STAFF']
+    template_name = 'reports/analytics.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        today = timezone.now().date()
+        
+        # Summary metrics
+        total_tokens = QueueToken.objects.count()
+        today_tokens = QueueToken.objects.filter(created_at__date=today).count()
+        completed_tokens = QueueToken.objects.filter(status='COMPLETED').count()
+        completion_rate = round((completed_tokens / total_tokens * 100), 1) if total_tokens > 0 else 0
+        
+        # Tokens by status
+        status_counts = QueueToken.objects.values('status').annotate(count=Count('id'))
+        status_data = {item['status']: item['count'] for item in status_counts}
+        
+        # Hourly volume (Today)
+        hourly_data = [0] * 24
+        today_tokens_qs = QueueToken.objects.filter(created_at__date=today)
+        for token in today_tokens_qs:
+            hourly_data[token.created_at.hour] += 1
+
+        # Tokens per service
+        service_counts = QueueToken.objects.values('service__name').annotate(count=Count('id')).order_by('-count')[:5]
+        service_labels = [item['service__name'] for item in service_counts]
+        service_values = [item['count'] for item in service_counts]
+
+        context.update({
+            'total_tokens': total_tokens,
+            'today_tokens': today_tokens,
+            'completed_tokens': completed_tokens,
+            'completion_rate': completion_rate,
+            'status_json': json.dumps(status_data),
+            'hourly_json': json.dumps(hourly_data),
+            'service_labels_json': json.dumps(service_labels),
+            'service_values_json': json.dumps(service_values),
+        })
+        return context
+
