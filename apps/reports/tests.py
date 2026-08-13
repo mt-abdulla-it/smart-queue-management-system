@@ -1,8 +1,10 @@
+from typing import Any
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
-from apps.queues.models import Branch, Department, Service, QueueToken
+from apps.branches.models import Branch, Department, Service
+from apps.queues.models import QueueToken
 
 User = get_user_model()
 
@@ -32,7 +34,8 @@ class ReportsExportTestCase(TestCase):
 
     def test_export_csv_view_authenticated(self):
         self.client.login(username='admin_report', password='password123')
-        response = self.client.get(reverse('reports:export_csv'))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['Content-Type'], 'text/csv')
+        response: Any = self.client.get(reverse('reports:export_csv'))
+        self.assertEqual(getattr(response, 'status_code', None), 200)
+        self.assertEqual(response.headers.get('Content-Type'), 'text/csv')
         self.assertIn('GI-101', response.content.decode('utf-8'))
+
