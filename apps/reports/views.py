@@ -6,6 +6,7 @@ from typing import Any
 import io
 import json
 import openpyxl
+import csv
 from datetime import datetime
 
 from django.db.models import Count
@@ -21,6 +22,38 @@ from reportlab.lib.styles import getSampleStyleSheet
 
 from apps.core.mixins import RoleRequiredMixin
 from apps.queues.models import QueueToken
+
+
+class ExportCSVView(RoleRequiredMixin, View):
+    allowed_roles = ['ADMIN', 'STAFF']
+
+    def get(self, request, *args, **kwargs):
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="SQMS_Tokens_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow(['Token Number', 'User Name', 'Branch', 'Service', 'Priority Weight', 'Status', 'Date Issued'])
+
+        tokens = QueueToken.objects.all().select_related('user', 'service__department__branch').order_by('-created_at')
+
+        for token in tokens:
+            user_name = token.user.get_full_name() if token.user else "Walk-in"
+            branch_name = token.service.department.branch.name if token.service and token.service.department and token.service.department.branch else "N/A"
+            service_name = token.service.name if token.service else "N/A"
+            priority_weight = getattr(token, 'priority_weight', 0)
+
+            writer.writerow([
+                token.token_number,
+                user_name,
+                branch_name,
+                service_name,
+                priority_weight,
+                token.status,
+                token.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            ])
+
+        return response
+
 
 class ExportExcelView(RoleRequiredMixin, View):
     allowed_roles = ['ADMIN']
