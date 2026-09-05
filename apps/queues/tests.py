@@ -361,26 +361,26 @@ class TokenScannerAndVerificationTestCase(TestCase):
     def test_scanner_view_access_control(self):
         # Regular user should be redirected/denied
         self.client.login(email='user@example.com', password='Password123!')
-        response = self.client.get(reverse('queues:scan_token'))
+        response: Any = self.client.get(reverse('queues:scan_token'))
         self.assertEqual(response.status_code, 302)
 
         # Staff user should get 200 OK
         self.client.login(email='staff@example.com', password='Password123!')
-        response = self.client.get(reverse('queues:scan_token'))
+        response: Any = self.client.get(reverse('queues:scan_token'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Digital QR Code Token Scanner')
 
     def test_token_verification_api_valid_token(self):
         self.client.login(email='staff@example.com', password='Password123!')
         # Test verification by token_number
-        response = self.client.get(reverse('queues:api_verify_token'), {'query': 'GEN-001'})
+        response: Any = self.client.get(reverse('queues:api_verify_token'), {'query': 'GEN-001'})
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertTrue(data['success'])
         self.assertEqual(data['token']['token_number'], 'GEN-001')
 
         # Test verification by verification_code
-        response = self.client.get(reverse('queues:api_verify_token'), {'query': 'SCAN12345'})
+        response: Any = self.client.get(reverse('queues:api_verify_token'), {'query': 'SCAN12345'})
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertTrue(data['success'])
@@ -389,13 +389,13 @@ class TokenScannerAndVerificationTestCase(TestCase):
         self.client.login(email='staff@example.com', password='Password123!')
         
         # Action: checkin
-        response = self.client.post(reverse('queues:api_verify_token'), {'query': 'GEN-001', 'action': 'checkin'})
+        response: Any = self.client.post(reverse('queues:api_verify_token'), {'query': 'GEN-001', 'action': 'checkin'})
         self.assertEqual(response.status_code, 200)
         self.token.refresh_from_db()
         self.assertIn('arrival confirmed', self.token.notes)
 
         # Action: call
-        response = self.client.post(reverse('queues:api_verify_token'), {'query': 'GEN-001', 'action': 'call'})
+        response: Any = self.client.post(reverse('queues:api_verify_token'), {'query': 'GEN-001', 'action': 'call'})
         self.assertEqual(response.status_code, 200)
         self.token.refresh_from_db()
         self.assertEqual(self.token.status, 'CALLED')
@@ -406,8 +406,9 @@ class TokenScannerAndVerificationTestCase(TestCase):
 
     def test_token_verification_api_invalid_query(self):
         self.client.login(email='staff@example.com', password='Password123!')
-        response = self.client.get(reverse('queues:api_verify_token'), {'query': 'INVALID-999'})
+        response: Any = self.client.get(reverse('queues:api_verify_token'), {'query': 'INVALID-999'})
         self.assertEqual(response.status_code, 404)
         data = response.json()
         self.assertFalse(data['success'])
+
 

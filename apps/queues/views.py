@@ -5,7 +5,7 @@ Handles queue booking, status checking, and staff queue management.
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db import transaction
+from django.db import transaction, models
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
