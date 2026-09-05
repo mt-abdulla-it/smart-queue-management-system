@@ -29,9 +29,15 @@ urlpatterns = [
     # Kiosk View
     path('kiosk/', views.KioskView.as_view(), name='kiosk'),
     
+    # Scanner & Verification Views
+    path('scan/', views.StaffTokenScannerView.as_view(), name='scan_token'),
+    path('verify/<int:pk>/', views.TokenVerificationDetailView.as_view(), name='verify_token'),
+    
     # API endpoints
     path('api/waiting-list/', views.LiveWaitingListAPIView.as_view(), name='api_waiting_list'),
     path('api/token-status/<int:pk>/', views.TokenLiveStatusAPIView.as_view(), name='api_token_status'),
     path('api/kiosk-issue-token/', views.KioskCreateTokenAPIView.as_view(), name='api_kiosk_issue_token'),
     path('api/checkin/<int:pk>/', views.TokenArrivalCheckinAPIView.as_view(), name='api_arrival_checkin'),
+    path('api/verify-token/', views.TokenVerificationAPIView.as_view(), name='api_verify_token'),
 ]
+

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Verify Token {{ token.token_number }} — {{ site_name }}{% endblock %}
+{% block page_header %}Digital Token Verification{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card glass-card border-0 shadow-2xl overflow-hidden rounded-4">
+                <!-- Status Banner Header -->
+                <div class="p-4 text-center text-white {% if is_valid_today %}bg-gradient-to-r bg-primary{% else %}bg-gradient-to-r bg-danger{% endif %}">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge bg-white text-dark rounded-pill px-3 py-1 fw-bold">
+                            {% if is_valid_today %}<i class="fas fa-check-circle text-success me-1"></i> VALID TICKET{% else %}<i class="fas fa-exclamation-triangle text-danger me-1"></i> EXPIRED DATE{% endif %}
+                        </span>
+                        <span class="badge bg-black bg-opacity-30 text-white rounded-pill px-3 py-1 fw-bold">
+                            {{ token.get_status_display }}
+                        </span>
+                    </div>
+                    <h1 class="display-3 fw-extrabold mb-1 text-white">{{ token.token_number }}</h1>
+                    <p class="mb-0 text-white-50 small">{{ token.service.name }} • {{ token.service.department.branch.name }}</p>
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="row g-3 mb-4">
+                        <div class="col-6 border-end">
+                            <span class="text-muted small d-block">Customer</span>
+                            <strong class="text-foreground">{% if token.user.get_full_name %}{{ token.user.get_full_name }}{% else %}{{ token.user.username }}{% endif %}</strong>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-muted small d-block">Queue Date</span>
+                            <strong class="text-foreground">{{ token.queue_date }}</strong>
+                        </div>
+                        <div class="col-6 border-end">
+                            <span class="text-muted small d-block">Service Department</span>
+                            <span class="text-foreground fw-semibold">{{ token.service.department.name }}</span>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-muted small d-block">Assigned Desk / Counter</span>
+                            <span class="badge bg-info bg-opacity-20 text-info fw-bold">{{ token.counter_number|default:"Counter 1" }}</span>
+                        </div>
+                    </div>
+
+                    {% if token.qr_code %}
+                    <div class="text-center p-3 rounded-4 bg-surface border mb-4">
+                        <img src="{{ token.qr_code.url }}" alt="Token QR Code" class="img-fluid rounded shadow-sm" style="max-width: 180px;">
+                        <p class="text-muted small mt-2 mb-0">Official Security QR Code Badge</p>
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-between gap-2 pt-2 border-top">
+                        <a href="{% url 'queues:token_detail' token.pk %}" class="btn btn-outline-primary rounded-pill w-100 fw-semibold">
+                            <i class="fas fa-ticket-alt me-1"></i> View Full Pass
+                        </a>
+                        {% if user.role in 'ADMIN,STAFF' %}
+                        <a href="{% url 'queues:scan_token' %}" class="btn btn-primary rounded-pill w-100 fw-semibold">
+                            <i class="fas fa-qrcode me-1"></i> Open Scanner View
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

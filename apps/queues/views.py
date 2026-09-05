@@ -12,7 +12,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views import View
 from django.views.generic import CreateView, ListView, DetailView, TemplateView
-from apps.core.mixins import RoleRequiredMixin
+from apps.core.mixins import RoleRequiredMixin, StaffRequiredMixin
 from apps.branches.models import Department, Service
 
 from .models import QueueToken, QueueHistory
@@ -567,5 +567,255 @@ class TokenArrivalCheckinAPIView(View):
             notes="Patient confirmed arrival on mobile."
         )
         return JsonResponse({'success': True, 'message': 'Arrival checked in successfully!'})
+
+
+# ---------- QR SCANNER & TOKEN VERIFICATION VIEWS ---------- #
+
+class StaffTokenScannerView(StaffRequiredMixin, TemplateView):
+    """View for staff and admin users to scan and verify customer token QR codes."""
+    template_name = 'queues/scanner.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        today = timezone.now().date()
+        context['title'] = 'Digital QR Code Token Scanner'
+        context['today_date'] = today.strftime('%B %d, %Y')
+        context['today_scans_count'] = QueueHistory.objects.filter(
+            created_at__date=today,
+            action__in=[QueueHistory.Action.CALLED, QueueHistory.Action.SERVING, QueueHistory.Action.COMPLETED]
+        ).count()
+        return context
+
+
+class TokenVerificationAPIView(View):
+    """
+    API endpoint for verifying scanned QR codes or manually entered token numbers.
+    Supports performing immediate lifecycle actions (checkin, call, serve, complete, hold).
+    """
+
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def _resolve_token(self, query):
+        """Resolves target QueueToken from raw query string, URL, token number, or verification code."""
+        if not query:
+            return None
+            
+        query = str(query).strip()
+
+        # Handle full URL scanning e.g. .../queues/token/42/ or .../queues/verify/42/
+        if '/queues/token/' in query or '/queues/verify/' in query:
+            import re
+            match = re.search(r'/(?:token|verify)/(\d+)/?', query)
+            if match:
+                token_id = int(match.group(1))
+                token = QueueToken.objects.filter(pk=token_id).first()
+                if token:
+                    return token
+
+        # Numeric query lookup by ID
+        if query.isdigit():
+            token = QueueToken.objects.filter(pk=int(query)).first()
+            if token:
+                return token
+
+        # Search by token_number or verification_code for today or recent
+        today = timezone.now().date()
+        token = QueueToken.objects.filter(
+            models.Q(token_number__iexact=query) | models.Q(verification_code__iexact=query)
+        ).order_by('-created_at').first()
+
+        if token:
+            return token
+
+        # Fallback search by partial token_number
+        return QueueToken.objects.filter(
+            token_number__icontains=query
+        ).order_by('-created_at').first()
+
+    def get(self, request, *args, **kwargs):
+        query = request.GET.get('query') or request.GET.get('token_query') or request.GET.get('token_number')
+        return self._handle_verification(request, query)
+
+    def post(self, request, *args, **kwargs):
+        import json
+        query = request.POST.get('query') or request.POST.get('token_query') or request.POST.get('token_number')
+        
+        # Check JSON body if POST form-data is empty
+        if not query and request.body:
+            try:
+                data = json.loads(request.body)
+                query = data.get('query') or data.get('token_query') or data.get('token_number')
+                action = data.get('action')
+            except Exception:
+                action = None
+        else:
+            action = request.POST.get('action')
+
+        return self._handle_verification(request, query, action)
+
+    def _handle_verification(self, request, query, action=None):
+        if not query:
+            return JsonResponse({'success': False, 'error': 'No token query or QR payload provided.'}, status=400)
+
+        token = self._resolve_token(query)
+        if not token:
+            return JsonResponse({
+                'success': False,
+                'error': f'Token matching "{query}" was not found.'
+            }, status=404)
+
+        today = timezone.now().date()
+        is_valid_today = (token.queue_date == today)
+
+        # Execute requested action if provided
+        action_message = None
+        if action:
+            action = action.lower()
+            now = timezone.now()
+            user = request.user if request.user.is_authenticated else None
+
+            if action == 'checkin':
+                if "On-site arrival confirmed" not in token.notes:
+                    token.notes = f"{token.notes} | On-site arrival confirmed via QR Scanner.".strip(" |")
+                    token.save()
+                    QueueHistory.objects.create(
+                        token=token,
+                        action_by=user,
+                        action=QueueHistory.Action.CREATED,
+                        notes="Arrival confirmed via Staff QR Scanner."
+                    )
+                action_message = f"Token {token.token_number} arrival checked in!"
+
+            elif action == 'call':
+                token.status = QueueToken.Status.CALLED
+                token.called_at = now
+                if user:
+                    token.called_by = user
+                token.save()
+                QueueHistory.objects.create(
+                    token=token,
+                    action_by=user,
+                    action=QueueHistory.Action.CALLED,
+                    notes="Called via Staff QR Scanner."
+                )
+                action_message = f"Token {token.token_number} called!"
+
+            elif action == 'serve':
+                token.status = QueueToken.Status.SERVING
+                token.serving_at = now
+                token.save()
+                QueueHistory.objects.create(
+                    token=token,
+                    action_by=user,
+                    action=QueueHistory.Action.SERVING,
+                    notes="Serving started via Staff QR Scanner."
+                )
+                action_message = f"Token {token.token_number} is now SERVING!"
+
+            elif action == 'complete':
+                token.status = QueueToken.Status.COMPLETED
+                token.completed_at = now
+                token.save()
+                QueueHistory.objects.create(
+                    token=token,
+                    action_by=user,
+                    action=QueueHistory.Action.COMPLETED,
+                    notes="Completed service via Staff QR Scanner."
+                )
+                action_message = f"Token {token.token_number} marked COMPLETED!"
+
+            elif action == 'hold':
+                token.status = QueueToken.Status.ON_HOLD
+                token.save()
+                QueueHistory.objects.create(
+                    token=token,
+                    action_by=user,
+                    action=QueueHistory.Action.ON_HOLD,
+                    notes="Placed on hold via Staff QR Scanner."
+                )
+                action_message = f"Token {token.token_number} placed ON HOLD."
+
+            elif action == 'cancel':
+                token.status = QueueToken.Status.CANCELLED
+                token.save()
+                QueueHistory.objects.create(
+                    token=token,
+                    action_by=user,
+                    action=QueueHistory.Action.CANCELLED,
+                    notes="Cancelled via Staff QR Scanner."
+                )
+                action_message = f"Token {token.token_number} CANCELLED."
+
+        # Calculate current waiting position if WAITING
+        position = token.position
+        if token.status == QueueToken.Status.WAITING:
+            waiting_ids = list(QueueToken.objects.filter(
+                service=token.service,
+                status=QueueToken.Status.WAITING,
+                queue_date=token.queue_date
+            ).order_by('created_at').values_list('id', flat=True))
+            try:
+                position = waiting_ids.index(token.id) + 1
+            except ValueError:
+                position = 1
+
+        customer_name = token.user.get_full_name() or token.user.username if token.user else 'Guest Customer'
+
+        return JsonResponse({
+            'success': True,
+            'message': action_message or 'Token QR verified successfully.',
+            'is_valid_today': is_valid_today,
+            'token': {
+                'id': token.id,
+                'token_number': token.token_number,
+                'customer_name': customer_name,
+                'customer_email': token.user.email if token.user else '',
+                'service_name': token.service.name,
+                'department_name': token.service.department.name if token.service.department else 'General',
+                'branch_name': token.branch.name if token.branch else 'Main Branch',
+                'status': token.status,
+                'status_display': token.get_status_display(),
+                'booking_type': token.get_booking_type_display(),
+                'triage_level': token.get_triage_level_display(),
+                'is_priority': token.is_priority,
+                'counter_number': token.counter_number or 'Counter 1',
+                'position': position,
+                'estimated_wait_minutes': token.estimated_wait_minutes,
+                'verification_code': token.verification_code or '',
+                'queue_date': str(token.queue_date),
+                'booked_at': timezone.localtime(token.booked_at).strftime('%I:%M %p, %b %d, %Y') if token.booked_at else '',
+                'notes': token.notes or '',
+                'detail_url': reverse('queues:token_detail', kwargs={'pk': token.pk}),
+                'verify_url': reverse('queues:verify_token', kwargs={'pk': token.pk}),
+                'qr_code_url': token.qr_code.url if token.qr_code else '',
+            }
+        })
+
+
+class TokenVerificationDetailView(LoginRequiredMixin, DetailView):
+    """Standalone page displaying token verification badge and details."""
+    model = QueueToken
+    template_name = 'queues/verify_detail.html'
+    context_object_name = 'token'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        token = self.object
+        today = timezone.now().date()
+        context['is_valid_today'] = (token.queue_date == today)
+        status_classes = {
+            'WAITING': 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+            'CALLED': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+            'SERVING': 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30',
+            'COMPLETED': 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+            'CANCELLED': 'bg-rose-500/20 text-rose-400 border-rose-500/30',
+            'NO_SHOW': 'bg-slate-500/20 text-slate-400 border-slate-500/30',
+            'ON_HOLD': 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+            'SKIPPED': 'bg-slate-500/20 text-slate-400 border-slate-500/30',
+        }
+        context['status_class'] = status_classes.get(token.status, 'bg-slate-500/20 text-slate-400')
+        return context
+
 
 

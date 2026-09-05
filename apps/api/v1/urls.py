@@ -20,5 +20,7 @@ urlpatterns = [
     path('auth/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     
     # API endpoints
+    path('queues/verify/', views.QueueTokenVerifyAPIView.as_view(), name='queue_token_verify'),
     path('', include(router.urls)),
 ]
+

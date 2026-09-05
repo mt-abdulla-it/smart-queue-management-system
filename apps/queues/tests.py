@@ -320,3 +320,94 @@ class QueueEnhancementsTestCase(TestCase):
         from apps.queues.triage import PriorityQueueManager
         weight = PriorityQueueManager.calculate_effective_weight(token)
         self.assertEqual(weight, 80)  # VIP base weight is 80
+
+
+class TokenScannerAndVerificationTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.staff_user = User.objects.create_user(
+            email='staff@example.com',
+            password='Password123!',
+            role='STAFF',
+            first_name='Staff',
+            last_name='Member'
+        )
+        self.regular_user = User.objects.create_user(
+            email='user@example.com',
+            password='Password123!',
+            role='USER',
+            first_name='Regular',
+            last_name='User'
+        )
+        self.branch = Branch.objects.create(name="Central Hospital", code="CH")
+        self.department = Department.objects.create(name="OPD", branch=self.branch)
+        self.service = Service.objects.create(
+            name="General Consultation",
+            department=self.department,
+            code="GEN",
+            prefix="GEN",
+            avg_service_time_minutes=10
+        )
+        self.token = QueueToken.objects.create(
+            user=self.regular_user,
+            service=self.service,
+            branch=self.branch,
+            token_number="GEN-001",
+            status="WAITING",
+            verification_code="SCAN12345",
+            queue_date=timezone.now().date()
+        )
+
+    def test_scanner_view_access_control(self):
+        # Regular user should be redirected/denied
+        self.client.login(email='user@example.com', password='Password123!')
+        response = self.client.get(reverse('queues:scan_token'))
+        self.assertEqual(response.status_code, 302)
+
+        # Staff user should get 200 OK
+        self.client.login(email='staff@example.com', password='Password123!')
+        response = self.client.get(reverse('queues:scan_token'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Digital QR Code Token Scanner')
+
+    def test_token_verification_api_valid_token(self):
+        self.client.login(email='staff@example.com', password='Password123!')
+        # Test verification by token_number
+        response = self.client.get(reverse('queues:api_verify_token'), {'query': 'GEN-001'})
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data['success'])
+        self.assertEqual(data['token']['token_number'], 'GEN-001')
+
+        # Test verification by verification_code
+        response = self.client.get(reverse('queues:api_verify_token'), {'query': 'SCAN12345'})
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data['success'])
+
+    def test_token_verification_api_actions(self):
+        self.client.login(email='staff@example.com', password='Password123!')
+        
+        # Action: checkin
+        response = self.client.post(reverse('queues:api_verify_token'), {'query': 'GEN-001', 'action': 'checkin'})
+        self.assertEqual(response.status_code, 200)
+        self.token.refresh_from_db()
+        self.assertIn('arrival confirmed', self.token.notes)
+
+        # Action: call
+        response = self.client.post(reverse('queues:api_verify_token'), {'query': 'GEN-001', 'action': 'call'})
+        self.assertEqual(response.status_code, 200)
+        self.token.refresh_from_db()
+        self.assertEqual(self.token.status, 'CALLED')
+
+        # Verify audit history logged
+        history_actions = list(QueueHistory.objects.filter(token=self.token).values_list('action', flat=True))
+        self.assertIn(QueueHistory.Action.CALLED, history_actions)
+
+    def test_token_verification_api_invalid_query(self):
+        self.client.login(email='staff@example.com', password='Password123!')
+        response = self.client.get(reverse('queues:api_verify_token'), {'query': 'INVALID-999'})
+        self.assertEqual(response.status_code, 404)
+        data = response.json()
+        self.assertFalse(data['success'])
+

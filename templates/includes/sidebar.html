@@ -76,6 +76,12 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link {% active_link_startswith '/queues/scan/' %}" href="{% url 'queues:scan_token' %}">
+                    <i class="fas fa-qrcode"></i>
+                    <span class="nav-label">QR Token Scanner</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link {% active_link_startswith '/queues/kiosk/' %}" href="{% url 'queues:kiosk' %}" target="_blank">
                     <i class="fas fa-desktop"></i>
                     <span class="nav-label">Self-Service Kiosk</span>
@@ -111,6 +117,12 @@
                 <a class="nav-link {% active_link_startswith '/queues/display/' %}" href="{% url 'queues:live_display' %}">
                     <i class="fas fa-tv"></i>
                     <span class="nav-label">Live Display</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% active_link_startswith '/queues/scan/' %}" href="{% url 'queues:scan_token' %}">
+                    <i class="fas fa-qrcode"></i>
+                    <span class="nav-label">QR Token Scanner</span>
                 </a>
             </li>
             <li class="nav-item">
