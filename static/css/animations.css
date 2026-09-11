@@ -619,3 +619,60 @@
     border-radius: 50%;
 }
 
+/* =============================================================================
+   GLOWING LIVE PULSE & RIPPLE MICRO-ANIMATIONS
+   ============================================================================= */
+
+@keyframes pulseLiveDot {
+    0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+@keyframes pulseServingRing {
+    0% {
+        transform: scale(0.98);
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.6);
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 0 25px 8px rgba(99, 102, 241, 0.4);
+    }
+    100% {
+        transform: scale(0.98);
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.6);
+    }
+}
+
+.live-pulse-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--success, #10b981);
+    animation: pulseLiveDot 2s infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+}
+
+.serving-pulse-ring {
+    animation: pulseServingRing 3s infinite ease-in-out;
+}
+
+/* Dynamic Glass Card Lift */
+.glass-lift {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+}
+
+.glass-lift:hover {
+    transform: translateY(-6px) scale(1.015);
+    box-shadow: 0 20px 35px -10px rgba(99, 102, 241, 0.25);
+}
+
+
