@@ -7,17 +7,26 @@
 {% block extra_css %}
 <style>
     .admin-metric-card {
-        background: var(--bg-card);
-        border: 1px solid var(--border-color);
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px) saturate(180%);
+        -webkit-backdrop-filter: blur(12px) saturate(180%);
+        border: 1px solid rgba(226, 232, 240, 0.8);
         border-radius: var(--radius-lg);
         padding: 1.5rem;
         transition: all var(--transition-spring);
         position: relative;
         overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    }
+    [data-bs-theme="dark"] .admin-metric-card {
+        background: rgba(30, 41, 59, 0.75);
+        border-color: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     }
     .admin-metric-card:hover {
-        transform: translateY(-4px) scale(1.01);
+        transform: translateY(-5px) scale(1.015);
         box-shadow: var(--shadow-xl);
+        border-color: var(--primary-light);
     }
     .metric-icon-box {
         width: 56px;
